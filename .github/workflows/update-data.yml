@@ -37,6 +37,11 @@ jobs:
         run: python scripts/fetch_estat.py $EXTRA_ARGS
         continue-on-error: true
 
+      - name: Fetch FTE data from e-Stat API
+        if: ${{ env.ESTAT_APP_ID != '' }}
+        run: python scripts/fetch_fte.py
+        continue-on-error: true
+
       - name: Warn when ESTAT_APP_ID is missing
         if: ${{ env.ESTAT_APP_ID == '' }}
         run: |
