@@ -110,18 +110,54 @@ def discover_table(client: EstatClient, spec: dict, name: str) -> str | None:
     except Exception as e:  # pyestat/e-Stat 側の想定外レスポンス形状も系列単位で吸収する
         raise EstatError(f"{name}: 統計表の検索に失敗しました（{type(e).__name__}: {e}）") from e
     pattern = re.compile(spec.get("title_regex", ""))
+    title_exclude = spec.get("title_exclude", [])
+    candidates = []
     for table in resp.tables:
         title = table.get("TITLE")
         if isinstance(title, dict):
             title = title.get("$", "")
         title = str(title)
         stat_name = str(table.get("STATISTICS_NAME", ""))
+        combined = f"{stat_name} {title}"
+        if any(e in combined for e in title_exclude):
+            continue
         if pattern.search(title) or pattern.search(stat_name):
-            table_id = str(table.get("@id", ""))
-            print(f"  [{name}] 発見: {table_id} — {stat_name} / {title}")
+            candidates.append((str(table.get("@id", "")), stat_name, title))
+    if not candidates:
+        print(f"  [{name}] title_regex に合う表が見つかりません（候補 {len(resp.tables)} 件）")
+        return None
+    # 「長期累年」表があれば単位表記の変わり目が少なく信頼できるため優先する
+    for table_id, stat_name, title in candidates:
+        if "長期累年" in stat_name or "長期累年" in title:
+            print(f"  [{name}] 発見（長期累年を優先）: {table_id} — {stat_name} / {title}")
             return table_id
-    print(f"  [{name}] title_regex に合う表が見つかりません（候補 {len(resp.tables)} 件）")
-    return None
+    table_id, stat_name, title = candidates[0]
+    print(f"  [{name}] 発見: {table_id} — {stat_name} / {title}")
+    return table_id
+
+
+def check_plausible(name: str, by_year: dict[int, float]) -> None:
+    """隣接年の急激な跳躍（単位の混在を示唆）を検知して採用を拒否する。
+
+    畜産統計は年10%前後の変動が普通で、年ギャップが空いていても実際の
+    水準は大きく変わらない。数十〜数百倍の跳躍は「累年統計表の途中で
+    単位表記（千羽/万羽など）が変わっている」典型的な事故なので、
+    黙って公開データに混ぜないようここで弾く。
+    """
+    years = sorted(by_year)
+    for a, b in zip(years, years[1:]):
+        va, vb = by_year[a], by_year[b]
+        if not va or not vb:
+            continue
+        ratio = vb / va
+        bound = 1.5 ** max(b - a, 1)
+        if ratio > bound or ratio < 1 / bound:
+            raise EstatError(
+                f"{name}: {a}年→{b}年で {va:.4g} → {vb:.4g}（比率 {ratio:.3g}）という"
+                " 不自然な跳躍があり、統計表内で単位が変わっている疑いがあるため採用を"
+                " 見送ります。config/tables.toml の match/exclude・stats_data_id を"
+                " 見直すか、対象期間を絞ってください。"
+            )
 
 
 def fetch_series(client: EstatClient, name: str, spec: dict) -> dict[int, float]:
@@ -175,6 +211,7 @@ def fetch_series(client: EstatClient, name: str, spec: dict) -> dict[int, float]
     if not by_year:
         hint = f"（見つかった単位: {', '.join(sorted(skipped_units))}）" if skipped_units else ""
         raise EstatError(f"{name}: 条件に合う行がありません（表 {table_id}、{len(rows)} 行）{hint}。")
+    check_plausible(name, by_year)
     return by_year
 
 

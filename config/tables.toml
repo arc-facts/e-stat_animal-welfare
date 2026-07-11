@@ -42,6 +42,7 @@ file = "livestock.csv"
 description = "ブロイラー 飼養羽数"
 stats_data_id = ""
 title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
+title_exclude = ["規模別"]
 match = ["飼養羽数"]
 exclude = ["規模", "出荷"]
 unit = "千羽"
@@ -55,6 +56,7 @@ file = "livestock.csv"
 description = "ブロイラー 飼養戸数"
 stats_data_id = ""
 title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
+title_exclude = ["規模別"]
 match = ["飼養戸数"]
 exclude = ["規模", "出荷"]
 unit = "戸"
@@ -66,11 +68,11 @@ searchWord = "ブロイラー 累年 飼養戸数 羽数"
 [series.pigs_thousand]
 file = "livestock.csv"
 description = "豚 飼養頭数（総数）"
-# 「畜産統計調査 確報累年統計表 3 豚 飼養戸数・頭数（全国）」
-stats_data_id = "0003238287"
-title_regex = "豚.*累年|豚.*飼養戸数・頭数"
-match = ["飼養頭数", "計"]
-exclude = ["規模", "子取り", "肥育", "種おす", "経営タイプ"]
+stats_data_id = ""
+title_regex = "豚.*(累年|飼養戸数・頭数)"
+title_exclude = ["規模別"]
+match = ["飼養頭数"]
+exclude = ["規模", "子取り", "肥育", "種おす", "経営タイプ", "小計", "6か月", "6カ月"]
 unit = "千頭"
 
 [series.pigs_thousand.search]
@@ -80,10 +82,11 @@ searchWord = "豚 累年 飼養戸数 頭数"
 [series.sows_thousand]
 file = "livestock.csv"
 description = "子取り用めす豚（母豚）頭数"
-stats_data_id = "0003238287"
-title_regex = "豚.*累年|豚.*飼養戸数・頭数"
+stats_data_id = ""
+title_regex = "豚.*(累年|飼養戸数・頭数)"
+title_exclude = ["規模別"]
 match = ["子取り用めす豚"]
-exclude = ["規模"]
+exclude = ["規模", "小計"]
 unit = "千頭"
 
 [series.sows_thousand.search]
@@ -93,10 +96,11 @@ searchWord = "豚 累年 飼養戸数 頭数"
 [series.pig_farms]
 file = "livestock.csv"
 description = "豚 飼養戸数"
-stats_data_id = "0003238287"
-title_regex = "豚.*累年|豚.*飼養戸数・頭数"
+stats_data_id = ""
+title_regex = "豚.*(累年|飼養戸数・頭数)"
+title_exclude = ["規模別"]
 match = ["飼養戸数"]
-exclude = ["規模", "経営タイプ", "子取り", "肥育"]
+exclude = ["規模", "経営タイプ", "子取り", "肥育", "小計"]
 unit = "戸"
 
 [series.pig_farms.search]
@@ -109,11 +113,11 @@ searchWord = "豚 累年 飼養戸数 頭数"
 [series.broilers_slaughtered_thousand]
 file = "slaughter.csv"
 description = "ブロイラー（肉用若鶏）処理羽数"
-# 「食鳥流通統計調査 食鳥の処理羽数及び処理重量 年次」
-stats_data_id = "0002066172"
-title_regex = "食鳥.*処理羽数"
-match = ["肉用若鶏", "処理羽数"]
-exclude = ["重量", "規模"]
+stats_data_id = ""
+title_regex = "食鳥.*処理"
+title_exclude = ["規模別", "月別"]
+match = ["肉用若鶏"]
+exclude = ["重量", "規模", "戸数", "月"]
 unit = "千羽"
 
 [series.broilers_slaughtered_thousand.search]
@@ -123,10 +127,11 @@ searchWord = "食鳥 処理羽数 年次"
 [series.layers_culled_thousand]
 file = "slaughter.csv"
 description = "廃鶏（成鶏）処理羽数"
-stats_data_id = "0002066172"
-title_regex = "食鳥.*処理羽数"
-match = ["廃鶏", "処理羽数"]
-exclude = ["重量", "規模"]
+stats_data_id = ""
+title_regex = "食鳥.*処理"
+title_exclude = ["規模別", "月別"]
+match = ["廃鶏"]
+exclude = ["重量", "規模", "戸数", "月"]
 unit = "千羽"
 
 [series.layers_culled_thousand.search]
@@ -137,9 +142,10 @@ searchWord = "食鳥 処理羽数 年次"
 file = "slaughter.csv"
 description = "豚 と畜頭数"
 stats_data_id = ""
-title_regex = "と畜.*頭数"
+title_regex = "と畜頭数"
+title_exclude = ["規模別", "と畜場数", "月別"]
 match = ["豚"]
-exclude = ["規模", "都道府県", "月別"]
+exclude = ["規模", "都道府県", "月別", "場数"]
 unit = "千頭"
 
 [series.pigs_slaughtered_thousand.search]
