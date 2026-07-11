@@ -4,6 +4,12 @@ on:
   push:
     branches: [main, claude/animal-welfare-stats-graphs-fi6o3g]
   workflow_dispatch:
+  # update-data.yml が確報値をコミットした後にも自動で再デプロイする。
+  # （GitHub Actions の bot による push は push イベントを発火しないため、
+  #  データ更新ワークフローの完了を workflow_run で受けて連鎖させる）
+  workflow_run:
+    workflows: ["Update data from e-Stat"]
+    types: [completed]
 
 permissions:
   contents: read
