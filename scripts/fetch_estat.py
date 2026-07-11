@@ -258,6 +258,44 @@ def run_discover(client: EstatClient, config: dict) -> None:
             print(f"  {table.get('@id')}  {table.get('STATISTICS_NAME','')} / {title}")
 
 
+def run_search(client: EstatClient, keyword: str) -> None:
+    """config/tables.toml に系列を定義する前に、任意のキーワードで統計表を
+    探索するための使い捨てコマンド（新しい統計調査の実在確認・表ID特定用）。
+    """
+    print(f"\n=== 検索: {keyword!r} ===")
+    try:
+        resp = client.list_stats(searchWord=keyword, limit=30)
+    except Exception as e:
+        print(f"  検索失敗: {type(e).__name__}: {e}", file=sys.stderr)
+        return
+    for table in resp.tables:
+        title = table.get("TITLE")
+        if isinstance(title, dict):
+            title = title.get("$", "")
+        print(f"  {table.get('@id')}  {table.get('STATISTICS_NAME','')} / {title}")
+
+
+def run_peek_table(client: EstatClient, table_id: str, limit: int) -> None:
+    """config/tables.toml に系列を定義する前に、任意の表IDの生の行を見る。"""
+    resp = client.get_stats_data(table_id)
+    rows = resp.to_flat()
+    print(f"\n=== 表 {table_id}、{len(rows)} 行 ===")
+    seen_combo = set()
+    shown = 0
+    for row in rows:
+        text = row_label_text(row)
+        unit = str(row.get("unit", ""))
+        combo = (text, unit)
+        if combo in seen_combo:
+            continue
+        seen_combo.add(combo)
+        print(f"  [{unit}] {text}")
+        shown += 1
+        if shown >= limit:
+            print(f"  …以下省略（--peek-limit で表示件数を増やせます、重複除去後 {len(seen_combo)}+ 件）")
+            break
+
+
 def run_peek(client: EstatClient, config: dict, name: str, limit: int) -> None:
     """指定した系列が使う表を実際に取得し、行ラベル・単位の実物を表示する。
 
@@ -297,6 +335,8 @@ def main() -> int:
     parser.add_argument("--only", action="append", help="指定した系列のみ更新（複数可）")
     parser.add_argument("--peek", action="append", help="指定した系列の表を実際に取得し行ラベル・単位を表示して終了（複数可）")
     parser.add_argument("--peek-limit", type=int, default=60, help="--peek で表示する行数の上限（重複除去後）")
+    parser.add_argument("--search", action="append", help="任意のキーワードで統計表を検索して終了（config未定義の調査用、複数可）")
+    parser.add_argument("--peek-table", action="append", help="任意の表IDの生の行ラベル・単位を表示して終了（config未定義の調査用、複数可）")
     args = parser.parse_args()
 
     app_id = os.environ.get("ESTAT_APP_ID", "").strip()
@@ -315,6 +355,16 @@ def main() -> int:
     if args.peek:
         for name in args.peek:
             run_peek(client, config, name, args.peek_limit)
+        return 0
+
+    if args.search:
+        for keyword in args.search:
+            run_search(client, keyword)
+        return 0
+
+    if args.peek_table:
+        for table_id in args.peek_table:
+            run_peek_table(client, table_id, args.peek_limit)
         return 0
 
     failures = []
