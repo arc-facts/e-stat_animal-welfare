@@ -44,10 +44,23 @@ def ratio_series(
     return out
 
 
+def total_series(table: dict[int, dict[str, float]]) -> list[list[float]]:
+    """犬猫殺処分の合計系列。total 列があればそれを、無ければ dogs+cats を使う。"""
+    out = []
+    for y in sorted(table):
+        row = table[y]
+        if "total" in row:
+            out.append([y, row["total"]])
+        elif "dogs" in row or "cats" in row:
+            out.append([y, row.get("dogs", 0) + row.get("cats", 0)])
+    return out
+
+
 def main() -> None:
     livestock = read_csv("livestock.csv")
     slaughter = read_csv("slaughter.csv")
     population = read_csv("population.csv")
+    euthanasia = read_csv("euthanasia.csv")
     meta = json.loads((DATA_DIR / "meta.json").read_text(encoding="utf-8"))
 
     data = {
@@ -65,6 +78,12 @@ def main() -> None:
             "broilers": series(slaughter, "broilers_slaughtered_thousand"),
             "layers_culled": series(slaughter, "layers_culled_thousand"),
             "pigs": series(slaughter, "pigs_slaughtered_thousand"),
+        },
+        # 犬猫の殺処分数（実数・頭）— 環境省。合計と、判明している年の犬・猫内訳
+        "euthanasia": {
+            "total": total_series(euthanasia),
+            "dogs": series(euthanasia, "dogs"),
+            "cats": series(euthanasia, "cats"),
         },
         # 1戸（経営体）当たり飼養数（羽・頭）
         "per_farm": {

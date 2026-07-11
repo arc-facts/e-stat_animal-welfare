@@ -13,6 +13,7 @@
   --pigs: #f0980a;     /* 豚 */
   --sows: #0a9a2e;     /* 母豚 */
   --population: #8a93a3; /* 人口（文脈系列） */
+  --dogcat: #a8338c;   /* 犬猫（殺処分・比較用） */
   --notice-bg: #fff6e0;
 
   /* ネイティブUI（スクロールバー・フォームのアクセント色等）をシステム設定に
@@ -36,6 +37,7 @@
     --broilers: #199e70;
     --pigs: #c98500;
     --sows: #008300;
+    --dogcat: #c96bb0;
     --notice-bg: #2a2416;
   }
 }
@@ -114,8 +116,19 @@ section > .desc { color: var(--ink-2); font-size: 0.92rem; margin: 0 0 16px; max
 .legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 8px 2px 2px; font-size: 0.82rem; color: var(--ink-2); }
 .legend .item { display: inline-flex; align-items: center; gap: 6px; }
 .legend .swatch { width: 14px; height: 3px; border-radius: 2px; }
+.legend .swatch.sq { width: 12px; height: 12px; border-radius: 3px; }
 
 .multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+
+/* ---- 種別比較（面積比の帯グラフ）---- */
+#chart-species svg { border-radius: 6px; overflow: hidden; }
+.species-legend { gap: 10px 18px; }
+.species-note {
+  margin: 12px 0 2px; font-size: 0.9rem; line-height: 1.7;
+  color: var(--ink-2); border-left: 3px solid var(--dogcat);
+  padding: 6px 0 6px 12px; background: transparent;
+}
+.empty-note { color: var(--muted); font-size: 0.85rem; padding: 24px 4px; text-align: center; }
 
 .tooltip {
   position: absolute;

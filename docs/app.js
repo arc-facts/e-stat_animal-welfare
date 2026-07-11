@@ -8,7 +8,7 @@
     css = getComputedStyle(document.documentElement);
     return {
       layers: v("--layers"), broilers: v("--broilers"), pigs: v("--pigs"),
-      sows: v("--sows"), population: v("--population"),
+      sows: v("--sows"), population: v("--population"), dogcat: v("--dogcat"),
       grid: v("--grid"), axis: v("--axis"), surface: v("--surface"),
       ink: v("--ink"), ink2: v("--ink-2"), muted: v("--muted")
     };
@@ -23,6 +23,15 @@
   }
   function trim(s) { return s.indexOf(".") >= 0 ? s.replace(/\.?0+$/, "") : s; }
   function fmtPlain(x) { return Math.round(x).toLocaleString("ja-JP"); }
+
+  /* 軸ラベル用: 実数（1羽・1頭・1人単位）を億・万の日本語表記にする。
+     引数は「百万」単位（飼養数チャートの内部スケール）。 */
+  function axisCount(million) {
+    var n = million * 1e6;
+    if (n === 0) return "0";
+    if (n >= 1e8) return trim((n / 1e8).toFixed(1)) + "億";
+    return trim((n / 1e4).toFixed(0)) + "万";
+  }
 
   function last(series) { return series[series.length - 1]; }
   function prev(series) { return series[series.length - 2]; }
@@ -172,7 +181,7 @@
         g.setAttribute("visibility", "visible");
         html += '<div class="t-row"><span class="t-name"><span class="dot" style="background:' +
           s.color + '"></span>' + s.name + '</span><span class="t-val">' +
-          opts.tipFmt(val) + "</span></div>";
+          opts.tipFmt(val, s) + "</span></div>";
       });
       tip.innerHTML = html;
       tip.style.display = "block";
@@ -231,7 +240,7 @@
     var body = years.map(function (year) {
       return "<tr><td>" + year + "</td>" + series.map(function (s) {
         var val = atYear(s.data, year);
-        return "<td>" + (val == null ? "—" : opts.tipFmt(val)) + "</td>";
+        return "<td>" + (val == null ? "—" : opts.tipFmt(val, s)) + "</td>";
       }).join("") + "</tr>";
     }).join("");
     det.innerHTML = "<summary>データを表で見る</summary><table><thead>" + head + "</thead><tbody>" + body + "</tbody></table>";
@@ -250,17 +259,96 @@
     parent.appendChild(d);
   }
 
+  /* ---------- 種別の年間屠殺・殺処分数の比較（面積比） ---------- */
+  function renderSpecies(d, C) {
+    var host = document.getElementById("chart-species");
+    var noteEl = document.getElementById("species-note");
+    var subEl = document.getElementById("species-sub");
+    if (!host) return;
+    var sl = d.slaughter || {}, eu = d.euthanasia || {};
+    function latest(s) { return s && s.length ? last(s) : null; }
+    var b = latest(sl.broilers), l = latest(sl.layers_culled), p = latest(sl.pigs), dc = latest(eu.total);
+    var items = [];
+    if (b) items.push({ name: "ブロイラー", color: C.broilers, year: b[0], animals: b[1] * 1000, unit: "羽" });
+    if (l) items.push({ name: "廃鶏（採卵鶏）", color: C.layers, year: l[0], animals: l[1] * 1000, unit: "羽" });
+    if (p) items.push({ name: "豚", color: C.pigs, year: p[0], animals: p[1] * 1000, unit: "頭" });
+    if (dc) items.push({ name: "犬猫（殺処分）", color: C.dogcat, year: dc[0], animals: dc[1], unit: "頭" });
+    if (!items.length) { host.innerHTML = ""; if (noteEl) noteEl.textContent = ""; return; }
+
+    var total = items.reduce(function (a, it) { return a + it.animals; }, 0);
+    var years = items.map(function (it) { return it.year; });
+    var minY = Math.min.apply(null, years), maxY = Math.max.apply(null, years);
+    if (subEl) subEl.textContent =
+      "各種の最新確報年（" + (minY === maxY ? maxY + "年" : minY + "〜" + maxY + "年") +
+      "） / 出典: 畜産物流通調査（と畜・食鳥流通統計）・環境省";
+
+    // 100%積み上げ帯（面積＝実数の割合）
+    var W = 1000, H = 72, gap = 2, x = 0;
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" preserveAspectRatio="none" ' +
+      'aria-label="種別の年間屠殺・殺処分数の割合の帯グラフ" style="width:100%;height:' + H + 'px;display:block">';
+    items.forEach(function (it) {
+      var w = it.animals / total * W, share = it.animals / total * 100;
+      var ww = Math.max(w - gap, 0.5);
+      svg += '<rect x="' + x.toFixed(3) + '" y="0" width="' + ww.toFixed(3) + '" height="' + H + '" fill="' + it.color + '"></rect>';
+      if (w > 70) {
+        svg += '<text x="' + (x + 12) + '" y="' + (H / 2 - 3) + '" font-size="15" font-weight="600" fill="#fff">' + it.name + '</text>';
+        svg += '<text x="' + (x + 12) + '" y="' + (H / 2 + 17) + '" font-size="13" fill="rgba(255,255,255,.88)">' + trim(share.toFixed(1)) + '%</text>';
+      }
+      x += w;
+    });
+    svg += '</svg>';
+
+    // 凡例（実数と割合）
+    var lg = '<div class="legend species-legend">';
+    items.forEach(function (it) {
+      var share = it.animals / total * 100;
+      var shareTxt = share < 0.01 ? "0.001%未満" : trim(share.toFixed(share < 1 ? 2 : 1)) + "%";
+      lg += '<span class="item"><span class="swatch sq" style="background:' + it.color + '"></span>' +
+        it.name + '（' + it.year + '年）: ' + fmtCount(it.animals / 1000, it.unit) + ' ・ ' + shareTxt + '</span>';
+    });
+    lg += '</div>';
+
+    // 表ビュー
+    var tbl = '<details class="table-view"><summary>データを表で見る</summary><table><thead>' +
+      '<tr><th>種類</th><th>年</th><th>数</th><th>割合</th></tr></thead><tbody>';
+    items.forEach(function (it) {
+      var share = it.animals / total * 100;
+      tbl += '<tr><td>' + it.name + '</td><td>' + it.year + '</td><td>' +
+        fmtCount(it.animals / 1000, it.unit) + '</td><td>' +
+        (share < 0.01 ? "0.001%未満" : trim(share.toFixed(2)) + "%") + '</td></tr>';
+    });
+    tbl += '</tbody></table></details>';
+
+    host.innerHTML = svg + lg + tbl;
+
+    if (noteEl) {
+      if (dc && b) {
+        var ratio = (b[1] * 1000) / dc[1];
+        var ratioTxt = ratio >= 10000 ? "約" + fmtPlain(Math.round(ratio / 10000)) + "万倍"
+          : "約" + fmtPlain(Math.round(ratio)) + "倍";
+        noteEl.innerHTML = "犬猫の殺処分数（" + fmtCount(dc[1] / 1000, "頭") + "・" + dc[0] +
+          "年度）は、この帯グラフでは幅0.001%未満で目には見えません。ブロイラー1種だけで、" +
+          "その" + ratioTxt + "が1年間に殺されています。社会的な関心が集まる犬猫の殺処分に対し、" +
+          "その何万倍もの畜産動物が屠殺されていることが分かります。";
+      } else if (!p) {
+        noteEl.textContent = "※豚のと畜頭数は確報値を取得中のため、集計に含めていません。";
+      } else {
+        noteEl.textContent = "";
+      }
+    }
+  }
+
   var DATA = null;
 
   function render() {
     var d = DATA, C = colors();
     var inv = d.inventory, sl = d.slaughter;
 
-    /* 暫定データ注記 */
+    /* データ注記: 確報のみ・未取得年は空欄 */
     if (d.meta && d.meta.provisional) {
       document.getElementById("provisional-notice").hidden = false;
       document.getElementById("meta-note").textContent =
-        "現在のグラフは公表資料から整理した暫定値を含みます。e-Stat APIによる確定値取得後に自動で置き換わります。";
+        "確報値のみを掲載しています。未取得・未公表の年次は空欄です（推計値では補完していません）。";
     } else if (d.meta && d.meta.generated_at) {
       document.getElementById("meta-note").textContent =
         "データ取得日時: " + d.meta.generated_at + "（e-Stat API）";
@@ -296,27 +384,34 @@
     kpi("豚", inv.pigs, "頭", C.pigs, "うち母豚 " + fmtCount(last(inv.sows)[1], "頭"));
     kpi("日本の人口", inv.population, "人", C.population);
 
-    /* 飼養数チャート（百万単位）— 鶏（羽）と豚（頭）は単位・規模が大きく
-       異なるため別グラフに分け、両方に人口を対比の基準線として表示する */
+    /* 飼養数チャート — 鶏（羽）と豚（頭）は単位・規模が大きく異なるため別グラフに
+       分け、両方に人口を対比の基準線として表示する。軸・ツールチップは「百万」
+       ではなく実数（1羽・1頭・1人単位）で表記してスケールを直感的に伝える。
+       内部のスケール計算は百万単位で行う（値は千 → /1000 で百万）。 */
     function toMillion(series) { return series.map(function (p) { return [p[0], p[1] / 1000]; }); }
+    // 系列に応じて羽/頭/人の単位でツールチップ・表を表示する（値は百万単位）
+    function countTip(val, s) {
+      var unit = s && s.unit ? s.unit : "";
+      return fmtCount(val * 1000, unit);
+    }
     lineChart(document.getElementById("chart-inventory-birds"), {
       ariaLabel: "採卵鶏・ブロイラーの飼養数と日本の人口の推移",
       series: [
-        { name: "採卵鶏", color: C.layers, data: toMillion(inv.layers) },
-        { name: "ブロイラー", color: C.broilers, data: toMillion(inv.broilers) },
-        { name: "日本の人口", color: C.population, data: toMillion(inv.population), context: true }
+        { name: "採卵鶏", color: C.layers, unit: "羽", data: toMillion(inv.layers) },
+        { name: "ブロイラー", color: C.broilers, unit: "羽", data: toMillion(inv.broilers) },
+        { name: "日本の人口", color: C.population, unit: "人", data: toMillion(inv.population), context: true }
       ],
-      yFmt: function (t) { return fmtPlain(t); },
-      tipFmt: function (val) { return trim(val.toFixed(1)) + "百万"; }
+      yFmt: axisCount,
+      tipFmt: countTip
     });
     lineChart(document.getElementById("chart-inventory-pigs"), {
       ariaLabel: "豚の飼養頭数と日本の人口の推移",
       series: [
-        { name: "豚", color: C.pigs, data: toMillion(inv.pigs) },
-        { name: "日本の人口", color: C.population, data: toMillion(inv.population), context: true }
+        { name: "豚", color: C.pigs, unit: "頭", data: toMillion(inv.pigs) },
+        { name: "日本の人口", color: C.population, unit: "人", data: toMillion(inv.population), context: true }
       ],
-      yFmt: function (t) { return fmtPlain(t); },
-      tipFmt: function (val) { return trim(val.toFixed(1)) + "百万"; }
+      yFmt: axisCount,
+      tipFmt: countTip
     });
 
     /* 母豚チャート（万頭） */
@@ -327,6 +422,9 @@
       yFmt: function (t) { return fmtPlain(t); },
       tipFmt: function (val) { return trim(val.toFixed(1)) + "万頭"; }
     });
+
+    /* 種別の屠殺数比較（面積比） */
+    renderSpecies(d, C);
 
     /* 屠殺数 — スモールマルチプル */
     var sm = document.getElementById("chart-slaughter");
@@ -346,30 +444,37 @@
       chart.className = "chart";
       card.appendChild(chart);
       sm.appendChild(card);
+      if (!spec.data || !spec.data.length) {
+        chart.innerHTML = '<p class="empty-note">確報値を取得中です（確定値が未取得の年は空欄）。</p>';
+        return;
+      }
       lineChart(chart, {
         ariaLabel: spec.name + "の年間処理数の推移",
         compact: true, width: 340, height: 200, area: true,
-        series: [{ name: spec.name, color: spec.color, data: spec.data }],
+        series: [{ name: spec.name, color: spec.color, unit: spec.unit, data: spec.data }],
         yFmt: function (t) { return t >= 100000 ? trim((t / 100000).toFixed(1)) + "億" : (t >= 10 ? fmtPlain(t / 10) + "万" : t); },
         tipFmt: function (val) { return fmtCount(val, spec.unit); }
       });
     });
 
-    /* 1戸当たり（2000年=100の指数） */
-    function indexed(series) {
-      var base = series.length ? series[0][1] : 1;
-      return series.map(function (p) { return [p[0], p[1] / base * 100]; });
-    }
+    /* 1戸当たり飼養数（実数）— 単位が異なる鶏（羽/戸）と豚（頭/戸）を別グラフに分ける */
     var pf = d.per_farm;
-    lineChart(document.getElementById("chart-perfarm"), {
-      ariaLabel: "1戸当たり飼養数の伸び（2000年を100とした指数）",
+    function per10k(t) { return t >= 10000 ? trim((t / 10000).toFixed(1)) + "万" : fmtPlain(t); }
+    lineChart(document.getElementById("chart-perfarm-birds"), {
+      ariaLabel: "鶏の1戸当たり飼養羽数の推移",
       series: [
-        { name: "採卵鶏", color: C.layers, data: indexed(pf.layers) },
-        { name: "ブロイラー", color: C.broilers, data: indexed(pf.broilers) },
-        { name: "豚", color: C.pigs, data: indexed(pf.pigs) }
+        { name: "採卵鶏", color: C.layers, unit: "羽", data: pf.layers },
+        { name: "ブロイラー", color: C.broilers, unit: "羽", data: pf.broilers }
       ],
+      yFmt: per10k,
+      tipFmt: function (val) { return fmtPlain(Math.round(val)) + "羽/戸"; }
+    });
+    lineChart(document.getElementById("chart-perfarm-pigs"), {
+      ariaLabel: "豚の1戸当たり飼養頭数の推移",
+      series: [{ name: "豚", color: C.pigs, unit: "頭", data: pf.pigs }],
+      area: true,
       yFmt: fmtPlain,
-      tipFmt: function (val) { return fmtPlain(val) + "（2000年=100）"; }
+      tipFmt: function (val) { return fmtPlain(Math.round(val)) + "頭/戸"; }
     });
 
     var pt = document.getElementById("perfarm-tiles");

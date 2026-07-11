@@ -19,8 +19,9 @@
     国内のアニマルウェルフェアを考えるための基礎資料です。
   </p>
   <p class="notice" id="provisional-notice" hidden>
-    ⚠️ 現在表示しているのは公表資料から整理した<strong>暫定データ</strong>です（一部の年次は概数）。
-    e-Stat API による確定値への自動更新は準備中です。詳細は
+    掲載している数値は政府統計の<strong>確報値</strong>です。確定値が未取得・未公表の
+    年次は、推計で埋めず<strong>空欄</strong>にしています（グラフは線が途切れ、表は「—」で表示）。
+    一部の系列は e-Stat API からの自動取得を順次進めています。詳細は
     <a href="https://github.com/A-Watahiki/e-stat_animal-welfare/blob/HEAD/data/README.md">データについて</a>をご覧ください。
   </p>
 </header>
@@ -42,12 +43,12 @@
       豚は単位（頭）も規模も鶏（羽）と大きく異なるため、グラフを分けています。
     </p>
     <div class="card">
-      <h3>鶏の飼養数と日本の人口（百万羽・人）</h3>
+      <h3>鶏の飼養数と日本の人口（実数：羽・人）</h3>
       <p class="sub">各年2月1日現在（人口は10月1日現在） / 出典: 畜産統計調査・人口推計</p>
       <div class="chart" id="chart-inventory-birds"></div>
     </div>
     <div class="card" style="margin-top:12px">
-      <h3>豚の飼養頭数と日本の人口（百万頭・人）</h3>
+      <h3>豚の飼養頭数と日本の人口（実数：頭・人）</h3>
       <p class="sub">各年2月1日現在（人口は10月1日現在） / 出典: 畜産統計調査・人口推計</p>
       <div class="chart" id="chart-inventory-pigs"></div>
     </div>
@@ -74,21 +75,34 @@
       日本の人口の約6倍にあたる鶏が、生後およそ50日で出荷されています。
       採卵鶏も卵を産む量が落ちる1〜2年で「廃鶏」として処理されます。
     </p>
+    <div class="card">
+      <h3>1年間に殺される動物の数（種類別の割合）</h3>
+      <p class="sub" id="species-sub">出典: 畜産物流通調査・環境省</p>
+      <div class="chart" id="chart-species"></div>
+      <p class="species-note" id="species-note"></p>
+    </div>
+    <p class="desc" style="margin-top:28px">それぞれの年次推移は以下の通りです。</p>
     <div class="multiples" id="chart-slaughter"></div>
   </section>
 
   <section>
-    <h2>集約化 — 1戸当たりの飼養数はこの四半世紀で数倍に</h2>
+    <h2>集約化 — 1戸当たりの飼養数はこの数十年で数倍に</h2>
     <p class="desc">
       飼育する農家（経営体）の数は減り続ける一方、動物の数はほぼ減っていません。
       つまり1戸当たりの飼養数が急増し、少人数で大量の動物を管理する
-      集約的（工場式）畜産への移行が進んでいます。
+      集約的（工場式）畜産への移行が進んでいます。単位が異なるため鶏（羽）と
+      豚（頭）でグラフを分けています。
       ※畜産統計に従業員数の系列がないため「1戸（経営体）当たり」で示しています。
     </p>
     <div class="card">
-      <h3>1戸当たり飼養数の伸び（2000年 = 100）</h3>
-      <p class="sub">飼養数 ÷ 飼養戸数を2000年を100として指数化 / 出典: 畜産統計調査</p>
-      <div class="chart" id="chart-perfarm"></div>
+      <h3>鶏 1戸当たり飼養羽数（羽/戸）</h3>
+      <p class="sub">飼養羽数 ÷ 飼養戸数 / 出典: 畜産統計調査</p>
+      <div class="chart" id="chart-perfarm-birds"></div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h3>豚 1戸当たり飼養頭数（頭/戸）</h3>
+      <p class="sub">飼養頭数 ÷ 飼養戸数 / 出典: 畜産統計調査</p>
+      <div class="chart" id="chart-perfarm-pigs"></div>
     </div>
     <div class="tiles" id="perfarm-tiles"></div>
   </section>
