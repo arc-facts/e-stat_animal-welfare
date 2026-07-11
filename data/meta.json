@@ -1,6 +1,6 @@
 {
   "provisional": true,
-  "generated_at": "2026-07-11T04:11:47+00:00",
+  "generated_at": "2026-07-11T04:14:43+00:00",
   "note": "このデータは公表資料から手作業で整理した暫定シードデータです。scripts/fetch_estat.py を ESTAT_APP_ID 付きで実行すると e-Stat API の値で上書きされ、provisional が false になります。",
   "sources": {
     "livestock": "農林水産省「畜産統計調査」（統計コード 00500222）",
