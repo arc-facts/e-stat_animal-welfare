@@ -17,7 +17,7 @@ description = "採卵鶏 成鶏めす飼養羽数（種鶏を除く）"
 stats_data_id = ""
 title_regex = "採卵鶏.*(累年|飼養戸数・羽数)"
 match = ["成鶏めす", "羽数"]
-exclude = ["種鶏", "規模", "ひな"]
+exclude = ["種鶏", "規模", "ひな", "1戸当たり", "１戸当たり"]
 unit = "千羽"
 
 [series.layers_thousand.search]
@@ -30,7 +30,7 @@ description = "採卵鶏 飼養戸数"
 stats_data_id = ""
 title_regex = "採卵鶏.*(累年|飼養戸数・羽数)"
 match = ["飼養戸数"]
-exclude = ["種鶏", "規模", "成鶏めす", "ひな"]
+exclude = ["種鶏", "規模", "成鶏めす", "ひな", "1戸当たり", "１戸当たり"]
 unit = "戸"
 
 [series.layer_farms.search]
@@ -44,7 +44,7 @@ stats_data_id = ""
 title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
 title_exclude = ["規模別"]
 match = ["飼養羽数"]
-exclude = ["規模", "出荷"]
+exclude = ["規模", "出荷", "1戸当たり", "１戸当たり"]
 unit = "千羽"
 
 [series.broilers_thousand.search]
@@ -58,7 +58,7 @@ stats_data_id = ""
 title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
 title_exclude = ["規模別"]
 match = ["飼養戸数"]
-exclude = ["規模", "出荷"]
+exclude = ["規模", "出荷", "1戸当たり", "１戸当たり"]
 unit = "戸"
 
 [series.broiler_farms.search]
@@ -72,7 +72,7 @@ stats_data_id = ""
 title_regex = "豚.*(累年|飼養戸数・頭数)"
 title_exclude = ["規模別"]
 match = ["飼養頭数"]
-exclude = ["規模", "子取り", "肥育", "種おす", "経営タイプ", "小計", "6か月", "6カ月"]
+exclude = ["規模", "子取り", "肥育", "種おす", "経営タイプ", "小計", "6か月", "6カ月", "6ヶ月", "1戸当たり", "１戸当たり"]
 unit = "千頭"
 
 [series.pigs_thousand.search]
@@ -86,7 +86,7 @@ stats_data_id = ""
 title_regex = "豚.*(累年|飼養戸数・頭数)"
 title_exclude = ["規模別"]
 match = ["子取り用めす豚"]
-exclude = ["規模", "小計"]
+exclude = ["規模", "小計", "1戸当たり", "１戸当たり"]
 unit = "千頭"
 
 [series.sows_thousand.search]
@@ -100,7 +100,7 @@ stats_data_id = ""
 title_regex = "豚.*(累年|飼養戸数・頭数)"
 title_exclude = ["規模別"]
 match = ["飼養戸数"]
-exclude = ["規模", "経営タイプ", "子取り", "肥育", "小計"]
+exclude = ["規模", "経営タイプ", "子取り", "肥育", "小計", "1戸当たり", "１戸当たり"]
 unit = "戸"
 
 [series.pig_farms.search]

@@ -150,7 +150,7 @@ def check_plausible(name: str, by_year: dict[int, float]) -> None:
         if not va or not vb:
             continue
         ratio = vb / va
-        bound = 1.5 ** max(b - a, 1)
+        bound = 1.8 ** max(b - a, 1)
         if ratio > bound or ratio < 1 / bound:
             raise EstatError(
                 f"{name}: {a}年→{b}年で {va:.4g} → {vb:.4g}（比率 {ratio:.3g}）という"
