@@ -14,6 +14,12 @@
   --sows: #0a9a2e;     /* 母豚 */
   --population: #8a93a3; /* 人口（文脈系列） */
   --notice-bg: #fff6e0;
+
+  /* ネイティブUI（スクロールバー・フォームのアクセント色等）をシステム設定に
+     自動追従させつつ、サイトのブランドカラーに揃える */
+  color-scheme: light dark;
+  accent-color: var(--layers);
+  scrollbar-color: var(--axis) var(--page);
 }
 @media (prefers-color-scheme: dark) {
   :root {
