@@ -2,6 +2,11 @@ name: Update data from e-Stat
 
 on:
   workflow_dispatch:
+    inputs:
+      extra_args:
+        description: "fetch_estat.py への追加引数（例: --discover, --only pigs_thousand）"
+        required: false
+        default: ""
   schedule:
     # 毎月10日 09:00 JST（畜産統計の公表後に月次で追随）
     - cron: "0 0 10 * *"
@@ -27,7 +32,9 @@ jobs:
 
       - name: Fetch from e-Stat API
         if: ${{ env.ESTAT_APP_ID != '' }}
-        run: python scripts/fetch_estat.py
+        env:
+          EXTRA_ARGS: ${{ inputs.extra_args }}
+        run: python scripts/fetch_estat.py $EXTRA_ARGS
         continue-on-error: true
 
       - name: Warn when ESTAT_APP_ID is missing

@@ -105,7 +105,10 @@ def discover_table(client: EstatClient, spec: dict, name: str) -> str | None:
     search = spec.get("search", {})
     if not search:
         return None
-    resp = client.list_stats(**search, limit=100)
+    try:
+        resp = client.list_stats(**search, limit=100)
+    except Exception as e:  # pyestat/e-Stat 側の想定外レスポンス形状も系列単位で吸収する
+        raise EstatError(f"{name}: 統計表の検索に失敗しました（{type(e).__name__}: {e}）") from e
     pattern = re.compile(spec.get("title_regex", ""))
     for table in resp.tables:
         title = table.get("TITLE")
@@ -126,7 +129,10 @@ def fetch_series(client: EstatClient, name: str, spec: dict) -> dict[int, float]
     if not table_id:
         raise EstatError(f"{name}: 統計表IDを特定できません。--discover で候補を確認してください。")
 
-    resp = client.get_stats_data(table_id)
+    try:
+        resp = client.get_stats_data(table_id)
+    except Exception as e:
+        raise EstatError(f"{name}: 表 {table_id} の取得に失敗しました（{type(e).__name__}: {e}）") from e
     rows = resp.to_flat()
 
     match = spec.get("match", [])
@@ -135,6 +141,7 @@ def fetch_series(client: EstatClient, name: str, spec: dict) -> dict[int, float]
 
     by_year: dict[int, float] = {}
     ambiguous: dict[int, list[str]] = {}
+    skipped_units: set[str] = set()
     for row in rows:
         text = row_label_text(row)
         if not all(m in text for m in match):
@@ -150,10 +157,10 @@ def fetch_series(client: EstatClient, name: str, spec: dict) -> dict[int, float]
         unit_label = str(row.get("unit", target_unit))
         scaled = scale_value(value, unit_label, target_unit)
         if scaled is None:
-            raise EstatError(
-                f"{name}: 未知の単位 '{unit_label}'（目標 {target_unit}）。"
-                " scripts/fetch_estat.py の UNIT_SCALE に追加してください。"
-            )
+            # 同じ match/exclude 条件に「構成比(%)」「戸数」など別の測定列がぶら下がっている
+            # 累年統計表が多いため、単位が目標と違う列は無視して他の候補行を探す。
+            skipped_units.add(unit_label)
+            continue
         if year in by_year and by_year[year] != scaled:
             ambiguous.setdefault(year, []).append(text)
             continue
@@ -166,7 +173,8 @@ def fetch_series(client: EstatClient, name: str, spec: dict) -> dict[int, float]
             f" match / exclude を絞り込んでください。例:\n    {examples}"
         )
     if not by_year:
-        raise EstatError(f"{name}: 条件に合う行がありません（表 {table_id}、{len(rows)} 行）。")
+        hint = f"（見つかった単位: {', '.join(sorted(skipped_units))}）" if skipped_units else ""
+        raise EstatError(f"{name}: 条件に合う行がありません（表 {table_id}、{len(rows)} 行）{hint}。")
     return by_year
 
 
@@ -238,6 +246,10 @@ def main() -> int:
             series = fetch_series(client, name, spec)
         except EstatError as e:
             print(f"  失敗: {e}", file=sys.stderr)
+            failures.append(name)
+            continue
+        except Exception as e:  # 1系列の想定外エラーで残りの系列取得を止めない
+            print(f"  失敗（想定外のエラー）: {type(e).__name__}: {e}", file=sys.stderr)
             failures.append(name)
             continue
         update_csv(DATA_DIR / spec["file"], name, series)
