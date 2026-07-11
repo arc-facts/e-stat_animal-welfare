@@ -278,15 +278,21 @@ def run_search(client: EstatClient, keyword: str, survey_years: str | None = Non
         print(f"  {table.get('@id')}  {table.get('STATISTICS_NAME','')} / {title}")
 
 
-def run_peek_table(client: EstatClient, table_id: str, limit: int) -> None:
-    """config/tables.toml に系列を定義する前に、任意の表IDの生の行を見る。"""
+def run_peek_table(client: EstatClient, table_id: str, limit: int, grep: str | None = None) -> None:
+    """config/tables.toml に系列を定義する前に、任意の表IDの生の行を見る。
+
+    grep を指定すると、行数の多い表で目的の項目（例: "自営農業労働時間"）を
+    探すために、その文字列を含む行だけを表示する（--peek-limit の制限を受けない）。
+    """
     resp = client.get_stats_data(table_id)
     rows = resp.to_flat()
-    print(f"\n=== 表 {table_id}、{len(rows)} 行 ===")
+    print(f"\n=== 表 {table_id}、{len(rows)} 行{'（grep: ' + grep + '）' if grep else ''} ===")
     seen_combo = set()
     shown = 0
     for row in rows:
         text = row_label_text(row)
+        if grep and grep not in text:
+            continue
         unit = str(row.get("unit", ""))
         combo = (text, unit)
         if combo in seen_combo:
@@ -294,7 +300,7 @@ def run_peek_table(client: EstatClient, table_id: str, limit: int) -> None:
         seen_combo.add(combo)
         print(f"  [{unit}] {text}")
         shown += 1
-        if shown >= limit:
+        if not grep and shown >= limit:
             print(f"  …以下省略（--peek-limit で表示件数を増やせます、重複除去後 {len(seen_combo)}+ 件）")
             break
 
@@ -341,6 +347,7 @@ def main() -> int:
     parser.add_argument("--search", action="append", help="任意のキーワードで統計表を検索して終了（config未定義の調査用、複数可）")
     parser.add_argument("--search-year", help="--search と併用し、e-Stat の surveyYears で調査年を絞り込む（例: 2004）")
     parser.add_argument("--peek-table", action="append", help="任意の表IDの生の行ラベル・単位を表示して終了（config未定義の調査用、複数可）")
+    parser.add_argument("--peek-grep", help="--peek-table と併用し、この文字列を含む行だけを表示する（--peek-limit を無視）")
     args = parser.parse_args()
 
     app_id = os.environ.get("ESTAT_APP_ID", "").strip()
@@ -368,7 +375,7 @@ def main() -> int:
 
     if args.peek_table:
         for table_id in args.peek_table:
-            run_peek_table(client, table_id, args.peek_limit)
+            run_peek_table(client, table_id, args.peek_limit, args.peek_grep)
         return 0
 
     failures = []
