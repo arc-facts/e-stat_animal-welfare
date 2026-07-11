@@ -1,10 +1,25 @@
 {
   "provisional": true,
-  "generated_at": null,
+  "generated_at": "2026-07-11T01:01:30+00:00",
   "note": "このデータは公表資料から手作業で整理した暫定シードデータです。scripts/fetch_estat.py を ESTAT_APP_ID 付きで実行すると e-Stat API の値で上書きされ、provisional が false になります。",
   "sources": {
     "livestock": "農林水産省「畜産統計調査」（統計コード 00500222）",
     "slaughter": "農林水産省「畜産物流通調査（と畜・食鳥流通統計）」（統計コード 00500227）",
     "population": "総務省統計局「人口推計」（各年10月1日現在、統計コード 00200524）"
-  }
+  },
+  "fetched_series": [
+    "broiler_farms",
+    "pig_farms"
+  ],
+  "failed_series": [
+    "broilers_slaughtered_thousand",
+    "broilers_thousand",
+    "layer_farms",
+    "layers_culled_thousand",
+    "layers_thousand",
+    "pigs_slaughtered_thousand",
+    "pigs_thousand",
+    "population_thousand",
+    "sows_thousand"
+  ]
 }
