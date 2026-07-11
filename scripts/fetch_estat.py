@@ -254,10 +254,45 @@ def run_discover(client: EstatClient, config: dict) -> None:
             print(f"  {table.get('@id')}  {table.get('STATISTICS_NAME','')} / {title}")
 
 
+def run_peek(client: EstatClient, config: dict, name: str, limit: int) -> None:
+    """指定した系列が使う表を実際に取得し、行ラベル・単位の実物を表示する。
+
+    match/exclude を無視して生の行を見るためのデバッグ用。config/tables.toml の
+    match/exclude/title_regex を正しく書くために、まずこれで実際の語彙を確認する。
+    """
+    spec = config["series"].get(name)
+    if spec is None:
+        print(f"未知の系列名: {name}。config/tables.toml の [series.*] を確認してください。", file=sys.stderr)
+        return
+    table_id = spec.get("stats_data_id") or discover_table(client, spec, name)
+    if not table_id:
+        print(f"{name}: 統計表IDを特定できませんでした。", file=sys.stderr)
+        return
+    resp = client.get_stats_data(table_id)
+    rows = resp.to_flat()
+    print(f"\n=== {name} ({spec.get('description', '')}) — 表 {table_id}、{len(rows)} 行 ===")
+    seen_combo = set()
+    shown = 0
+    for row in rows:
+        text = row_label_text(row)
+        unit = str(row.get("unit", ""))
+        combo = (text, unit)
+        if combo in seen_combo:
+            continue
+        seen_combo.add(combo)
+        print(f"  [{unit}] {text}")
+        shown += 1
+        if shown >= limit:
+            print(f"  …以下省略（--peek-limit で表示件数を増やせます、重複除去後 {len(seen_combo)}+ 件）")
+            break
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--discover", action="store_true", help="統計表の候補一覧を表示して終了")
     parser.add_argument("--only", action="append", help="指定した系列のみ更新（複数可）")
+    parser.add_argument("--peek", action="append", help="指定した系列の表を実際に取得し行ラベル・単位を表示して終了（複数可）")
+    parser.add_argument("--peek-limit", type=int, default=60, help="--peek で表示する行数の上限（重複除去後）")
     args = parser.parse_args()
 
     app_id = os.environ.get("ESTAT_APP_ID", "").strip()
@@ -271,6 +306,11 @@ def main() -> int:
 
     if args.discover:
         run_discover(client, config)
+        return 0
+
+    if args.peek:
+        for name in args.peek:
+            run_peek(client, config, name, args.peek_limit)
         return 0
 
     failures = []
