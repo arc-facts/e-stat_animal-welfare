@@ -14,7 +14,8 @@
 [series.layers_thousand]
 file = "livestock.csv"
 description = "採卵鶏 成鶏めす飼養羽数（種鶏を除く）"
-stats_data_id = ""
+# 「畜産統計調査 長期累年 / 採卵鶏飼養戸数･羽数累年統計 全国(昭和35年～平成31年)」
+stats_data_id = "0001884437"
 title_regex = "採卵鶏.*(累年|飼養戸数・羽数)"
 # 実際の行ラベル例（表0001884437）: "飼養羽数_採卵鶏（種鶏を除く）_成鶏めす（6ヶ月以上）"
 # 「種鶏を除く」自体に「種鶏」という文字列を含むため、excludeで"種鶏"を使うと
@@ -30,7 +31,7 @@ searchWord = "採卵鶏 累年 飼養戸数 羽数"
 [series.layer_farms]
 file = "livestock.csv"
 description = "採卵鶏 飼養戸数"
-stats_data_id = ""
+stats_data_id = "0001884437"
 title_regex = "採卵鶏.*(累年|飼養戸数・羽数)"
 # 行ラベル例: "001 飼養戸数"（総数）/ "002 飼養戸数_採卵鶏（種鶏のみの飼養者を除く）" /
 # "003 飼養戸数_種鶏のみ"。総数だけを残すため下位区分を明示的に除外する。
@@ -45,7 +46,11 @@ searchWord = "採卵鶏 累年 飼養戸数 羽数"
 [series.broilers_thousand]
 file = "livestock.csv"
 description = "ブロイラー 飼養羽数"
-stats_data_id = ""
+# 「確報 令和５年畜産統計 / 累年統計表 ブロイラー 飼養戸数・羽数（全国）
+#  （平成25年～令和５年）」— 同名の表が公表年ごとに複数あり、discover_table の
+# 「長期累年」優先ロジックが効かない（この系列のタイトルはどれも「長期累年」
+# ではなく「累年統計表」）ため、確認済みの最新版を直接指定する。
+stats_data_id = "0002115816"
 title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
 title_exclude = ["規模別"]
 # 行ラベル例: "002 飼養羽数" / "003 １戸当たりの飼養羽数"（"飼養羽数"を含む） /
@@ -62,7 +67,7 @@ searchWord = "ブロイラー 累年 飼養戸数 羽数"
 [series.broiler_farms]
 file = "livestock.csv"
 description = "ブロイラー 飼養戸数"
-stats_data_id = ""
+stats_data_id = "0002115816"
 title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
 title_exclude = ["規模別"]
 match = ["飼養戸数"]
@@ -76,7 +81,8 @@ searchWord = "ブロイラー 累年 飼養戸数 羽数"
 [series.pigs_thousand]
 file = "livestock.csv"
 description = "豚 飼養頭数（総数）"
-stats_data_id = ""
+# 「畜産統計調査 長期累年 / 豚飼養戸数･頭数累年統計 全国(昭和35年～平成31年)」
+stats_data_id = "0001884287"
 title_regex = "豚.*(累年|飼養戸数・頭数)"
 title_exclude = ["規模別"]
 # 行ラベル例（表0001884287）: "003 飼養頭数_計"（目的の行）のほか
@@ -94,7 +100,7 @@ searchWord = "豚 累年 飼養戸数 頭数"
 [series.sows_thousand]
 file = "livestock.csv"
 description = "子取り用めす豚（母豚）頭数"
-stats_data_id = ""
+stats_data_id = "0001884287"
 title_regex = "豚.*(累年|飼養戸数・頭数)"
 title_exclude = ["規模別"]
 # 行ラベル例: "004 飼養頭数_子取り用めす豚"（総数、目的の行）と
@@ -111,7 +117,7 @@ searchWord = "豚 累年 飼養戸数 頭数"
 [series.pig_farms]
 file = "livestock.csv"
 description = "豚 飼養戸数"
-stats_data_id = ""
+stats_data_id = "0001884287"
 title_regex = "豚.*(累年|飼養戸数・頭数)"
 title_exclude = ["規模別"]
 match = ["飼養戸数"]
@@ -131,7 +137,8 @@ description = "ブロイラー（肉用若鶏）処理羽数"
 # 「食鳥流通累年統計 食鳥処理場調査（ブロイラー）処理量」— この表は
 # 鳥種がタイトルで固定（行ラベルには"肉用若鶏"等の文字列は出てこない）。
 # 行ラベル例: "100 羽数 100 全ての食鳥処理場 00000 全国 2017 ... yearly"
-stats_data_id = ""
+# 同名タイトルで都道府県別の別表も多数ヒットするため、確認済みの全国表を直接指定。
+stats_data_id = "0003368799"
 title_regex = "食鳥.*処理量.*ブロイラー"
 title_exclude = ["規模別", "月別"]
 match = ["羽数", "全国"]
@@ -145,17 +152,18 @@ searchWord = "食鳥 処理場調査 ブロイラー 処理量 累年"
 [series.layers_culled_thousand]
 file = "slaughter.csv"
 description = "廃鶏（成鶏）処理羽数"
-# ブロイラーと同じ調査の「成鶏」版の累年表を探す（存在すれば同じ行構造のはず）。
+# ブロイラーと同じ調査の「成鶏」版の累年表を探す。"成鶏"では0件だったため
+# 鳥種を指定しない広い検索にして候補一覧から目視で選ぶ（次回 --discover で調査）。
 stats_data_id = ""
-title_regex = "食鳥.*処理量.*成鶏"
-title_exclude = ["規模別", "月別"]
+title_regex = "食鳥.*処理量"
+title_exclude = ["規模別", "月別", "ブロイラー"]
 match = ["羽数", "全国"]
 exclude = ["重量", "規模", "戸数", "月別"]
 unit = "千羽"
 
 [series.layers_culled_thousand.search]
 statsCode = "00500227"
-searchWord = "食鳥 処理場調査 成鶏 処理量 累年"
+searchWord = "食鳥 処理場調査 処理量 累年"
 
 [series.pigs_slaughtered_thousand]
 file = "slaughter.csv"
@@ -169,7 +177,7 @@ unit = "千頭"
 
 [series.pigs_slaughtered_thousand.search]
 statsCode = "00500227"
-searchWord = "と畜 累年"
+searchWord = "と畜 頭数 累年 全国"
 
 # ---------------------------------------------------------------- 人口
 # 人口推計（統計コード 00200524）
@@ -185,4 +193,4 @@ unit = "千人"
 
 [series.population_thousand.search]
 statsCode = "00200524"
-searchWord = "人口推計"
+searchWord = "人口推計 長期時系列"
