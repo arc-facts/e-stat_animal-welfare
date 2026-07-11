@@ -1,29 +1,31 @@
 :root {
-  --page: #f9f9f7;
-  --surface: #fcfcfb;
-  --ink: #0b0b0b;
-  --ink-2: #52514e;
-  --muted: #898781;
-  --grid: #e1e0d9;
-  --axis: #c3c2b7;
-  --border: rgba(11, 11, 11, 0.10);
+  --page: #f5f8fc;
+  --surface: #ffffff;
+  --ink: #12151c;
+  --ink-2: #495467;
+  --muted: #8a93a3;
+  --grid: #e9edf3;
+  --axis: #cdd5e0;
+  --border: rgba(18, 21, 28, 0.07);
+  --shadow: 0 1px 2px rgba(30, 41, 59, 0.04), 0 8px 20px -6px rgba(30, 41, 59, 0.10);
   --layers: #2a78d6;   /* 採卵鶏 */
-  --broilers: #1baf7a; /* ブロイラー */
-  --pigs: #eda100;     /* 豚 */
-  --sows: #008300;     /* 母豚 */
-  --population: #898781; /* 人口（文脈系列） */
-  --notice-bg: #fdf6e3;
+  --broilers: #14ae76; /* ブロイラー */
+  --pigs: #f0980a;     /* 豚 */
+  --sows: #0a9a2e;     /* 母豚 */
+  --population: #8a93a3; /* 人口（文脈系列） */
+  --notice-bg: #fff6e0;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --page: #0d0d0d;
-    --surface: #1a1a19;
-    --ink: #ffffff;
-    --ink-2: #c3c2b7;
-    --muted: #898781;
-    --grid: #2c2c2a;
-    --axis: #383835;
-    --border: rgba(255, 255, 255, 0.10);
+    --page: #0c0f14;
+    --surface: #171b23;
+    --ink: #f4f6fa;
+    --ink-2: #b9c2d0;
+    --muted: #8993a3;
+    --grid: #262b35;
+    --axis: #3a4150;
+    --border: rgba(255, 255, 255, 0.08);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px -6px rgba(0, 0, 0, 0.4);
     --layers: #3987e5;
     --broilers: #199e70;
     --pigs: #c98500;
@@ -66,7 +68,8 @@ section > .desc { color: var(--ink-2); font-size: 0.92rem; margin: 0 0 16px; max
 .hero {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
   padding: 28px 28px 24px;
   margin-top: 28px;
 }
@@ -79,7 +82,8 @@ section > .desc { color: var(--ink-2); font-size: 0.92rem; margin: 0 0 16px; max
 .tile {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
   padding: 16px 18px 14px;
 }
 .tile .label { font-size: 0.82rem; color: var(--ink-2); display: flex; align-items: center; gap: 7px; }
@@ -91,7 +95,8 @@ section > .desc { color: var(--ink-2); font-size: 0.92rem; margin: 0 0 16px; max
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
   padding: 20px 20px 12px;
 }
 .card h3 { margin: 0 0 2px; font-size: 1.02rem; }
@@ -141,7 +146,8 @@ details.table-view th { color: var(--ink-2); font-weight: 600; }
 .fact {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
   padding: 18px 20px;
 }
 .fact h3 { margin: 0 0 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
