@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+"""data/*.csv と data/meta.json を結合し docs/data/data.json を生成する。
+
+派生指標（1戸当たり飼養数、人口当たり頭数など）はここで計算する。
+標準ライブラリのみで動く。
+
+    python scripts/build_site_data.py
+"""
+
+from __future__ import annotations
+
+import csv
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+DATA_DIR = ROOT / "data"
+OUT = ROOT / "docs" / "data" / "data.json"
+
+
+def read_csv(name: str) -> dict[int, dict[str, float]]:
+    rows: dict[int, dict[str, float]] = {}
+    with open(DATA_DIR / name, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            year = int(r.pop("year"))
+            rows[year] = {k: float(v) for k, v in r.items() if v not in ("", None)}
+    return rows
+
+
+def series(table: dict[int, dict[str, float]], column: str) -> list[list[float]]:
+    """[[year, value], ...] 形式（年昇順、欠測年は含めない）。"""
+    return [[y, table[y][column]] for y in sorted(table) if column in table[y]]
+
+
+def ratio_series(
+    num: dict[int, dict[str, float]], num_col: str,
+    den: dict[int, dict[str, float]], den_col: str,
+    scale: float = 1.0,
+) -> list[list[float]]:
+    out = []
+    for y in sorted(num):
+        if num_col in num.get(y, {}) and den_col in den.get(y, {}) and den[y][den_col]:
+            out.append([y, num[y][num_col] * scale / den[y][den_col]])
+    return out
+
+
+def main() -> None:
+    livestock = read_csv("livestock.csv")
+    slaughter = read_csv("slaughter.csv")
+    population = read_csv("population.csv")
+    meta = json.loads((DATA_DIR / "meta.json").read_text(encoding="utf-8"))
+
+    data = {
+        "meta": meta,
+        # 飼養数（千羽・千頭・千人）
+        "inventory": {
+            "layers": series(livestock, "layers_thousand"),
+            "broilers": series(livestock, "broilers_thousand"),
+            "pigs": series(livestock, "pigs_thousand"),
+            "sows": series(livestock, "sows_thousand"),
+            "population": series(population, "population_thousand"),
+        },
+        # 年間屠殺数（千羽・千頭）
+        "slaughter": {
+            "broilers": series(slaughter, "broilers_slaughtered_thousand"),
+            "layers_culled": series(slaughter, "layers_culled_thousand"),
+            "pigs": series(slaughter, "pigs_slaughtered_thousand"),
+        },
+        # 1戸（経営体）当たり飼養数（羽・頭）
+        "per_farm": {
+            "layers": ratio_series(livestock, "layers_thousand", livestock, "layer_farms", 1000),
+            "broilers": ratio_series(livestock, "broilers_thousand", livestock, "broiler_farms", 1000),
+            "pigs": ratio_series(livestock, "pigs_thousand", livestock, "pig_farms", 1000),
+        },
+        # 飼養戸数
+        "farms": {
+            "layers": series(livestock, "layer_farms"),
+            "broilers": series(livestock, "broiler_farms"),
+            "pigs": series(livestock, "pig_farms"),
+        },
+    }
+
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    n = sum(len(v) for group in data.values() if isinstance(group, dict)
+            for v in group.values() if isinstance(v, list))
+    print(f"docs/data/data.json を生成しました（{n} データ点）")
+
+
+if __name__ == "__main__":
+    main()

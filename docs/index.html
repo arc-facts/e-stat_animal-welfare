@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>日本の畜産動物はいま — 数字で見るアニマルウェルフェア</title>
+<meta name="description" content="採卵鶏・ブロイラー・豚（母豚）の飼養数、年間の屠殺数、1戸当たり飼養数の推移を、日本の人口と対比して可視化。出典は農林水産省・総務省の政府統計（e-Stat）。">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;🐷&lt;/text&gt;&lt;/svg&gt;">
+</head>
+<body>
+
+<header class="site">
+  <h1>日本の畜産動物はいま</h1>
+  <p class="lede">
+    採卵鶏・ブロイラー（肉用鶏）・豚がどれだけ飼育され、屠殺され、
+    どれほど集約化が進んでいるのかを、政府統計（e-Stat）のデータで可視化しています。
+    国内のアニマルウェルフェアを考えるための基礎資料です。
+  </p>
+  <p class="notice" id="provisional-notice" hidden>
+    ⚠️ 現在表示しているのは公表資料から整理した<strong>暫定データ</strong>です（一部の年次は概数）。
+    e-Stat API による確定値への自動更新は準備中です。詳細は
+    <a href="https://github.com/A-Watahiki/e-stat_animal-welfare/blob/main/data/README.md">データについて</a>をご覧ください。
+  </p>
+</header>
+
+<main>
+  <div class="hero" id="hero">
+    <div class="figure" id="hero-figure">—</div>
+    <div class="caption" id="hero-caption">読み込み中…</div>
+  </div>
+
+  <div class="tiles" id="kpi-tiles"></div>
+
+  <section>
+    <h2>飼育されている数 — 鶏は人口の2倍以上</h2>
+    <p class="desc">
+      毎年2月1日時点で飼育されている数の推移です。灰色の線は日本の総人口。
+      採卵鶏（種鶏を除く成鶏めす）とブロイラーはそれぞれ1億羽を超え、
+      合計すると日本の人口の2倍以上の鶏が、常時飼育されています。
+    </p>
+    <div class="card">
+      <h3>飼養数と日本の人口（百万羽・頭・人）</h3>
+      <p class="sub">各年2月1日現在（人口は10月1日現在） / 出典: 畜産統計調査・人口推計</p>
+      <div class="chart" id="chart-inventory"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>母豚 — 繁殖の道具として飼われるメス豚</h2>
+    <p class="desc">
+      子取り用めす豚（母豚）は、繰り返し妊娠・出産させるために飼育される豚です。
+      その多くが、体の向きも変えられない妊娠ストールで飼育されています。
+      頭数は減っていますが、1頭当たりの生産性（年間離乳頭数）は上がり続けています。
+    </p>
+    <div class="card">
+      <h3>子取り用めす豚（母豚）の飼養頭数（万頭）</h3>
+      <p class="sub">各年2月1日現在 / 出典: 畜産統計調査</p>
+      <div class="chart" id="chart-sows"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>年間の屠殺数 — 1年間に殺される数</h2>
+    <p class="desc">
+      1年間に食用として処理（屠殺）される数です。ブロイラーだけで年間7億羽超 ——
+      日本の人口の約6倍にあたる鶏が、生後およそ50日で出荷されています。
+      採卵鶏も卵を産む量が落ちる1〜2年で「廃鶏」として処理されます。
+    </p>
+    <div class="multiples" id="chart-slaughter"></div>
+  </section>
+
+  <section>
+    <h2>集約化 — 1戸当たりの飼養数はこの四半世紀で数倍に</h2>
+    <p class="desc">
+      飼育する農家（経営体）の数は減り続ける一方、動物の数はほぼ減っていません。
+      つまり1戸当たりの飼養数が急増し、少人数で大量の動物を管理する
+      集約的（工場式）畜産への移行が進んでいます。
+      ※畜産統計に従業員数の系列がないため「1戸（経営体）当たり」で示しています。
+    </p>
+    <div class="card">
+      <h3>1戸当たり飼養数の伸び（2000年 = 100）</h3>
+      <p class="sub">飼養数 ÷ 飼養戸数を2000年を100として指数化 / 出典: 畜産統計調査</p>
+      <div class="chart" id="chart-perfarm"></div>
+    </div>
+    <div class="tiles" id="perfarm-tiles"></div>
+  </section>
+
+  <section>
+    <h2>飼育密度 — 統計には表れない「過密」</h2>
+    <p class="desc">
+      1羽・1頭当たりの飼育面積（飼育密度）は全国統計が存在しません。
+      ここでは飼養実態調査などで知られている飼育方式の実態を参考情報として示します。
+    </p>
+    <div class="facts">
+      <div class="fact">
+        <h3><span class="key" style="background:var(--layers)"></span>採卵鶏 — ケージ飼育が9割超</h3>
+        <div class="big">約430〜555cm²/羽</div>
+        <p>国内の採卵鶏の9割以上はケージ（主にバタリーケージ）で飼育されています。
+        1羽当たりの面積は一般にB5用紙1枚ほどで、羽を広げることもできません。
+        （畜産技術協会「採卵鶏の飼養実態アンケート調査」等）</p>
+      </div>
+      <div class="fact">
+        <h3><span class="key" style="background:var(--broilers)"></span>ブロイラー — 1m²に十数羽</h3>
+        <div class="big">約50日で出荷</div>
+        <p>ブロイラーは出荷直前には1m²当たり十数羽という過密状態になります。
+        急速に成長するよう品種改良され、生後およそ50日で屠殺されます。
+        （畜産技術協会「ブロイラーの飼養実態アンケート調査」等）</p>
+      </div>
+      <div class="fact">
+        <h3><span class="key" style="background:var(--sows)"></span>母豚 — 妊娠ストールが約9割</h3>
+        <div class="big">体の向きも変えられない</div>
+        <p>妊娠中の母豚の約9割は、方向転換もできない幅約60cmの妊娠ストール
+        （檻）で飼育されています。EUなどでは使用が制限されています。
+        （日本養豚協会「養豚基礎調査」等）</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <h2>出典・注記</h2>
+  <ul>
+    <li>飼養数・飼養戸数: 農林水産省「畜産統計調査」（各年2月1日現在）。採卵鶏は種鶏を除く成鶏めす羽数。</li>
+    <li>屠殺数: 農林水産省「畜産物流通調査」（と畜統計・食鳥流通統計、暦年）。</li>
+    <li>人口: 総務省統計局「人口推計」（各年10月1日現在）。</li>
+    <li>データはいずれも政府統計の総合窓口 <a href="https://www.e-stat.go.jp/">e-Stat</a> で公開されているものです。</li>
+    <li>「1戸当たり」は飼養数を飼養戸数で割った値です（畜産統計に従業員数の統計はありません）。</li>
+    <li id="meta-note"></li>
+  </ul>
+  <p>
+    ソースコード・データ: <a href="https://github.com/A-Watahiki/e-stat_animal-welfare">GitHub — A-Watahiki/e-stat_animal-welfare</a>
+  </p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+name: Update data from e-Stat
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 毎月10日 09:00 JST（畜産統計の公表後に月次で追随）
+    - cron: "0 0 10 * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Fetch from e-Stat API
+        if: ${{ secrets.ESTAT_APP_ID != '' }}
+        env:
+          ESTAT_APP_ID: ${{ secrets.ESTAT_APP_ID }}
+        run: python scripts/fetch_estat.py
+        continue-on-error: true
+
+      - name: Warn when ESTAT_APP_ID is missing
+        if: ${{ secrets.ESTAT_APP_ID == '' }}
+        run: |
+          echo "::warning::Secrets に ESTAT_APP_ID が設定されていないため、暫定シードデータのままサイトを生成します。"
+          echo "::warning::https://www.e-stat.go.jp/api/ で利用登録し、リポジトリの Settings > Secrets and variables > Actions に ESTAT_APP_ID を追加してください。"
+
+      - name: Build site data
+        run: python scripts/build_site_data.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data docs/data
+          if git diff --cached --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "data: e-Stat データを更新"
+            git push
+          fi

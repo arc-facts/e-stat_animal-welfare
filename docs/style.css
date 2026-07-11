@@ -1,0 +1,158 @@
+:root {
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.10);
+  --layers: #2a78d6;   /* 採卵鶏 */
+  --broilers: #1baf7a; /* ブロイラー */
+  --pigs: #eda100;     /* 豚 */
+  --sows: #008300;     /* 母豚 */
+  --population: #898781; /* 人口（文脈系列） */
+  --notice-bg: #fdf6e3;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --layers: #3987e5;
+    --broilers: #199e70;
+    --pigs: #c98500;
+    --sows: #008300;
+    --notice-bg: #2a2416;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  line-height: 1.65;
+}
+main { max-width: 980px; margin: 0 auto; padding: 0 20px 64px; }
+
+header.site { max-width: 980px; margin: 0 auto; padding: 44px 20px 8px; }
+header.site h1 { font-size: 1.7rem; margin: 0 0 8px; line-height: 1.4; }
+header.site .lede { color: var(--ink-2); max-width: 44em; margin: 0; }
+
+.notice {
+  background: var(--notice-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: var(--ink-2);
+  margin: 20px 0 0;
+}
+.notice[hidden] { display: none; }
+
+section { margin-top: 44px; }
+section > h2 { font-size: 1.2rem; margin: 0 0 4px; }
+section > .desc { color: var(--ink-2); font-size: 0.92rem; margin: 0 0 16px; max-width: 46em; }
+
+/* ---- hero ---- */
+.hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 28px 24px;
+  margin-top: 28px;
+}
+.hero .figure { font-size: 52px; font-weight: 650; line-height: 1.15; letter-spacing: -0.01em; }
+.hero .figure small { font-size: 0.45em; font-weight: 500; color: var(--ink-2); }
+.hero .caption { color: var(--ink-2); margin-top: 6px; font-size: 0.95rem; }
+
+/* ---- KPI tiles ---- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px 14px;
+}
+.tile .label { font-size: 0.82rem; color: var(--ink-2); display: flex; align-items: center; gap: 7px; }
+.tile .label .key { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.tile .value { font-size: 1.65rem; font-weight: 650; margin-top: 2px; }
+.tile .sub { font-size: 0.78rem; color: var(--muted); }
+
+/* ---- chart cards ---- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 20px 12px;
+}
+.card h3 { margin: 0 0 2px; font-size: 1.02rem; }
+.card .sub { color: var(--muted); font-size: 0.82rem; margin: 0 0 10px; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart:focus-visible { outline: 2px solid var(--layers); outline-offset: 4px; border-radius: 6px; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 8px 2px 2px; font-size: 0.82rem; color: var(--ink-2); }
+.legend .item { display: inline-flex; align-items: center; gap: 6px; }
+.legend .swatch { width: 14px; height: 3px; border-radius: 2px; }
+
+.multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  min-width: 140px;
+  z-index: 5;
+  display: none;
+}
+.tooltip .t-year { font-weight: 650; margin-bottom: 3px; }
+.tooltip .t-row { display: flex; align-items: center; gap: 6px; justify-content: space-between; color: var(--ink-2); }
+.tooltip .t-row .t-name { display: inline-flex; align-items: center; gap: 6px; }
+.tooltip .t-row .t-val { font-variant-numeric: tabular-nums; color: var(--ink); }
+.tooltip .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+details.table-view { margin-top: 8px; font-size: 0.85rem; }
+details.table-view summary { cursor: pointer; color: var(--ink-2); padding: 4px 0; }
+details.table-view table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+details.table-view th, details.table-view td {
+  text-align: right; padding: 4px 10px;
+  border-bottom: 1px solid var(--grid);
+  font-variant-numeric: tabular-nums;
+}
+details.table-view th:first-child, details.table-view td:first-child { text-align: left; }
+details.table-view th { color: var(--ink-2); font-weight: 600; }
+
+/* ---- info cards (飼育密度・飼育方式) ---- */
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.fact {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+.fact h3 { margin: 0 0 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
+.fact h3 .key { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.fact p { margin: 0; font-size: 0.88rem; color: var(--ink-2); }
+.fact .big { font-size: 1.5rem; font-weight: 650; color: var(--ink); margin: 2px 0 6px; }
+
+footer.site {
+  max-width: 980px; margin: 0 auto; padding: 0 20px 60px;
+  color: var(--muted); font-size: 0.8rem;
+}
+footer.site h2 { font-size: 0.95rem; color: var(--ink-2); }
+footer.site a { color: inherit; }
+footer.site ul { padding-left: 1.2em; }

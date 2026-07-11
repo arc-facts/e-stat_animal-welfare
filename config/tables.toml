@@ -1,0 +1,163 @@
+# e-Stat から取得する統計表と、表の中から取り出す系列の定義。
+#
+# stats_data_id が空の場合、fetch_estat.py は search（getStatsList の検索条件）
+# と title_regex で統計表を自動発見します。発見結果はログに出るので、確定したら
+# stats_data_id に書き写すと以後の実行が安定します。
+#
+# match / exclude は、表の各行のラベル（全軸の label を連結した文字列）に対する
+# 部分一致条件です。1つの年に複数行が残った場合はエラーになり、残った行の
+# ラベル一覧が表示されるので、それを見て条件を絞り込んでください。
+
+# ---------------------------------------------------------------- 飼養数
+# 畜産統計調査（統計コード 00500222）の累年統計表（全国）
+
+[series.layers_thousand]
+file = "livestock.csv"
+description = "採卵鶏 成鶏めす飼養羽数（種鶏を除く）"
+stats_data_id = ""
+title_regex = "採卵鶏.*(累年|飼養戸数・羽数)"
+match = ["成鶏めす", "羽数"]
+exclude = ["種鶏", "規模", "ひな"]
+unit = "千羽"
+
+[series.layers_thousand.search]
+statsCode = "00500222"
+searchWord = "採卵鶏 累年 飼養戸数 羽数"
+
+[series.layer_farms]
+file = "livestock.csv"
+description = "採卵鶏 飼養戸数"
+stats_data_id = ""
+title_regex = "採卵鶏.*(累年|飼養戸数・羽数)"
+match = ["飼養戸数"]
+exclude = ["種鶏", "規模", "成鶏めす", "ひな"]
+unit = "戸"
+
+[series.layer_farms.search]
+statsCode = "00500222"
+searchWord = "採卵鶏 累年 飼養戸数 羽数"
+
+[series.broilers_thousand]
+file = "livestock.csv"
+description = "ブロイラー 飼養羽数"
+stats_data_id = ""
+title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
+match = ["飼養羽数"]
+exclude = ["規模", "出荷"]
+unit = "千羽"
+
+[series.broilers_thousand.search]
+statsCode = "00500222"
+searchWord = "ブロイラー 累年 飼養戸数 羽数"
+
+[series.broiler_farms]
+file = "livestock.csv"
+description = "ブロイラー 飼養戸数"
+stats_data_id = ""
+title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
+match = ["飼養戸数"]
+exclude = ["規模", "出荷"]
+unit = "戸"
+
+[series.broiler_farms.search]
+statsCode = "00500222"
+searchWord = "ブロイラー 累年 飼養戸数 羽数"
+
+[series.pigs_thousand]
+file = "livestock.csv"
+description = "豚 飼養頭数（総数）"
+# 「畜産統計調査 確報累年統計表 3 豚 飼養戸数・頭数（全国）」
+stats_data_id = "0003238287"
+title_regex = "豚.*累年|豚.*飼養戸数・頭数"
+match = ["飼養頭数", "計"]
+exclude = ["規模", "子取り", "肥育", "種おす", "経営タイプ"]
+unit = "千頭"
+
+[series.pigs_thousand.search]
+statsCode = "00500222"
+searchWord = "豚 累年 飼養戸数 頭数"
+
+[series.sows_thousand]
+file = "livestock.csv"
+description = "子取り用めす豚（母豚）頭数"
+stats_data_id = "0003238287"
+title_regex = "豚.*累年|豚.*飼養戸数・頭数"
+match = ["子取り用めす豚"]
+exclude = ["規模"]
+unit = "千頭"
+
+[series.sows_thousand.search]
+statsCode = "00500222"
+searchWord = "豚 累年 飼養戸数 頭数"
+
+[series.pig_farms]
+file = "livestock.csv"
+description = "豚 飼養戸数"
+stats_data_id = "0003238287"
+title_regex = "豚.*累年|豚.*飼養戸数・頭数"
+match = ["飼養戸数"]
+exclude = ["規模", "経営タイプ", "子取り", "肥育"]
+unit = "戸"
+
+[series.pig_farms.search]
+statsCode = "00500222"
+searchWord = "豚 累年 飼養戸数 頭数"
+
+# ---------------------------------------------------------------- 屠殺数
+# 畜産物流通調査（統計コード 00500227）
+
+[series.broilers_slaughtered_thousand]
+file = "slaughter.csv"
+description = "ブロイラー（肉用若鶏）処理羽数"
+# 「食鳥流通統計調査 食鳥の処理羽数及び処理重量 年次」
+stats_data_id = "0002066172"
+title_regex = "食鳥.*処理羽数"
+match = ["肉用若鶏", "処理羽数"]
+exclude = ["重量", "規模"]
+unit = "千羽"
+
+[series.broilers_slaughtered_thousand.search]
+statsCode = "00500227"
+searchWord = "食鳥 処理羽数 年次"
+
+[series.layers_culled_thousand]
+file = "slaughter.csv"
+description = "廃鶏（成鶏）処理羽数"
+stats_data_id = "0002066172"
+title_regex = "食鳥.*処理羽数"
+match = ["廃鶏", "処理羽数"]
+exclude = ["重量", "規模"]
+unit = "千羽"
+
+[series.layers_culled_thousand.search]
+statsCode = "00500227"
+searchWord = "食鳥 処理羽数 年次"
+
+[series.pigs_slaughtered_thousand]
+file = "slaughter.csv"
+description = "豚 と畜頭数"
+stats_data_id = ""
+title_regex = "と畜.*頭数"
+match = ["豚"]
+exclude = ["規模", "都道府県", "月別"]
+unit = "千頭"
+
+[series.pigs_slaughtered_thousand.search]
+statsCode = "00500227"
+searchWord = "と畜 頭数 年次 全国"
+
+# ---------------------------------------------------------------- 人口
+# 人口推計（統計コード 00200524）
+
+[series.population_thousand]
+file = "population.csv"
+description = "日本の総人口（各年10月1日現在）"
+stats_data_id = ""
+title_regex = "長期時系列|総人口"
+match = ["総人口", "男女計"]
+exclude = ["日本人人口", "都道府県", "月"]
+unit = "千人"
+
+[series.population_thousand.search]
+statsCode = "00200524"
+searchWord = "人口推計 長期時系列 総人口"
