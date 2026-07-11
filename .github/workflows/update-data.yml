@@ -12,6 +12,9 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    env:
+      # secrets コンテキストは if: 条件式に直接書けないため、一度 env に写してから判定する
+      ESTAT_APP_ID: ${{ secrets.ESTAT_APP_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,14 +26,12 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Fetch from e-Stat API
-        if: ${{ secrets.ESTAT_APP_ID != '' }}
-        env:
-          ESTAT_APP_ID: ${{ secrets.ESTAT_APP_ID }}
+        if: ${{ env.ESTAT_APP_ID != '' }}
         run: python scripts/fetch_estat.py
         continue-on-error: true
 
       - name: Warn when ESTAT_APP_ID is missing
-        if: ${{ secrets.ESTAT_APP_ID == '' }}
+        if: ${{ env.ESTAT_APP_ID == '' }}
         run: |
           echo "::warning::Secrets に ESTAT_APP_ID が設定されていないため、暫定シードデータのままサイトを生成します。"
           echo "::warning::https://www.e-stat.go.jp/api/ で利用登録し、リポジトリの Settings > Secrets and variables > Actions に ESTAT_APP_ID を追加してください。"
