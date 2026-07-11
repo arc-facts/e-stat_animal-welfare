@@ -294,11 +294,12 @@ def run_peek_table(client: EstatClient, table_id: str, limit: int, grep: str | N
         if grep and grep not in text:
             continue
         unit = str(row.get("unit", ""))
-        combo = (text, unit)
+        value = row.get("value")
+        combo = (text, unit, value)
         if combo in seen_combo:
             continue
         seen_combo.add(combo)
-        print(f"  [{unit}] {text}")
+        print(f"  [{unit}]={value!r} {text}  RAW={row!r}")
         shown += 1
         if not grep and shown >= limit:
             print(f"  …以下省略（--peek-limit で表示件数を増やせます、重複除去後 {len(seen_combo)}+ 件）")
