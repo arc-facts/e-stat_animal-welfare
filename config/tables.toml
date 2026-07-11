@@ -152,13 +152,16 @@ searchWord = "食鳥 処理場調査 ブロイラー 処理量 累年"
 [series.layers_culled_thousand]
 file = "slaughter.csv"
 description = "廃鶏（成鶏）処理羽数"
-# ブロイラーと同じ調査の「成鶏」版の累年表を探す。"成鶏"では0件だったため
-# 鳥種を指定しない広い検索にして候補一覧から目視で選ぶ（次回 --discover で調査）。
+# 「食鳥 処理場調査 処理量 累年」で見つかる長期累年表はすべて
+# ブロイラー専用（0003368799とその都道府県別版のみ、49件確認）で、
+# 廃鶏/成鶏版の対応表がこの検索経路には存在しないと判明。
+# 自動取得を断念し、暫定シードデータのまま運用する
+# （data/README.md に出典・確認済み値を記載済み）。
 stats_data_id = ""
-title_regex = "食鳥.*処理量"
-title_exclude = ["規模別", "月別", "ブロイラー"]
-match = ["羽数", "全国"]
-exclude = ["重量", "規模", "戸数", "月別"]
+title_regex = "$^"
+title_exclude = []
+match = ["廃鶏"]
+exclude = []
 unit = "千羽"
 
 [series.layers_culled_thousand.search]
@@ -168,11 +171,13 @@ searchWord = "食鳥 処理場調査 処理量 累年"
 [series.pigs_slaughtered_thousand]
 file = "slaughter.csv"
 description = "豚 と畜頭数"
-stats_data_id = ""
-title_regex = "と畜.*(累年|頭数)"
-title_exclude = ["規模別", "と畜場数", "月別"]
-match = ["豚"]
-exclude = ["規模", "都道府県", "月別", "場数"]
+# 「畜産物流通調査 長期累年 / と畜頭数及びと畜場数累年統計」
+# （都道府県別出荷頭数・枝肉生産量の類似表と区別して確定）
+stats_data_id = "0003368795"
+title_regex = "と畜頭数及びと畜場数累年統計"
+title_exclude = []
+match = ["豚", "頭数"]
+exclude = ["規模", "都道府県", "月別", "場数", "牛", "馬"]
 unit = "千頭"
 
 [series.pigs_slaughtered_thousand.search]
@@ -193,4 +198,4 @@ unit = "千人"
 
 [series.population_thousand.search]
 statsCode = "00200524"
-searchWord = "人口推計 長期時系列"
+searchWord = "長期時系列"
