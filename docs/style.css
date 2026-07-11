@@ -120,9 +120,9 @@ section > .desc { color: var(--ink-2); font-size: 0.92rem; margin: 0 0 16px; max
 
 .multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
 
-/* ---- 種別比較（面積比の帯グラフ）---- */
-#chart-species svg { border-radius: 6px; overflow: hidden; }
-.species-legend { gap: 10px 18px; }
+/* ---- 種別比較（面積比のツリーマップ）---- */
+.waffle svg { border-radius: 10px; overflow: hidden; }
+.species-legend { gap: 10px 18px; margin-top: 12px; }
 .species-note {
   margin: 12px 0 2px; font-size: 0.9rem; line-height: 1.7;
   color: var(--ink-2); border-left: 3px solid var(--dogcat);

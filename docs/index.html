@@ -32,6 +32,13 @@
     <div class="caption" id="hero-caption">読み込み中…</div>
   </div>
 
+  <div class="card" style="margin-top:12px">
+    <h3>1年間に殺される動物の数（種類別の内訳）</h3>
+    <p class="sub" id="species-sub">出典: 畜産物流通調査・環境省</p>
+    <div class="waffle" id="chart-species"></div>
+    <p class="species-note" id="species-note"></p>
+  </div>
+
   <div class="tiles" id="kpi-tiles"></div>
 
   <section>
@@ -40,7 +47,7 @@
       毎年2月1日時点で飼育されている数の推移です。灰色の線は日本の総人口。
       採卵鶏（種鶏を除く成鶏めす）とブロイラーはそれぞれ1億羽を超え、
       合計すると日本の人口の2倍以上の鶏が、常時飼育されています。
-      豚は単位（頭）も規模も鶏（羽）と大きく異なるため、グラフを分けています。
+      豚は頭数が人口よりずっと小さく対比の意味が薄いため、単独のグラフで示します。
     </p>
     <div class="card">
       <h3>鶏の飼養数と日本の人口（実数：羽・人）</h3>
@@ -48,8 +55,8 @@
       <div class="chart" id="chart-inventory-birds"></div>
     </div>
     <div class="card" style="margin-top:12px">
-      <h3>豚の飼養頭数と日本の人口（実数：頭・人）</h3>
-      <p class="sub">各年2月1日現在（人口は10月1日現在） / 出典: 畜産統計調査・人口推計</p>
+      <h3>豚の飼養頭数（実数：頭）</h3>
+      <p class="sub">各年2月1日現在 / 出典: 畜産統計調査</p>
       <div class="chart" id="chart-inventory-pigs"></div>
     </div>
   </section>
@@ -74,15 +81,9 @@
       1年間に食用として処理（屠殺）される数です。ブロイラーだけで年間7億羽超 ——
       日本の人口の約6倍にあたる鶏が、生後およそ50日で出荷されています。
       採卵鶏も卵を産む量が落ちる1〜2年で「廃鶏」として処理されます。
+      種類別の内訳は冒頭の図をご覧ください。年ごとの推移は上の「飼育されている数」
+      セクションの飼養数の推移と概ね連動します。
     </p>
-    <div class="card">
-      <h3>1年間に殺される動物の数（種類別の割合）</h3>
-      <p class="sub" id="species-sub">出典: 畜産物流通調査・環境省</p>
-      <div class="chart" id="chart-species"></div>
-      <p class="species-note" id="species-note"></p>
-    </div>
-    <p class="desc" style="margin-top:28px">それぞれの年次推移は以下の通りです。</p>
-    <div class="multiples" id="chart-slaughter"></div>
   </section>
 
   <section>
