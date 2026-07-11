@@ -9,6 +9,7 @@
     return {
       layers: v("--layers"), broilers: v("--broilers"), pigs: v("--pigs"),
       sows: v("--sows"), population: v("--population"), dogcat: v("--dogcat"),
+      dairy: v("--dairy"), beef: v("--beef"),
       grid: v("--grid"), axis: v("--axis"), surface: v("--surface"),
       ink: v("--ink"), ink2: v("--ink-2"), muted: v("--muted")
     };
@@ -366,6 +367,43 @@
     }
   }
 
+  /* ---------- 労働力（FTE）当たり飼養頭数・羽数 ---------- */
+  function renderFte(d, C) {
+    var host = document.getElementById("fte-cards");
+    if (!host) return;
+    var fte = d.fte || {};
+    var species = [
+      { key: "layer", name: "採卵養鶏", color: C.layers, unit: "羽" },
+      { key: "broiler", name: "ブロイラー養鶏", color: C.broilers, unit: "羽" },
+      { key: "pig", name: "養豚", color: C.pigs, unit: "頭" },
+      { key: "dairy", name: "酪農", color: C.dairy, unit: "頭" },
+      { key: "beef", name: "肉用牛（肥育牛）", color: C.beef, unit: "頭" }
+    ];
+    host.innerHTML = "";
+    species.forEach(function (s) {
+      var rec = fte[s.key];
+      if (!rec || !rec["2010"] || !rec["2022"]) return;
+      var y0 = rec["2010"], y1 = rec["2022"];
+      var maxV = Math.max(y0.per_fte, y1.per_fte);
+      var ratio = y1.per_fte / y0.per_fte;
+
+      var card = document.createElement("div");
+      card.className = "tile fte-card";
+      function bar(year, rec2) {
+        var pct = maxV ? (rec2.per_fte / maxV * 100) : 0;
+        return '<div class="fte-bar-row"><span class="fte-bar-year">' + year + '年</span>' +
+          '<div class="fte-bar-track"><div class="fte-bar-fill" style="width:' + pct.toFixed(1) +
+          '%;background:' + s.color + '"></div></div>' +
+          '<span class="fte-bar-val">' + fmtPlain(Math.round(rec2.per_fte)) + s.unit + '</span></div>';
+      }
+      card.innerHTML =
+        '<div class="label"><span class="key" style="background:' + s.color + '"></span>' + s.name + '</div>' +
+        '<div class="fte-bars">' + bar(2010, y0) + bar(2022, y1) + '</div>' +
+        '<div class="sub">1FTE（年間2,080時間）当たり・' + ratio.toFixed(1) + '倍に増加</div>';
+      host.appendChild(card);
+    });
+  }
+
   var DATA = null;
 
   function render() {
@@ -473,6 +511,9 @@
       yFmt: fmtPlain,
       tipFmt: function (val) { return fmtPlain(Math.round(val)) + "頭/戸"; }
     });
+
+    /* 労働力（FTE）当たり飼養頭数・羽数 */
+    renderFte(d, C);
 
     var pt = document.getElementById("perfarm-tiles");
     pt.innerHTML = "";

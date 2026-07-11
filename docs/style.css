@@ -14,6 +14,8 @@
   --sows: #0a9a2e;     /* 母豚 */
   --population: #8a93a3; /* 人口（文脈系列） */
   --dogcat: #a8338c;   /* 犬猫（殺処分・比較用） */
+  --dairy: #0a8a9a;    /* 酪農 */
+  --beef: #b5541c;     /* 肉用牛（肥育牛） */
   --notice-bg: #fff6e0;
 
   /* ネイティブUI（スクロールバー・フォームのアクセント色等）をシステム設定に
@@ -38,6 +40,8 @@
     --pigs: #c98500;
     --sows: #008300;
     --dogcat: #c96bb0;
+    --dairy: #2ba8b8;
+    --beef: #d97a3f;
     --notice-bg: #2a2416;
   }
 }
@@ -98,6 +102,15 @@ section > .desc { color: var(--ink-2); font-size: 0.92rem; margin: 0 0 16px; max
 .tile .label .key { width: 10px; height: 10px; border-radius: 3px; flex: none; }
 .tile .value { font-size: 1.65rem; font-weight: 650; margin-top: 2px; }
 .tile .sub { font-size: 0.78rem; color: var(--muted); }
+
+/* ---- FTE比較カード ---- */
+.fte-card .fte-bars { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.fte-bar-row { display: grid; grid-template-columns: 3.2em 1fr auto; align-items: center; gap: 8px; }
+.fte-bar-year { font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fte-bar-track { background: var(--grid); border-radius: 4px; height: 14px; overflow: hidden; }
+.fte-bar-fill { height: 100%; border-radius: 4px; }
+.fte-bar-val { font-size: 0.85rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fte-card .sub { margin-top: 8px; }
 
 /* ---- chart cards ---- */
 .card {

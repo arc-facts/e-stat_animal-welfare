@@ -44,6 +44,29 @@ def ratio_series(
     return out
 
 
+def read_fte() -> dict[str, dict[int, dict[str, float]]]:
+    """species -> {year: {labor_hours, headcount, fte, per_fte}}。
+
+    FTE（フルタイム換算）= 自営農業労働時間 ÷ 2,080時間（週40時間×52週）。
+    """
+    path = DATA_DIR / "fte.csv"
+    out: dict[str, dict[int, dict[str, float]]] = {}
+    if not path.exists():
+        return out
+    with open(path, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            hours = float(r["labor_hours"])
+            headcount = float(r["headcount"])
+            fte = hours / 2080
+            out.setdefault(r["species"], {})[int(r["year"])] = {
+                "labor_hours": hours,
+                "headcount": headcount,
+                "fte": fte,
+                "per_fte": headcount / fte,
+            }
+    return out
+
+
 def total_series(table: dict[int, dict[str, float]]) -> list[list[float]]:
     """犬猫殺処分の合計系列。total 列があればそれを、無ければ dogs+cats を使う。"""
     out = []
@@ -97,6 +120,8 @@ def main() -> None:
             "broilers": series(livestock, "broiler_farms"),
             "pigs": series(livestock, "pig_farms"),
         },
+        # 労働力（FTE）当たり飼養頭数・羽数 — 農業経営統計調査「営農類型別経営統計」
+        "fte": read_fte(),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
