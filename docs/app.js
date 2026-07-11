@@ -296,13 +296,22 @@
     kpi("豚", inv.pigs, "頭", C.pigs, "うち母豚 " + fmtCount(last(inv.sows)[1], "頭"));
     kpi("日本の人口", inv.population, "人", C.population);
 
-    /* 飼養数チャート（百万単位） */
+    /* 飼養数チャート（百万単位）— 鶏（羽）と豚（頭）は単位・規模が大きく
+       異なるため別グラフに分け、両方に人口を対比の基準線として表示する */
     function toMillion(series) { return series.map(function (p) { return [p[0], p[1] / 1000]; }); }
-    lineChart(document.getElementById("chart-inventory"), {
-      ariaLabel: "採卵鶏・ブロイラー・豚の飼養数と日本の人口の推移",
+    lineChart(document.getElementById("chart-inventory-birds"), {
+      ariaLabel: "採卵鶏・ブロイラーの飼養数と日本の人口の推移",
       series: [
         { name: "採卵鶏", color: C.layers, data: toMillion(inv.layers) },
         { name: "ブロイラー", color: C.broilers, data: toMillion(inv.broilers) },
+        { name: "日本の人口", color: C.population, data: toMillion(inv.population), context: true }
+      ],
+      yFmt: function (t) { return fmtPlain(t); },
+      tipFmt: function (val) { return trim(val.toFixed(1)) + "百万"; }
+    });
+    lineChart(document.getElementById("chart-inventory-pigs"), {
+      ariaLabel: "豚の飼養頭数と日本の人口の推移",
+      series: [
         { name: "豚", color: C.pigs, data: toMillion(inv.pigs) },
         { name: "日本の人口", color: C.population, data: toMillion(inv.population), context: true }
       ],
