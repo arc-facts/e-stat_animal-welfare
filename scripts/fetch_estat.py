@@ -246,7 +246,11 @@ def run_discover(client: EstatClient, config: dict) -> None:
         seen.add(key)
         search = spec.get("search", {})
         print(f"\n=== {name}: {search} ===")
-        resp = client.list_stats(**search, limit=30)
+        try:
+            resp = client.list_stats(**search, limit=30)
+        except Exception as e:  # 1系列の検索失敗で残りの--discoverを止めない
+            print(f"  検索失敗: {type(e).__name__}: {e}", file=sys.stderr)
+            continue
         for table in resp.tables:
             title = table.get("TITLE")
             if isinstance(title, dict):

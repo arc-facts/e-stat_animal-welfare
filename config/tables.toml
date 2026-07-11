@@ -16,8 +16,11 @@ file = "livestock.csv"
 description = "採卵鶏 成鶏めす飼養羽数（種鶏を除く）"
 stats_data_id = ""
 title_regex = "採卵鶏.*(累年|飼養戸数・羽数)"
-match = ["成鶏めす", "羽数"]
-exclude = ["種鶏", "規模", "ひな", "1戸当たり", "１戸当たり"]
+# 実際の行ラベル例（表0001884437）: "飼養羽数_採卵鶏（種鶏を除く）_成鶏めす（6ヶ月以上）"
+# 「種鶏を除く」自体に「種鶏」という文字列を含むため、excludeで"種鶏"を使うと
+# 目的の行まで消えてしまう。目的の語句をmatchで直接指定して一意に絞り込む。
+match = ["成鶏めす（6ヶ月以上）", "採卵鶏（種鶏を除く）"]
+exclude = ["1戸当たり", "１戸当たり"]
 unit = "千羽"
 
 [series.layers_thousand.search]
@@ -29,8 +32,10 @@ file = "livestock.csv"
 description = "採卵鶏 飼養戸数"
 stats_data_id = ""
 title_regex = "採卵鶏.*(累年|飼養戸数・羽数)"
+# 行ラベル例: "001 飼養戸数"（総数）/ "002 飼養戸数_採卵鶏（種鶏のみの飼養者を除く）" /
+# "003 飼養戸数_種鶏のみ"。総数だけを残すため下位区分を明示的に除外する。
 match = ["飼養戸数"]
-exclude = ["種鶏", "規模", "成鶏めす", "ひな", "1戸当たり", "１戸当たり"]
+exclude = ["採卵鶏（種鶏のみ", "種鶏のみ", "1戸当たり", "１戸当たり"]
 unit = "戸"
 
 [series.layer_farms.search]
@@ -43,8 +48,11 @@ description = "ブロイラー 飼養羽数"
 stats_data_id = ""
 title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
 title_exclude = ["規模別"]
+# 行ラベル例: "002 飼養羽数" / "003 １戸当たりの飼養羽数"（"飼養羽数"を含む） /
+# "005 対前年比_飼養羽数"（同じく"飼養羽数"を含む、単位％）。
+# 両方を明示的に除外しないと"飼養羽数"だけでは複数行にマッチする。
 match = ["飼養羽数"]
-exclude = ["規模", "出荷", "1戸当たり", "１戸当たり"]
+exclude = ["規模", "出荷", "1戸当たり", "１戸当たり", "対前年比"]
 unit = "千羽"
 
 [series.broilers_thousand.search]
@@ -58,7 +66,7 @@ stats_data_id = ""
 title_regex = "ブロイラー.*(累年|飼養戸数・羽数)"
 title_exclude = ["規模別"]
 match = ["飼養戸数"]
-exclude = ["規模", "出荷", "1戸当たり", "１戸当たり"]
+exclude = ["規模", "出荷", "1戸当たり", "１戸当たり", "対前年比"]
 unit = "戸"
 
 [series.broiler_farms.search]
@@ -71,8 +79,12 @@ description = "豚 飼養頭数（総数）"
 stats_data_id = ""
 title_regex = "豚.*(累年|飼養戸数・頭数)"
 title_exclude = ["規模別"]
+# 行ラベル例（表0001884287）: "003 飼養頭数_計"（目的の行）のほか
+# "004 子取り用めす豚" "005 種おす豚" "006 肥育豚" "007 その他"
+# "008〜011 6ヶ月未満/6ヶ月以上の内訳" "012 1戸当たり飼養頭数" が並ぶため、
+# それらを漏れなく除外する。
 match = ["飼養頭数"]
-exclude = ["規模", "子取り", "肥育", "種おす", "経営タイプ", "小計", "6か月", "6カ月", "6ヶ月", "1戸当たり", "１戸当たり"]
+exclude = ["規模", "子取り", "肥育", "種おす", "経営タイプ", "小計", "その他", "6か月", "6カ月", "6ヶ月", "1戸当たり", "１戸当たり"]
 unit = "千頭"
 
 [series.pigs_thousand.search]
@@ -85,8 +97,11 @@ description = "子取り用めす豚（母豚）頭数"
 stats_data_id = ""
 title_regex = "豚.*(累年|飼養戸数・頭数)"
 title_exclude = ["規模別"]
+# 行ラベル例: "004 飼養頭数_子取り用めす豚"（総数、目的の行）と
+# "010 飼養頭数_6ヶ月以上_子取り用めす豚"（6ヶ月以上のみの内数）の
+# 2つが"子取り用めす豚"にマッチするため、後者を除外して総数を残す。
 match = ["子取り用めす豚"]
-exclude = ["規模", "小計", "1戸当たり", "１戸当たり"]
+exclude = ["規模", "小計", "6か月", "6カ月", "6ヶ月", "1戸当たり", "１戸当たり", "戸数"]
 unit = "千頭"
 
 [series.sows_thousand.search]
@@ -113,36 +128,40 @@ searchWord = "豚 累年 飼養戸数 頭数"
 [series.broilers_slaughtered_thousand]
 file = "slaughter.csv"
 description = "ブロイラー（肉用若鶏）処理羽数"
+# 「食鳥流通累年統計 食鳥処理場調査（ブロイラー）処理量」— この表は
+# 鳥種がタイトルで固定（行ラベルには"肉用若鶏"等の文字列は出てこない）。
+# 行ラベル例: "100 羽数 100 全ての食鳥処理場 00000 全国 2017 ... yearly"
 stats_data_id = ""
-title_regex = "食鳥.*処理"
+title_regex = "食鳥.*処理量.*ブロイラー"
 title_exclude = ["規模別", "月別"]
-match = ["肉用若鶏"]
-exclude = ["重量", "規模", "戸数", "月"]
+match = ["羽数", "全国"]
+exclude = ["重量", "規模", "戸数", "月別"]
 unit = "千羽"
 
 [series.broilers_slaughtered_thousand.search]
 statsCode = "00500227"
-searchWord = "食鳥 処理羽数 年次"
+searchWord = "食鳥 処理場調査 ブロイラー 処理量 累年"
 
 [series.layers_culled_thousand]
 file = "slaughter.csv"
 description = "廃鶏（成鶏）処理羽数"
+# ブロイラーと同じ調査の「成鶏」版の累年表を探す（存在すれば同じ行構造のはず）。
 stats_data_id = ""
-title_regex = "食鳥.*処理"
+title_regex = "食鳥.*処理量.*成鶏"
 title_exclude = ["規模別", "月別"]
-match = ["廃鶏"]
-exclude = ["重量", "規模", "戸数", "月"]
+match = ["羽数", "全国"]
+exclude = ["重量", "規模", "戸数", "月別"]
 unit = "千羽"
 
 [series.layers_culled_thousand.search]
 statsCode = "00500227"
-searchWord = "食鳥 処理羽数 年次"
+searchWord = "食鳥 処理場調査 成鶏 処理量 累年"
 
 [series.pigs_slaughtered_thousand]
 file = "slaughter.csv"
 description = "豚 と畜頭数"
 stats_data_id = ""
-title_regex = "と畜頭数"
+title_regex = "と畜.*(累年|頭数)"
 title_exclude = ["規模別", "と畜場数", "月別"]
 match = ["豚"]
 exclude = ["規模", "都道府県", "月別", "場数"]
@@ -150,7 +169,7 @@ unit = "千頭"
 
 [series.pigs_slaughtered_thousand.search]
 statsCode = "00500227"
-searchWord = "と畜 頭数 年次 全国"
+searchWord = "と畜 累年"
 
 # ---------------------------------------------------------------- 人口
 # 人口推計（統計コード 00200524）
@@ -166,4 +185,4 @@ unit = "千人"
 
 [series.population_thousand.search]
 statsCode = "00200524"
-searchWord = "人口推計 長期時系列 総人口"
+searchWord = "人口推計"
