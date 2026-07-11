@@ -258,13 +258,16 @@ def run_discover(client: EstatClient, config: dict) -> None:
             print(f"  {table.get('@id')}  {table.get('STATISTICS_NAME','')} / {title}")
 
 
-def run_search(client: EstatClient, keyword: str) -> None:
+def run_search(client: EstatClient, keyword: str, survey_years: str | None = None) -> None:
     """config/tables.toml に系列を定義する前に、任意のキーワードで統計表を
     探索するための使い捨てコマンド（新しい統計調査の実在確認・表ID特定用）。
     """
-    print(f"\n=== 検索: {keyword!r} ===")
+    params = {"searchWord": keyword, "limit": 30}
+    if survey_years:
+        params["surveyYears"] = survey_years
+    print(f"\n=== 検索: {keyword!r} (surveyYears={survey_years!r}) ===")
     try:
-        resp = client.list_stats(searchWord=keyword, limit=30)
+        resp = client.list_stats(**params)
     except Exception as e:
         print(f"  検索失敗: {type(e).__name__}: {e}", file=sys.stderr)
         return
@@ -336,6 +339,7 @@ def main() -> int:
     parser.add_argument("--peek", action="append", help="指定した系列の表を実際に取得し行ラベル・単位を表示して終了（複数可）")
     parser.add_argument("--peek-limit", type=int, default=60, help="--peek で表示する行数の上限（重複除去後）")
     parser.add_argument("--search", action="append", help="任意のキーワードで統計表を検索して終了（config未定義の調査用、複数可）")
+    parser.add_argument("--search-year", help="--search と併用し、e-Stat の surveyYears で調査年を絞り込む（例: 2004）")
     parser.add_argument("--peek-table", action="append", help="任意の表IDの生の行ラベル・単位を表示して終了（config未定義の調査用、複数可）")
     args = parser.parse_args()
 
@@ -359,7 +363,7 @@ def main() -> int:
 
     if args.search:
         for keyword in args.search:
-            run_search(client, keyword)
+            run_search(client, keyword, args.search_year)
         return 0
 
     if args.peek_table:
