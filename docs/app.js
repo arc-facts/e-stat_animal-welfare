@@ -272,6 +272,22 @@
     var items = [];
     if (b) items.push({ name: "ブロイラー", color: C.broilers, year: b[0], animals: b[1] * 1000, unit: "羽" });
     if (l) items.push({ name: "廃鶏（採卵鶏）", color: C.layers, year: l[0], animals: l[1] * 1000, unit: "羽" });
+    // 採卵鶏由来の雄ひよこ殺処分数。孵化場での性判別後、卵を産まない雄ひよこは
+    // 生後すぐに殺処分される（統計として公表されていないため、雌雛と概ね同数
+    // 孵化するという前提で、雌の羽数（＝廃鶏として入れ替わる年間羽数）と
+    // 同数と仮定して概算する）。
+    var maleChicks = latest(sl.layer_male_chicks);
+    if (l) {
+      var mc = maleChicks
+        ? { animals: maleChicks[1] * 1000, year: maleChicks[0], estimated: false }
+        : { animals: l[1] * 1000, year: l[0], estimated: true };
+      items.push({
+        name: "雄ひよこ（採卵鶏由来" + (mc.estimated ? "・推定" : "") + "）",
+        shortName: "雄ひよこ" + (mc.estimated ? "（推定）" : ""),
+        color: "color-mix(in srgb, " + C.layers + " 55%, white)",
+        year: mc.year, animals: mc.animals, unit: "羽", estimated: mc.estimated
+      });
+    }
     if (p) items.push({ name: "豚", color: C.pigs, year: p[0], animals: p[1] * 1000, unit: "頭" });
     if (dc) items.push({ name: "犬猫（殺処分）", color: C.dogcat, year: dc[0], animals: dc[1], unit: "頭" });
     if (!items.length) { host.innerHTML = ""; if (noteEl) noteEl.textContent = ""; return; }
@@ -302,7 +318,7 @@
         var big = ww > 130 && hh > 60;
         var tx = x + 10, ty = y + (big ? 26 : 20);
         s += '<text x="' + tx + '" y="' + ty + '" font-size="' + (big ? 17 : 13) +
-          '" font-weight="600" fill="#fff">' + it.name + '</text>';
+          '" font-weight="600" fill="#fff">' + (it.shortName || it.name) + '</text>';
         if (hh > (big ? 46 : 34)) {
           s += '<text x="' + tx + '" y="' + (ty + (big ? 22 : 17)) + '" font-size="' + (big ? 15 : 12) +
             '" fill="rgba(255,255,255,.88)">' + trim(share.toFixed(share < 1 ? 2 : 1)) + '%</text>';
@@ -351,19 +367,23 @@
     host.innerHTML = svg + lg + tbl;
 
     if (noteEl) {
+      var note = "";
       if (dc && b) {
         var ratio = (b[1] * 1000) / dc[1];
         var ratioTxt = ratio >= 10000 ? "約" + fmtPlain(Math.round(ratio / 10000)) + "万倍"
           : "約" + fmtPlain(Math.round(ratio)) + "倍";
-        noteEl.innerHTML = "犬猫の殺処分数（" + fmtCount(dc[1] / 1000, "頭") + "・" + dc[0] +
+        note = "犬猫の殺処分数（" + fmtCount(dc[1] / 1000, "頭") + "・" + dc[0] +
           "年度）は、この帯グラフでは幅0.001%未満で目には見えません。ブロイラー1種だけで、" +
           "その" + ratioTxt + "が1年間に殺されています。社会的な関心が集まる犬猫の殺処分に対し、" +
           "その何万倍もの畜産動物が屠殺されていることが分かります。";
       } else if (!p) {
-        noteEl.textContent = "※豚のと畜頭数は確報値を取得中のため、集計に含めていません。";
-      } else {
-        noteEl.textContent = "";
+        note = "※豚のと畜頭数は確報値を取得中のため、集計に含めていません。";
       }
+      if (mc && mc.estimated) {
+        note += (note ? " " : "") + "※雄ひよこの殺処分数は公式統計が存在しないため、" +
+          "雌雛（廃鶏として入れ替わる年間羽数）と概ね同数孵化するという前提での概算値です。";
+      }
+      noteEl.innerHTML = note;
     }
   }
 
@@ -431,24 +451,6 @@
     document.getElementById("hero-caption").textContent =
       slYear + "年のブロイラー・廃鶏（採卵鶏）・豚の処理数の合計。日本の人口（" +
       fmtCount(pop, "人") + "）の約" + ratio.toFixed(1) + "倍にあたります。";
-
-    /* KPIタイル */
-    var tiles = document.getElementById("kpi-tiles");
-    tiles.innerHTML = "";
-    function kpi(name, series, unit, color, subExtra) {
-      var lp = last(series), pp = prev(series);
-      var delta = pp ? ((lp[1] - pp[1]) / pp[1] * 100) : null;
-      tile(tiles, {
-        label: name, color: color,
-        value: fmtCount(lp[1], unit),
-        sub: lp[0] + "年" + (delta != null ? "・前回比 " + (delta >= 0 ? "+" : "") + delta.toFixed(1) + "%" : "") +
-          (subExtra ? "・" + subExtra : "")
-      });
-    }
-    kpi("採卵鶏（種鶏を除く成鶏めす）", inv.layers, "羽", C.layers);
-    kpi("ブロイラー（肉用鶏）", inv.broilers, "羽", C.broilers);
-    kpi("豚", inv.pigs, "頭", C.pigs, "うち母豚 " + fmtCount(last(inv.sows)[1], "頭"));
-    kpi("日本の人口", inv.population, "人", C.population);
 
     /* 飼養数チャート — 鶏（羽）と豚（頭）は単位・規模が大きく異なるため別グラフに
        分け、両方に人口を対比の基準線として表示する。軸・ツールチップは「百万」
