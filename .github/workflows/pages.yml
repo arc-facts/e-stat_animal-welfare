@@ -36,6 +36,16 @@ jobs:
       - name: Build site data
         run: python scripts/build_site_data.py
 
+      - name: Cache-bust static assets
+        # index.html と app.js/style.css がブラウザ・CDNのキャッシュにより
+        # 別バージョンの組み合わせで配信されると、要素IDの不整合等で
+        # 実行時エラーになりうる。コミットSHAをクエリ文字列として付与し、
+        # デプロイのたびに両者が必ずセットで再取得されるようにする。
+        run: |
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          sed -i "s/style\.css\"/style.css?v=$SHA_SHORT\"/" docs/index.html
+          sed -i "s/app\.js\"/app.js?v=$SHA_SHORT\"/" docs/index.html
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
