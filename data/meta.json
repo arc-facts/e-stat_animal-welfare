@@ -1,6 +1,6 @@
 {
   "provisional": true,
-  "generated_at": "2026-07-11T18:47:19+00:00",
+  "generated_at": "2026-08-10T01:09:50+00:00",
   "note": "掲載値は政府統計の確報値のみ。確定値が未取得・未公表の年次は空欄（推計で補完しない）。scripts/fetch_estat.py を ESTAT_APP_ID 付きで実行すると e-Stat API から確報値を取得・更新する。provisional は未取得系列が残っている間 true。",
   "sources": {
     "livestock": "農林水産省「畜産統計調査」（統計コード 00500222）",
