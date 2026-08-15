@@ -1,0 +1,53 @@
+name: Update data from spreadsheet
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 6時間ごと（シートを直してから最大6時間で公開サイトに反映）
+    - cron: "0 */6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check spreadsheet is configured
+        id: cfg
+        run: |
+          if grep -qE '^\s*spreadsheet_id\s*=\s*""' config/sheets.toml; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::config/sheets.toml の spreadsheet_id が空のため取り込みをスキップしました。"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 取り込みに失敗したらここで止める。壊れたデータを公開しないため、
+      # continue-on-error は付けない。
+      - name: Fetch from spreadsheet
+        if: steps.cfg.outputs.configured == 'true'
+        run: python scripts/fetch_sheets.py
+
+      - name: Build site data
+        if: steps.cfg.outputs.configured == 'true'
+        run: python scripts/build_site_data.py
+
+      - name: Commit and push if changed
+        if: steps.cfg.outputs.configured == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data docs/data
+          if git diff --cached --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "data: スプレッドシートの内容を反映"
+            git push
+          fi

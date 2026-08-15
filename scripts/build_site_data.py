@@ -163,6 +163,33 @@ def read_cagefree_sea() -> list[dict]:
     return out
 
 
+def read_rows(name: str, ints=(), floats=(), bools=()) -> list[dict]:
+    """図表用の小さな表をそのまま読む（列の型だけ整える）。
+
+    値の書き換えはスプレッドシート側で行い、ここでは加工しない。
+    空欄は None のまま残す（グラフ側で「データなし」として扱う）。
+    """
+    path = DATA_DIR / name
+    if not path.exists():
+        return []
+    out = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            rec: dict = {}
+            for k, v in r.items():
+                v = (v or "").strip()
+                if k in bools:
+                    rec[k] = v in ("1", "true", "TRUE", "yes")
+                elif k in ints:
+                    rec[k] = int(v) if v else None
+                elif k in floats:
+                    rec[k] = float(v) if v else None
+                else:
+                    rec[k] = v
+            out.append(rec)
+    return out
+
+
 def read_sow_cycle() -> dict[str, float]:
     """母豚の繁殖サイクルのパラメータ（広岡 2018 のベース条件）。
 
@@ -249,6 +276,15 @@ def main() -> None:
         "cagefree_sea": read_cagefree_sea(),
         # 母豚の繁殖サイクル — 広岡（2018）のシミュレーションモデルのベース条件
         "sow_cycle": read_sow_cycle(),
+        # 1羽当たり飼養面積（実面積比の図）
+        "space_per_hen": read_rows(
+            "space_per_hen.csv",
+            floats=("cm2", "width_cm", "height_cm"), bools=("outline",)),
+        # ケージフリーへの移行で減る痛みの時間 — Welfare Footprint Institute
+        "pain_hours": read_rows(
+            "pain_hours.csv", ints=("vs_conventional", "vs_enriched")),
+        # ブロイラーの飼養密度
+        "broiler_density": read_rows("broiler_density.csv", ints=("birds",)),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

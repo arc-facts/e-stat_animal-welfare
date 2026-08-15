@@ -366,6 +366,12 @@ main {
   line-height: 1.9;
   color: var(--ink-2);
 }
+/* 縦罫のない、ふつうの補足 */
+.species-note--plain {
+  border-left: 0;
+  padding-left: 0;
+  margin-top: 10px;
+}
 .empty-note {
   color: var(--muted); font-size: 0.88rem;
   padding: 28px 4px; text-align: center;

@@ -1,0 +1,37 @@
+# Googleスプレッドシートから data/*.csv を取り込む設定
+#
+# 前提: スプレッドシートを「リンクを知っている全員が閲覧可」にしておくこと。
+#       （共有 → 一般的なアクセス → リンクを知っている全員／閲覧者）
+#       書き込み権限は不要。取り込みは読み取りのみ。
+#
+# spreadsheet_id は共有URLの /d/ と /edit の間の文字列。
+#   https://docs.google.com/spreadsheets/d/【ここ】/edit
+
+[sheet]
+spreadsheet_id = ""
+
+# タブ名 = 書き出し先のCSV名。タブ名はシート側のタブ名と完全一致させる。
+# ここに無いタブは無視される（メモ用のタブを自由に足してよい）。
+[tabs]
+cagefree = "cagefree.csv"
+cagefree_types = "cagefree_types.csv"
+cagefree_world = "cagefree_world.csv"
+cagefree_sea = "cagefree_sea.csv"
+space_per_hen = "space_per_hen.csv"
+pain_hours = "pain_hours.csv"
+broiler_density = "broiler_density.csv"
+sow_cycle = "sow_cycle.csv"
+euthanasia = "euthanasia.csv"
+
+# 取り込み時に列名を検査する。シート側で見出しを書き換えたり列を並べ替えたりすると
+# ここで弾かれ、壊れたデータが公開されるのを防ぐ。
+[columns]
+cagefree = ["source", "year", "scope", "cagefree_birds", "total_birds", "share_pct", "note"]
+cagefree_types = ["source", "year", "type", "birds", "farms"]
+cagefree_world = ["country", "code", "year", "share_pct", "source", "basis", "show"]
+cagefree_sea = ["country", "code", "layer_hens", "commitments_total", "commitments_local", "commitments_intl"]
+space_per_hen = ["key", "name", "cm2", "width_cm", "height_cm", "outline", "note"]
+pain_hours = ["key", "name", "name_en", "vs_conventional", "vs_enriched"]
+broiler_density = ["key", "title", "birds", "label", "note"]
+sow_cycle = ["parameter", "value", "unit", "label"]
+euthanasia = ["year", "dogs", "cats", "total"]

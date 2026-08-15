@@ -8,7 +8,7 @@ on:
   # （GitHub Actions の bot による push は push イベントを発火しないため、
   #  データ更新ワークフローの完了を workflow_run で受けて連鎖させる）
   workflow_run:
-    workflows: ["Update data from e-Stat"]
+    workflows: ["Update data from e-Stat", "Update data from spreadsheet"]
     types: [completed]
 
 permissions:

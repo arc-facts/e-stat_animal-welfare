@@ -3,6 +3,41 @@
 このディレクトリの CSV がサイトの元データです。`scripts/build_site_data.py` が
 これらを結合・加工して `docs/data/data.json` を生成します。
 
+## 更新の経路は2つ
+
+| 経路 | 対象 | 更新のしかた |
+|---|---|---|
+| **e-Stat API（自動）** | `livestock` / `slaughter` / `population` / `fte` | `update-data.yml` が毎月10日に取得。手を入れない |
+| **Googleスプレッドシート（手動）** | それ以外すべて | シートを編集すると `update-sheets.yml` が6時間ごとに取り込む |
+
+自動取得の系列をシートに載せていないのは、月次の上書きと手編集がぶつかるためです。
+どうしても手で直す場合は、このディレクトリの CSV を直接編集してください。
+
+### スプレッドシート運用の始め方
+
+1. `python scripts/make_sheet_workbook.py` で `build/animal-welfare-data.xlsx` を作る
+   （手管理のCSVを1冊にまとめたもの。`pip install openpyxl` が必要）
+2. Googleドライブにアップロードし、**Googleスプレッドシートとして開く**（＝変換）
+3. 共有 → 一般的なアクセス → **「リンクを知っている全員」「閲覧者」** にする
+   （取り込みは読み取りのみ。編集権限は渡しません）
+4. 共有URLの `/d/` と `/edit` の間の文字列を `config/sheets.toml` の
+   `spreadsheet_id` に貼る
+5. `python scripts/fetch_sheets.py --check` で差分を確認できる
+
+以後、シートを直せば最大6時間で公開サイトに反映されます。すぐ反映したいときは
+GitHub の Actions から「Update data from spreadsheet」を手動実行してください。
+
+### 壊れたデータが公開されない仕組み
+
+`scripts/fetch_sheets.py` は、書き出す前に次を検査します。1つでも引っかかれば
+**どのCSVも書き換えずに異常終了**し、サイトは前の状態のまま保たれます。
+
+- 1行目の見出しが `config/sheets.toml` の `[columns]` と完全一致するか（順序も）
+- データ行が1行以上あるか
+- 行数が既存の半分以下に減っていないか（タブの消し間違いを検知）
+
+また `1,234` のような桁区切りは自動で `1234` に直します（日本語の読点は触りません）。
+
 ## 掲載方針: 確報値のみ・不明な年は空欄
 
 このサイトは政府統計の**確報値のみ**を掲載します。確定値が未取得・未公表の

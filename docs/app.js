@@ -770,23 +770,20 @@
   }
 
   /* ---------- 1羽が使える面積（実面積比で描く） ----------
-     すべて同じ縮尺（cm→px）で並べるので、図形の大小がそのまま面積の差になる。 */
-  var SPACE_ITEMS = [
-    { name: "バタリーケージ", cm2: 448.9, note: "日本の実測平均", fill: true },
-    { name: "A4用紙", cm2: 623.7, note: "比較の目安", w: 21.0, h: 29.7, fill: false, ref: true },
-    { name: "エンリッチドケージ", cm2: 750, note: "EUの下限", fill: true },
-    { name: "ケージフリー（屋内）", cm2: 1111, note: "EU 9羽/m²", fill: true }
-  ];
-
+     すべて同じ縮尺（cm→px）で並べるので、図形の大小がそのまま面積の差になる。
+     ケージフリーは載せない。平均面積を四角で描くと、その広さを1羽が
+     動き回れるかのように読めてしまい、実態を取り違えさせるため。 */
   function renderSpace(d, C) {
     var host = document.getElementById("chart-space");
     if (!host) return;
+    var items = (d.space_per_hen || []).filter(function (it) { return it.cm2; });
+    if (!items.length) { host.innerHTML = ""; return; }
     var W = Math.max(280, Math.round(host.clientWidth) || 720);
-    var cols = W < 560 ? 2 : 4;
-    var rows = Math.ceil(SPACE_ITEMS.length / cols);
+    var cols = W < 560 ? 2 : items.length;
+    var rows = Math.ceil(items.length / cols);
     var maxCm = 0;
-    SPACE_ITEMS.forEach(function (it) {
-      maxCm = Math.max(maxCm, it.h || Math.sqrt(it.cm2), it.w || Math.sqrt(it.cm2));
+    items.forEach(function (it) {
+      maxCm = Math.max(maxCm, it.height_cm || Math.sqrt(it.cm2), it.width_cm || Math.sqrt(it.cm2));
     });
     var cellW = W / cols;
     var scale = (cellW - 22) / maxCm;      // px / cm
@@ -797,13 +794,13 @@
 
     var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) +
       '" role="img" aria-label="飼育方式ごとの1羽当たり面積を実面積比で比べた図">';
-    SPACE_ITEMS.forEach(function (it, i) {
+    items.forEach(function (it, i) {
       var cx = (i % cols) * cellW + cellW / 2;
       var baseY = Math.floor(i / cols) * rowH + shapeH;
-      var w = (it.w || Math.sqrt(it.cm2)) * scale;
-      var h = (it.h || Math.sqrt(it.cm2)) * scale;
+      var w = (it.width_cm || Math.sqrt(it.cm2)) * scale;
+      var h = (it.height_cm || Math.sqrt(it.cm2)) * scale;
       var x = cx - w / 2, y = baseY - h;
-      if (it.fill) {
+      if (!it.outline) {
         svg += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) +
           '" height="' + h.toFixed(1) + '" fill="' + C.layers + '" opacity="0.85" rx="2"></rect>';
       } else {
@@ -828,31 +825,29 @@
   /* ---------- ケージフリーへの移行で減る痛みの時間 ----------
      出典: Welfare Footprint Institute。エンリッチドケージとの比較では
      Disabling の推定値が示されていないため、その棒は描かない。 */
-  var PAIN_ROWS = [
-    { name: "身動きが取れないほどの痛み", en: "Disabling", vsConv: 275, vsEnr: null },
-    { name: "はっきり苦痛な痛み", en: "Hurtful", vsConv: 2313, vsEnr: 1410 },
-    { name: "気になる程度の不快", en: "Annoying", vsConv: 4645, vsEnr: 4065 }
-  ];
-
   function renderPain(d, C) {
     var host = document.getElementById("chart-pain");
     if (!host) return;
+    var rowsP = d.pain_hours || [];
+    if (!rowsP.length) { host.innerHTML = ""; return; }
     var W = Math.max(280, Math.round(host.clientWidth) || 720);
-    var maxV = 4645;
+    var maxV = rowsP.reduce(function (m, r) {
+      return Math.max(m, r.vs_conventional || 0, r.vs_enriched || 0);
+    }, 1);
     var BAR = 18, GAPB = 6, HEAD = 22, BLOCK = HEAD + BAR * 2 + GAPB + 20;
     var valueW = 74;
     var track = Math.max(60, W - valueW - 6);
-    var H = PAIN_ROWS.length * BLOCK;
+    var H = rowsP.length * BLOCK;
 
     var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) +
       '" role="img" aria-label="ケージフリーへの移行で減る痛みの時間">';
-    PAIN_ROWS.forEach(function (r, i) {
+    rowsP.forEach(function (r, i) {
       var top = i * BLOCK;
       svg += '<text x="0" y="' + (top + 13) + '" font-size="12.5" font-weight="700" fill="' +
         C.ink + '">' + esc(r.name) + '<tspan font-size="11" font-weight="400" fill="' +
-        C.muted + '">  ' + r.en + "</tspan></text>";
-      [{ v: r.vsConv, op: 1, label: "従来型ケージと比べて" },
-       { v: r.vsEnr, op: 0.45, label: "エンリッチドケージと比べて" }].forEach(function (b, j) {
+        C.muted + '">  ' + esc(r.name_en) + "</tspan></text>";
+      [{ v: r.vs_conventional, op: 1 },
+       { v: r.vs_enriched, op: 0.45 }].forEach(function (b, j) {
         var y = top + HEAD + j * (BAR + GAPB);
         if (b.v == null) {
           svg += '<text x="0" y="' + (y + BAR * 0.5 + 4) + '" font-size="11.5" fill="' +
@@ -880,13 +875,9 @@
     var host = document.getElementById("chart-broiler-density");
     if (!host) return;
     var W = Math.max(280, Math.round(host.clientWidth) || 720);
-    var panels = [
-      { title: "日本（出荷直前）", birds: 15, label: "十数羽 / 1m²",
-        note: "日本には法的な上限がありません（図は15羽で作図）" },
-      { title: "ベターチキンコミットメント", birds: 10, label: "約10羽 / 1m²",
-        note: "30kg/m²以下。出荷体重3kgとして換算" }
-    ];
-    var cols = W < 480 ? 1 : 2;
+    var panels = d.broiler_density || [];
+    if (!panels.length) { host.innerHTML = ""; return; }
+    var cols = W < 480 ? 1 : Math.min(2, panels.length);
     var cellW = W / cols;
     var side = Math.min(cellW - 24, 200);
     var LABEL = 62;
