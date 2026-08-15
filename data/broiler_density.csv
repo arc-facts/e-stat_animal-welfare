@@ -1,3 +1,5 @@
-key,title,birds,label,note,source_text,source_url,claim_id
-japan,日本（出荷直前）,15,十数羽 / 1m²,日本には法的な上限がありません（図は15羽で作図）,出荷直前には1m²当たり十数羽になるとされる（畜産技術協会「ブロイラーの飼養実態アンケート調査」等）。日本には飼養密度の法的上限がない。※一次資料のURL未確認,,c404
-bcc,ベターチキンコミットメント,10,約10羽 / 1m²,30kg/m²以下。出荷体重3kgとして換算,Better Chicken Commitment の要件「Maximum stocking density of 30kg/m²」。出荷体重3kgとして1m²当たり約10羽に換算,https://betterchickencommitment.com/,c405
+key,label,kg_per_m2,birds_per_m2,note,source_text,source_url,claim_id
+japan_max,日本（最大）,58.99,22.69,法的な上限がないため、ここまでの密度が実在する,畜産技術協会の飼養実態アンケート調査にもとづく数値（アニマルライツセンターによる集計）。日本は平均1m²あたり15.90羽・46.68kg、最大22.69羽・58.99kg,https://www.hopeforanimals.org/broiler/495/,c404
+japan_avg,日本（平均）,46.68,15.90,日本には飼養密度の法的な上限がない,畜産技術協会の飼養実態アンケート調査にもとづく数値（アニマルライツセンターによる集計）。日本は平均1m²あたり15.90羽・46.68kg、最大22.69羽・58.99kg,https://www.hopeforanimals.org/broiler/495/,c404
+eu,EU（上限）,33,16.5,EU指令2007/43/ECの上限。条件を満たす場合のみ39kg/m²まで,EU指令 2007/43/EC は飼養密度の上限を33kg/m²と定め、追加要件を満たす場合に限り39kg/m²までを認めている,https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32007L0043,c407
+bcc,ベターチキンコミットメント,30,,国際的な企業向け基準が求める上限,Better Chicken Commitment「Maximum stocking density of 30kg/m²」,https://betterchickencommitment.com/,c405

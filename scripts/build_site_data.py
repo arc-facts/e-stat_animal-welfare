@@ -303,7 +303,7 @@ def main() -> None:
         "pain_hours": read_rows(
             "pain_hours.csv", ints=("vs_conventional", "vs_enriched")),
         # ブロイラーの飼養密度
-        "broiler_density": read_rows("broiler_density.csv", ints=("birds",)),
+        "broiler_density": read_rows("broiler_density.csv", floats=("kg_per_m2", "birds_per_m2")),
         # 一生の年表（採卵鶏・ブロイラー）
         "hen_timeline": read_rows("hen_timeline.csv", ints=("day",)),
         "broiler_timeline": read_rows("broiler_timeline.csv", ints=("day",)),

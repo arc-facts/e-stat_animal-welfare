@@ -871,20 +871,55 @@
   }
 
   /* ---------- ブロイラーの飼養密度 ----------
-     1m²の枠に鶏を並べた図は「大して変わらない」印象を与えるため、
-     数値そのものを大きく出す形にした。要点は羽数の差ではなく、
-     日本には上限そのものが無いこと。 */
+     羽数で比べると体重差が隠れて「大差ない」ように見えるため、
+     規制でも使われる kg/m² で並べる。日本には上限そのものがない。 */
   function renderBroilerDensity(d, C) {
     var host = document.getElementById("chart-broiler-density");
     if (!host) return;
-    var panels = d.broiler_density || [];
-    if (!panels.length) { host.innerHTML = ""; return; }
-    host.innerHTML = '<div class="tiles tiles--num">' + panels.map(function (p, i) {
-      return '<div class="tile numtile' + (i === 0 ? " numtile--bad" : "") + '">' +
-        '<div class="label">' + esc(p.title) + "</div>" +
-        '<div class="numtile-v">' + esc(p.label) + "</div>" +
-        '<div class="sub">' + esc(p.note) + "</div></div>";
-    }).join("") + "</div>";
+    var rows = d.broiler_density || [];
+    if (!rows.length) { host.innerHTML = ""; return; }
+
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var narrow = W < 520;
+    var maxV = rows.reduce(function (m, r) { return Math.max(m, r.kg_per_m2); }, 1);
+    var BAR = narrow ? 26 : 32, GAP = narrow ? 30 : 34;
+    var labelW = Math.min(narrow ? 118 : 176,
+      Math.round(widest(rows.map(function (r) { return r.label; }), narrow ? 12 : 13)) + 12);
+    var valueW = narrow ? 74 : 92;
+    var track = Math.max(60, W - labelW - valueW - 10);
+    var H = rows.length * (BAR + GAP) - GAP + 4;
+
+    var svg = '<svg viewBox="0 0 ' + W + " " + H +
+      '" role="img" aria-label="ブロイラーの飼養密度の比較（1平方メートル当たりのキログラム）">';
+    rows.forEach(function (r, i) {
+      var y = i * (BAR + GAP);
+      var jp = r.key.indexOf("japan") === 0;
+      var lb = el("text", {});
+      svg += '<text x="' + (labelW - 8) + '" y="' + (y + BAR * 0.5 + 5) + '" text-anchor="end" font-size="' +
+        (narrow ? 12 : 13) + '" font-weight="' + (jp ? 700 : 400) + '" fill="' +
+        (jp ? C.ink : C.ink2) + '">' + esc(r.label) + "</text>";
+      svg += '<rect x="' + labelW + '" y="' + y + '" width="' + track + '" height="' + BAR +
+        '" fill="' + C.rule + '" rx="2"></rect>';
+      svg += '<rect x="' + labelW + '" y="' + y + '" width="' + (track * r.kg_per_m2 / maxV).toFixed(1) +
+        '" height="' + BAR + '" fill="' + C.broilers + '" opacity="' + (jp ? 1 : 0.45) + '" rx="2"></rect>';
+      svg += '<text x="' + (labelW + track + 8) + '" y="' + (y + BAR * 0.5 + 6) + '" font-size="' +
+        (narrow ? 14 : 16) + '" font-weight="700" fill="' + (jp ? C.ink : C.ink2) +
+        '" style="font-variant-numeric: tabular-nums">' + trim(r.kg_per_m2.toFixed(2)) + "</text>";
+      svg += '<text x="' + labelW + '" y="' + (y + BAR + 15) + '" font-size="11" fill="' + C.muted + '">' +
+        (r.birds_per_m2 ? "1m²あたり " + trim(r.birds_per_m2.toFixed(2)) + "羽・" : "") +
+        esc(r.note) + "</text>";
+    });
+    svg += "</svg>";
+
+    var jaAvg = rows.filter(function (r) { return r.key === "japan_avg"; })[0];
+    var bcc = rows.filter(function (r) { return r.key === "bcc"; })[0];
+    var lead = "";
+    if (jaAvg && bcc) {
+      lead = '<p class="breakdown">日本の<strong>平均</strong>は、ベターチキンコミットメントが求める上限の<strong>' +
+        (jaAvg.kg_per_m2 / bcc.kg_per_m2).toFixed(2) + "倍</strong>、EUの上限の<strong>" +
+        (jaAvg.kg_per_m2 / 33).toFixed(2) + "倍</strong>です。</p>";
+    }
+    host.innerHTML = svg + '<p class="sub" style="margin-top:8px">単位はkg/m²（1m²あたりの体重の合計）</p>' + lead;
   }
 
   /* ---------- 母豚の一生（横から見たコイル） ----------
@@ -913,10 +948,38 @@
     var H = cy + A + 26;
     var BW = narrowH ? 9 : 13;
 
+    /* 弧の長さが日数に比例するように、角度を取り直す。
+       角度を時間に正比例させると、輪の上下（動きが遅いところ）と
+       中間（速いところ）で同じ日数でも線の長さが変わってしまい、
+       妊娠と授乳の比が目で読めなくなるため。
+       1巻きの形はどの巻きでも同じなので、1巻き分の対応表を作れば足りる。 */
+    var LUT = (function () {
+      var N = 720, ths = [0], lens = [0], acc = 0;
+      var px = 0, py = -A;
+      for (var i = 1; i <= N; i++) {
+        var th = i / N * Math.PI * 2;
+        var qx = advance * th / (Math.PI * 2), qy = -A * Math.cos(th);
+        acc += Math.sqrt((qx - px) * (qx - px) + (qy - py) * (qy - py));
+        px = qx; py = qy; ths.push(th); lens.push(acc);
+      }
+      return { ths: ths, lens: lens, total: acc };
+    })();
+    function thetaAt(u) {                 // u: 1巻きのなかの時間の割合 0〜1
+      var target = u * LUT.total, lo = 0, hi = LUT.lens.length - 1;
+      while (lo < hi - 1) {
+        var mid = (lo + hi) >> 1;
+        if (LUT.lens[mid] <= target) lo = mid; else hi = mid;
+      }
+      var seg = LUT.lens[hi] - LUT.lens[lo];
+      var f = seg > 0 ? (target - LUT.lens[lo]) / seg : 0;
+      return LUT.ths[lo] + (LUT.ths[hi] - LUT.ths[lo]) * f;
+    }
     function pos(day) {
-      var th = (day - mate) / fi * Math.PI * 2;
+      var t = (day - mate) / fi;
+      var turn = Math.min(Math.floor(t), nc - 1);
+      var th = thetaAt(Math.min(Math.max(t - turn, 0), 1));
       return {
-        x: LEAD + (day - mate) / (end - mate) * coilW,
+        x: LEAD + turn * advance + advance * th / (Math.PI * 2),
         y: cy - A * Math.cos(th),
         front: Math.sin(th) >= 0
       };
@@ -928,8 +991,8 @@
     var PHASE = { preg: [C.sows, 1], lact: [C.pigs, 1], dry: [C.pigs, 0.32] };
 
     var runs = [], cur = null;
-    for (var day = mate; day <= end; day += 1) {
-      var q = pos(day), ph = phaseOf(day === end ? end - 0.5 : day);
+    for (var day = mate; day <= end; day += 0.5) {
+      var q = pos(day), ph = phaseOf(Math.min(day, end - 0.25));
       if (!cur || cur.ph !== ph || cur.front !== q.front) {
         if (cur) { cur.pts.push(q); runs.push(cur); }
         cur = { ph: ph, front: q.front, pts: [q] };
@@ -952,10 +1015,11 @@
     [false, true].forEach(function (isFront) {
       runs.filter(function (r) { return r.front === isFront; }).forEach(function (r) {
         var st = PHASE[r.ph];
+        // 色は凡例と完全に一致させ、奥行きは線の太さと重なり順だけで示す
         svg += '<path d="' + dOf(r) + '" fill="none" stroke="' + st[0] +
-          '" stroke-width="' + (isFront ? BW : BW * 0.62).toFixed(1) +
-          '" stroke-opacity="' + (st[1] * (isFront ? 1 : 0.5)).toFixed(2) +
-          '" stroke-linecap="round"></path>';
+          '" stroke-width="' + (isFront ? BW : BW * 0.66).toFixed(1) +
+          '" stroke-opacity="' + st[1] +
+          '" stroke-linecap="butt"></path>';
       });
     });
 
