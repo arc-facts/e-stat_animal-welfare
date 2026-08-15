@@ -34,7 +34,7 @@ docs/                  静的サイト（GitHub Pages で公開する本体）
 1. **GitHub Pages を有効化**: リポジトリの Settings → Pages → Source を
    「GitHub Actions」にする。main ブランチに push すると
    `pages.yml` がサイトをデプロイします。
-   公開 URL: `https://a-watahiki.github.io/e-stat_animal-welfare/`
+   公開 URL: `https://arc-facts.github.io/e-stat_animal-welfare/`
 2. **（推奨）e-Stat API キーを設定**: [e-Stat API 利用登録](https://www.e-stat.go.jp/api/)
    （無料）で appId を取得し、Settings → Secrets and variables → Actions に
    `ESTAT_APP_ID` という名前で登録する。

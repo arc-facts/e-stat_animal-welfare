@@ -41,7 +41,7 @@ GUIDE = [
     ("日本の畜産動物はいま — データ管理シート", "head"),
     ("", None),
     ("このシートを編集すると、GitHub Actions が取り込んで公開サイトに反映します。", None),
-    ("https://a-watahiki.github.io/e-stat_animal-welfare/", None),
+    ("https://arc-facts.github.io/e-stat_animal-welfare/", None),
     ("", None),
     ("使い方", "h2"),
     ("1. 下のタブの数値を直接書き換える", None),
