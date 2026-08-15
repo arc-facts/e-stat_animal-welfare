@@ -59,3 +59,5 @@ c241,ブロイラー,ブロイラーの初生ひなの体重は40g前後,一次�
 c242,ブロイラー,ブロイラーの成長速度は過去50年で300%以上（1日25g→100g）増加した,Knowles et al. (2008) PLoS ONE 3(2):e1545,https://doi.org/10.1371/journal.pone.0001545,FALSE,,,
 c243,ブロイラー,平均40日齢で27.6%が歩行に障害を示し、3.3%はほとんど歩けない,"Knowles et al. (2008)。51,000羽（176群・480万羽相当）の調査",https://doi.org/10.1371/journal.pone.0001545,FALSE,,,
 c244,ブロイラー,1957年の品種と同条件で比べると、2005年の品種は56日齢体重が約4倍になっている,Zuidhof et al. (2014) Poultry Science 93(12):2970-2982,https://doi.org/10.3382/ps.2014-04291,FALSE,,,
+c245,ブロイラー,"同一条件で56日齢まで育てた体重は1957年品種905g・1978年品種1,808g・2005年品種4,202g","Zuidhof et al. (2014) Figure 1 の併記体重。0日齢は34/42/44g、28日齢は316/632/1,396g",https://doi.org/10.3382/ps.2014-04291,FALSE,,,
+c246,ブロイラー,1957年から2005年にかけてブロイラーの成長は400%以上増加し、飼料要求率は50%低下した,"Zuidhof et al. (2014) Abstract「From 1957 to 2005, broiler growth increased by over 400%, with a concurrent 50% reduction in feed conversion ratio」",https://doi.org/10.3382/ps.2014-04291,FALSE,,,

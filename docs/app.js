@@ -1034,6 +1034,69 @@
     }
   }
 
+  /* ---------- 品種別の成長（Zuidhof 2014 の体重を自前の図に起こす） ----------
+     原論文の図は写真で、著作権は Poultry Science Association にある。
+     体重の数値は事実なので、円の面積を体重に比例させた図として描き直す。 */
+  function renderBroilerGrowth(d, C) {
+    var host = document.getElementById("chart-broiler-growth");
+    if (!host) return;
+    var rows = d.broiler_growth || [];
+    if (!rows.length) { host.innerHTML = ""; return; }
+
+    var strains = [], days = [];
+    rows.forEach(function (r) {
+      if (strains.indexOf(r.strain) < 0) strains.push(r.strain);
+      if (days.indexOf(r.day) < 0) days.push(r.day);
+    });
+    strains.sort(function (a, b) { return a - b; });
+    days.sort(function (a, b) { return a - b; });
+    function wOf(st, dy) {
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].strain === st && rows[i].day === dy) return rows[i].body_weight_g;
+      }
+      return 0;
+    }
+    var maxW = rows.reduce(function (m, r) { return Math.max(m, r.body_weight_g); }, 1);
+
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var GUT = W < 480 ? 40 : 56;          // 日齢を書く左の余白
+    var HEAD = 22;                         // 品種名の行
+    var cellW = (W - GUT) / strains.length;
+    var Rmax = Math.min(cellW / 2 - (W < 480 ? 4 : 10), 130);
+    function radius(w) { return Rmax * Math.sqrt(w / maxW); }
+
+    var rowH = days.map(function (dy) {
+      var r = Math.max.apply(null, strains.map(function (st) { return radius(wOf(st, dy)); }));
+      return Math.max(2 * r, 10) + 30;
+    });
+    var H = HEAD + rowH.reduce(function (a, b) { return a + b; }, 0);
+
+    var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) +
+      '" role="img" aria-label="1957年・1978年・2005年の品種を同じ条件で育てたときの体重の違い">';
+    strains.forEach(function (st, i) {
+      svg += '<text x="' + (GUT + cellW * (i + 0.5)).toFixed(1) + '" y="14" text-anchor="middle" ' +
+        'font-size="12.5" font-weight="700" fill="' + C.ink + '">' + st + "年</text>";
+    });
+    var y = HEAD;
+    days.forEach(function (dy, j) {
+      var cy = y + rowH[j] / 2 - 8;
+      svg += '<text x="0" y="' + (cy + 4).toFixed(1) + '" font-size="12" fill="' + C.ink2 +
+        '" style="font-variant-numeric: tabular-nums">' + dy + "日齢</text>";
+      strains.forEach(function (st, i) {
+        var w = wOf(st, dy), r = radius(w);
+        var cx = GUT + cellW * (i + 0.5);
+        svg += '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) +
+          '" fill="' + C.broilers + '" opacity="' + (st === strains[strains.length - 1] ? 0.95 : 0.55) + '"></circle>';
+        svg += '<text x="' + cx.toFixed(1) + '" y="' + (cy + r + 16).toFixed(1) +
+          '" text-anchor="middle" font-size="11.5" fill="' + C.ink2 +
+          '" style="font-variant-numeric: tabular-nums">' + fmtPlain(w) + "g</text>";
+      });
+      y += rowH[j];
+    });
+    svg += "</svg>";
+    host.innerHTML = svg;
+  }
+
   /* ---------- 一生の年表 ----------
      出来事の数が多く説明も要るため、帯ではなく縦の年表で組む。
      上に日齢の目盛り帯を置いて、間隔の偏りが見えるようにする。 */
@@ -1196,6 +1259,7 @@
     renderTimeline("chart-broiler-life", d.broiler_timeline, C, {
       ariaLabel: "ブロイラーの一生", color: C.broilers, fillTo: 50
     });
+    renderBroilerGrowth(d, C);
 
     /* 母豚の一生 */
     renderSowLife(d, C);

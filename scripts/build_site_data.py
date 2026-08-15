@@ -307,6 +307,7 @@ def main() -> None:
         # 一生の年表（採卵鶏・ブロイラー）
         "hen_timeline": read_rows("hen_timeline.csv", ints=("day",)),
         "broiler_timeline": read_rows("broiler_timeline.csv", ints=("day",)),
+        "broiler_growth": read_rows("broiler_growth.csv", ints=("day", "body_weight_g", "strain")),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

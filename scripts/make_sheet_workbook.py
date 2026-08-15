@@ -37,6 +37,7 @@ TABS = [
     ("euthanasia", "犬猫の殺処分数"),
     ("hen_timeline", "ケージ飼育された採卵鶏の一生（年表）"),
     ("broiler_timeline", "ブロイラーの一生（年表）"),
+    ("broiler_growth", "ブロイラーの品種別の成長（Zuidhof 2014）"),
     ("claims", "主張の台帳（ファクトチェック用・同期しない）"),
 ]
 

@@ -24,6 +24,7 @@ sow_cycle = "sow_cycle.csv"
 euthanasia = "euthanasia.csv"
 hen_timeline = "hen_timeline.csv"
 broiler_timeline = "broiler_timeline.csv"
+broiler_growth = "broiler_growth.csv"
 
 # 取り込み時に列名を検査する。シート側で見出しを書き換えたり列を並べ替えたりすると
 # ここで弾かれ、壊れたデータが公開されるのを防ぐ。
@@ -42,3 +43,4 @@ sow_cycle = ["parameter", "value", "unit", "label", "source_text", "source_url",
 euthanasia = ["year", "dogs", "cats", "total", "source_text", "source_url", "claim_id"]
 hen_timeline = ["key", "day", "day_label", "event", "detail", "source_text", "source_url", "claim_id"]
 broiler_timeline = ["key", "day", "day_label", "event", "detail", "source_text", "source_url", "claim_id"]
+broiler_growth = ["strain", "strain_label", "day", "body_weight_g", "source_text", "source_url", "claim_id"]
