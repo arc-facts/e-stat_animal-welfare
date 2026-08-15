@@ -19,7 +19,7 @@ OUT = ROOT / "docs" / "data" / "data.json"
 
 
 #: 出典を書き留めるための列。数値ではないので時系列の読み取りからは外す。
-NOTE_COLUMNS = ("source_text", "source_url", "note")
+NOTE_COLUMNS = ("source_text", "source_url", "note", "claim_id")
 
 
 def read_csv(name: str) -> dict[int, dict[str, float]]:

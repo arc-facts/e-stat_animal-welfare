@@ -25,13 +25,16 @@ euthanasia = "euthanasia.csv"
 
 # 取り込み時に列名を検査する。シート側で見出しを書き換えたり列を並べ替えたりすると
 # ここで弾かれ、壊れたデータが公開されるのを防ぐ。
+# claims（主張の台帳）は同期しない。checked_by に協力者の氏名が入るため、
+# 公開リポジトリには取り込まない。台帳はシート上だけで運用する。
+
 [columns]
-cagefree = ["source", "year", "scope", "cagefree_birds", "total_birds", "share_pct", "note", "source_text", "source_url"]
-cagefree_types = ["source", "year", "type", "birds", "farms", "source_text", "source_url"]
-cagefree_world = ["country", "code", "year", "share_pct", "source", "basis", "show", "source_text", "source_url"]
-cagefree_sea = ["country", "code", "layer_hens", "commitments_total", "commitments_local", "commitments_intl", "source_text", "source_url"]
-space_per_hen = ["key", "name", "cm2", "width_cm", "height_cm", "outline", "note", "source_text", "source_url"]
-pain_hours = ["key", "name", "name_en", "vs_conventional", "vs_enriched", "source_text", "source_url"]
-broiler_density = ["key", "title", "birds", "label", "note", "source_text", "source_url"]
-sow_cycle = ["parameter", "value", "unit", "label", "source_text", "source_url"]
-euthanasia = ["year", "dogs", "cats", "total", "source_text", "source_url"]
+cagefree = ["source", "year", "scope", "cagefree_birds", "total_birds", "share_pct", "note", "source_text", "source_url", "claim_id"]
+cagefree_types = ["source", "year", "type", "birds", "farms", "source_text", "source_url", "claim_id"]
+cagefree_world = ["country", "code", "year", "share_pct", "source", "basis", "show", "source_text", "source_url", "claim_id"]
+cagefree_sea = ["country", "code", "layer_hens", "commitments_total", "commitments_local", "commitments_intl", "source_text", "source_url", "claim_id"]
+space_per_hen = ["key", "name", "cm2", "width_cm", "height_cm", "outline", "note", "source_text", "source_url", "claim_id"]
+pain_hours = ["key", "name", "name_en", "vs_conventional", "vs_enriched", "source_text", "source_url", "claim_id"]
+broiler_density = ["key", "title", "birds", "label", "note", "source_text", "source_url", "claim_id"]
+sow_cycle = ["parameter", "value", "unit", "label", "source_text", "source_url", "claim_id"]
+euthanasia = ["year", "dogs", "cats", "total", "source_text", "source_url", "claim_id"]

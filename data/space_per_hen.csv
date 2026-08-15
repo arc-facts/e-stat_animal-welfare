@@ -1,4 +1,4 @@
-key,name,cm2,width_cm,height_cm,outline,note,source_text,source_url
-battery,バタリーケージ,448.9,,,0,日本の実測平均,大木(2025)表11「1羽当り飼養スペース」より、ケージ飼育のみの経営（回答43）におけるバタリーケージの平均 448.9cm²,https://lab-navi.azabu-u.ac.jp/va-10
-a4,A4用紙,623.7,21,29.7,1,比較の目安,A4判の寸法は210mm×297mm＝623.7cm²（ISO 216 / JIS P 0138）,https://www.iso.org/standard/36631.html
-enriched,エンリッチドケージ,750,,,0,EUの下限,EU指令 1999/74/EC 第6条「at least 750 cm2 of cage area per hen」（エンリッチドケージの下限）,https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A31999L0074
+key,name,cm2,width_cm,height_cm,outline,note,source_text,source_url,claim_id
+battery,バタリーケージ,448.9,,,0,日本の実測平均,大木(2025)表11「1羽当り飼養スペース」より、ケージ飼育のみの経営（回答43）におけるバタリーケージの平均 448.9cm²,https://lab-navi.azabu-u.ac.jp/va-10,c214
+a4,A4用紙,623.7,21,29.7,1,比較の目安,A4判の寸法は210mm×297mm＝623.7cm²（ISO 216 / JIS P 0138）,https://www.iso.org/standard/36631.html,c215
+enriched,エンリッチドケージ,750,,,0,EUの下限,EU指令 1999/74/EC 第6条「at least 750 cm2 of cage area per hen」（エンリッチドケージの下限）,https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A31999L0074,c216
