@@ -1034,6 +1034,55 @@
     }
   }
 
+  /* ---------- 一生の年表 ----------
+     出来事の数が多く説明も要るため、帯ではなく縦の年表で組む。
+     上に日齢の目盛り帯を置いて、間隔の偏りが見えるようにする。 */
+  function renderTimeline(hostId, rows, C, opts) {
+    var host = document.getElementById(hostId);
+    if (!host) return;
+    if (!rows || !rows.length) { host.innerHTML = '<p class="empty-note">データを取得中です。</p>'; return; }
+    opts = opts || {};
+    var items = rows.slice().sort(function (a, b) { return a.day - b.day; });
+    var end = opts.end || items[items.length - 1].day;
+
+    // 目盛り帯: 一生の長さのなかで各出来事がいつ起きるか
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var BAR = 14, TICK = 26, H = BAR + TICK;
+    var svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' +
+      esc(opts.ariaLabel || "一生の年表") + '">';
+    svg += '<rect x="0" y="0" width="' + W + '" height="' + BAR + '" fill="' + C.rule + '" rx="2"></rect>';
+    if (opts.fillTo) {
+      svg += '<rect x="0" y="0" width="' + (W * opts.fillTo / end).toFixed(1) +
+        '" height="' + BAR + '" fill="' + opts.color + '" opacity="0.85" rx="2"></rect>';
+    }
+    items.forEach(function (it) {
+      var x = Math.min(W - 1, Math.max(1, it.day / end * W));
+      svg += '<line x1="' + x.toFixed(1) + '" y1="0" x2="' + x.toFixed(1) + '" y2="' +
+        (BAR + 5) + '" stroke="' + C.ink + '" stroke-width="1.5"></line>';
+    });
+    var step = end > 400 ? 200 : (end > 100 ? 20 : 10);
+    for (var t = 0; t <= end; t += step) {
+      svg += '<text x="' + (t / end * W).toFixed(1) + '" y="' + (BAR + TICK - 4) +
+        '" text-anchor="' + (t === 0 ? "start" : "middle") + '" font-size="11" fill="' + C.muted +
+        '" style="font-variant-numeric: tabular-nums">' + t + "</text>";
+    }
+    svg += '<text x="' + W + '" y="' + (BAR + TICK - 4) + '" text-anchor="end" font-size="11" fill="' +
+      C.muted + '">日齢</text></svg>';
+
+    var list = '<ol class="tl">';
+    items.forEach(function (it) {
+      var src = it.source_url
+        ? ' <a class="tl-src" href="' + esc(it.source_url) + '">出典</a>'
+        : ' <span class="tl-src tl-src--none">出典未特定</span>';
+      list += '<li><span class="tl-day">' + esc(it.day_label) + "</span>" +
+        '<div class="tl-body"><b class="tl-event">' + esc(it.event) + "</b>" +
+        '<p class="tl-detail">' + esc(it.detail) + src + "</p></div></li>";
+    });
+    list += "</ol>";
+
+    host.innerHTML = svg + list;
+  }
+
   /* ---------- 柱（縦組みの索引）の現在地表示 ---------- */
   function initRail() {
     var rail = document.getElementById("rail");
@@ -1139,6 +1188,14 @@
     renderSpace(d, C);
     renderPain(d, C);
     renderBroilerDensity(d, C);
+
+    /* 一生の年表 */
+    renderTimeline("chart-hen-life", d.hen_timeline, C, {
+      ariaLabel: "ケージ飼育された採卵鶏の一生", color: C.layers, fillTo: 708
+    });
+    renderTimeline("chart-broiler-life", d.broiler_timeline, C, {
+      ariaLabel: "ブロイラーの一生", color: C.broilers, fillTo: 50
+    });
 
     /* 母豚の一生 */
     renderSowLife(d, C);

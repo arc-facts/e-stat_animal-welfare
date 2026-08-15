@@ -23,6 +23,7 @@
   <a href="#concentration">集約化</a>
   <a href="#labor">労働力</a>
   <a href="#cagefree">採卵鶏</a>
+  <a href="#broiler">ブロイラー</a>
   <a href="#sows">母豚</a>
   <a href="#faq">Q&amp;A</a>
   <a href="#sources">出典</a>
@@ -215,6 +216,19 @@
           なお同調査では、各農場が増やす予定と回答した33万295羽を含めると1.74%になります。
         </p>
       </details>
+    </div>
+
+    <h3 class="subhead">ケージ飼育された1羽の一生</h3>
+    <div class="sheet">
+      <h3>採卵鶏の一生</h3>
+      <p class="sub">日本の一般的なケージ飼育の場合 / 帯は誘導換羽を行う経営の飼養期間</p>
+      <div class="timeline" id="chart-hen-life"></div>
+      <p class="species-note">
+        産卵率が落ちると、多くの経営では1年半ほどで廃鶏にします。
+        一方、餌を絞るなどして強制的に換羽させる<strong>誘導換羽</strong>を行えば産卵率が回復するため、
+        さらに約151日長く飼われます。飼養期間の長短は、鶏の状態ではなく
+        この処置を行うかどうかで決まっています。
+      </p>
     </div>
 
     <h3 class="subhead">世界との比較</h3>
@@ -414,6 +428,41 @@
     </div>
   </section>
 
+  <section class="section" id="broiler">
+    <h2>ブロイラー — 50日で出荷される鶏</h2>
+    <p class="desc">
+      ブロイラー（肉用鶏）はケージには入れられず、鶏舎の床で飼われています。
+      それでも福祉上の問題は小さくありません。問題の所在がケージとは違うところ、
+      つまり<strong>密飼いと、速く大きくなるよう改良された体そのもの</strong>にあるからです。
+      年間7億羽を超える、日本で最も多く殺されている動物です。
+    </p>
+
+    <div class="sheet">
+      <h3>ブロイラーの一生</h3>
+      <p class="sub">帯は孵化から出荷まで / 出典は各項目に付記</p>
+      <div class="timeline" id="chart-broiler-life"></div>
+      <p class="species-note">
+        母豚の1,170日、採卵鶏の550〜710日と比べると、ブロイラーの一生は約50日です。
+        短いのは寿命が短いからではなく、出荷体重に達するのが早いからです。
+        体だけが急速に大きくなる一方で骨格や心肺の発達が追いつかず、
+        歩行障害や腹水症、突然死が起こります。
+      </p>
+    </div>
+
+    <div class="sheet">
+      <h3>飼養密度</h3>
+      <p class="sub">1m²あたりの羽数 / 出荷体重3kgとして換算</p>
+      <div class="chart" id="chart-broiler-density"></div>
+      <p class="species-note">
+        世界では、成長の速さを抑えた品種（slower-growing breeds）への切り替えが進んでいます。
+        国際的な基準として広がっている<strong>ベターチキンコミットメント</strong>は、
+        飼養密度を30kg/m²以下にすること、福祉成績のよい成長の遅い品種を使うこと、
+        止まり木やつつき台などの環境エンリッチメントを与えること、自然光を入れること、
+        意識のあるまま吊るす方式をやめることなどを求めています。
+      </p>
+    </div>
+  </section>
+
   <section class="section" id="sows">
     <h2>母豚 — 繁殖の道具として飼われるメス豚</h2>
     <p class="desc">
@@ -531,8 +580,9 @@
           脚の変形や歩行困難、腹水症、突然死などが起こります。
           これは飼い方ではなく、鶏そのものの作られ方に由来する問題です。
         </p>
-        <div class="chart" id="chart-broiler-density"></div>
         <p>
+          飼養密度の図と、成長の速さを抑えた品種への切り替えについては
+          <a href="#broiler">ブロイラーの項目</a>にまとめています。
           世界では、成長の速さを抑えた品種（slower-growing breeds）への切り替えが進んでいます。
           国際的な基準として広がっているのが<strong>ベターチキンコミットメント（Better Chicken Commitment）</strong>で、
           飼養密度を30kg/m²以下にすること、福祉成績のよい成長の遅い品種を使うこと、

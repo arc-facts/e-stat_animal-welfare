@@ -22,6 +22,8 @@ pain_hours = "pain_hours.csv"
 broiler_density = "broiler_density.csv"
 sow_cycle = "sow_cycle.csv"
 euthanasia = "euthanasia.csv"
+hen_timeline = "hen_timeline.csv"
+broiler_timeline = "broiler_timeline.csv"
 
 # 取り込み時に列名を検査する。シート側で見出しを書き換えたり列を並べ替えたりすると
 # ここで弾かれ、壊れたデータが公開されるのを防ぐ。
@@ -38,3 +40,5 @@ pain_hours = ["key", "name", "name_en", "vs_conventional", "vs_enriched", "sourc
 broiler_density = ["key", "title", "birds", "label", "note", "source_text", "source_url", "claim_id"]
 sow_cycle = ["parameter", "value", "unit", "label", "source_text", "source_url", "claim_id"]
 euthanasia = ["year", "dogs", "cats", "total", "source_text", "source_url", "claim_id"]
+hen_timeline = ["key", "day", "day_label", "event", "detail", "source_text", "source_url", "claim_id"]
+broiler_timeline = ["key", "day", "day_label", "event", "detail", "source_text", "source_url", "claim_id"]

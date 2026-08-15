@@ -304,6 +304,9 @@ def main() -> None:
             "pain_hours.csv", ints=("vs_conventional", "vs_enriched")),
         # ブロイラーの飼養密度
         "broiler_density": read_rows("broiler_density.csv", ints=("birds",)),
+        # 一生の年表（採卵鶏・ブロイラー）
+        "hen_timeline": read_rows("hen_timeline.csv", ints=("day",)),
+        "broiler_timeline": read_rows("broiler_timeline.csv", ints=("day",)),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

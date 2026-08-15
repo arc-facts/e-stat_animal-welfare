@@ -432,6 +432,56 @@ main {
 
 .prose--tight { margin-top: 18px; font-size: 0.92rem; }
 
+/* --- 一生の年表 --- */
+.timeline svg { display: block; width: 100%; height: auto; margin-bottom: 6px; }
+.tl {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 22px;
+  border-left: 2px solid var(--rule-2);
+}
+.tl li { position: relative; padding: 12px 0 12px 0; }
+.tl li + li { border-top: 1px solid var(--rule); }
+.tl li::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: 19px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--sheet);
+}
+.tl-day {
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.tl-event {
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  font-size: 1rem;
+  color: var(--ink);
+}
+.tl-detail {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.85;
+  color: var(--ink-2);
+}
+.tl-src {
+  font-size: 0.78rem;
+  white-space: nowrap;
+  margin-left: 4px;
+}
+.tl-src--none { color: var(--muted); }
+@media (min-width: 620px) {
+  .tl li { display: grid; grid-template-columns: 8.5em 1fr; gap: 0 16px; }
+  .tl-day { padding-top: 2px; }
+}
+
 /* --- 補足の折りたたみ（用語説明・推計の幅など）--- */
 details.info,
 details.qa {

@@ -1,0 +1,6 @@
+key,day,day_label,event,detail,source_text,source_url,claim_id
+hatch,0,0日,孵化,孵化場で孵り、鶏舎へ運ばれる。体重は40g前後,,,c241
+growth,20,生後3週ごろ,急速な成長,品種改良により、1日あたりの増体量は過去50年で4倍になった。骨格や心肺の発達が体重に追いつかない,"Knowles et al. (2008)「In the past 50 years, broiler growth rates have increased by over 300% (from 25 g per day to 100 g per day).」",https://doi.org/10.1371/journal.pone.0001545,c242
+legs,40,約40日齢,歩行障害,平均40日齢の時点で27.6%が歩行に障害を示し、3.3%はほとんど歩けない状態にある,"Knowles et al. (2008)「At a mean age of 40 days, over 27.6% of birds in our study showed poor locomotion and 3.3% were almost unable to walk.」51000羽（176群・のべ480万羽相当）を調査",https://doi.org/10.1371/journal.pone.0001545,c243
+dense,45,出荷直前,密飼いのピーク,体が大きくなる一方で鶏舎の面積は変わらないため、床が見えないほど密集する。日本には飼養密度の法的上限がない,,,c406
+slaughter,50,約50日齢,と畜,出荷され食鳥処理場へ。1957年の品種を同じ条件で育てた場合と比べ、56日齢時点の体重は約4倍になっている,Zuidhof et al. (2014) は1957年・1978年・2005年の品種を同一条件で56日齢まで育てて比較し、56日齢体重で約400%の増加を報告している,https://doi.org/10.3382/ps.2014-04291,c244
