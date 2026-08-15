@@ -432,6 +432,19 @@ main {
 
 .prose--tight { margin-top: 18px; font-size: 0.92rem; }
 
+/* --- 数値を大きく見せるタイル --- */
+.tiles--num { margin-top: 0; }
+.numtile { display: flex; flex-direction: column; }
+.numtile-v {
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem);
+  line-height: 1.3;
+  margin: 6px 0 4px;
+  color: var(--ink);
+}
+.numtile--bad .numtile-v { color: var(--broilers); }
+
 /* --- 螺旋（母豚の繁殖サイクル）--- */
 .spiral { display: flex; justify-content: center; }
 .spiral svg { display: block; width: 100%; max-width: 420px; height: auto; }

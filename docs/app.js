@@ -870,57 +870,27 @@
       ';opacity:.45"></span>エンリッチドケージと比べて</span></div>';
   }
 
-  /* ---------- ブロイラーの飼養密度 ---------- */
+  /* ---------- ブロイラーの飼養密度 ----------
+     1m²の枠に鶏を並べた図は「大して変わらない」印象を与えるため、
+     数値そのものを大きく出す形にした。要点は羽数の差ではなく、
+     日本には上限そのものが無いこと。 */
   function renderBroilerDensity(d, C) {
     var host = document.getElementById("chart-broiler-density");
     if (!host) return;
-    var W = Math.max(280, Math.round(host.clientWidth) || 720);
     var panels = d.broiler_density || [];
     if (!panels.length) { host.innerHTML = ""; return; }
-    var cols = W < 480 ? 1 : Math.min(2, panels.length);
-    var cellW = W / cols;
-    var side = Math.min(cellW - 24, 200);
-    var LABEL = 62;
-    var rowsN = Math.ceil(panels.length / cols);
-    var H = rowsN * (side + LABEL);
-
-    var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) +
-      '" role="img" aria-label="ブロイラーの飼養密度の比較。1平方メートル当たりの羽数">';
-    panels.forEach(function (p, i) {
-      var cx = (i % cols) * cellW + cellW / 2;
-      var top = Math.floor(i / cols) * (side + LABEL);
-      var x0 = cx - side / 2;
-      svg += '<text x="' + cx.toFixed(1) + '" y="' + (top + 14) +
-        '" text-anchor="middle" font-size="12.5" font-weight="700" fill="' + C.ink + '">' +
-        esc(p.title) + "</text>";
-      var y0 = top + 24;
-      svg += '<rect x="' + x0.toFixed(1) + '" y="' + y0 + '" width="' + side.toFixed(1) +
-        '" height="' + side.toFixed(1) + '" fill="' + C.sheet2 + '" stroke="' + C.rule2 +
-        '" stroke-width="1"></rect>';
-      // 鶏を格子状に並べる（正確な配置ではなく、羽数の密度を示すための図）
-      var n = p.birds, gc = Math.ceil(Math.sqrt(n));
-      var cell = side / gc, r = cell * 0.31;
-      for (var k = 0; k < n; k++) {
-        var gx = x0 + (k % gc) * cell + cell / 2;
-        var gy = y0 + Math.floor(k / gc) * cell + cell / 2;
-        svg += '<ellipse cx="' + gx.toFixed(1) + '" cy="' + gy.toFixed(1) + '" rx="' +
-          (r * 1.15).toFixed(1) + '" ry="' + r.toFixed(1) + '" fill="' + C.broilers +
-          '" opacity="0.85"></ellipse>';
-      }
-      svg += '<text x="' + cx.toFixed(1) + '" y="' + (y0 + side + 18).toFixed(1) +
-        '" text-anchor="middle" font-size="12.5" font-weight="700" fill="' + C.ink + '">' +
-        esc(p.label) + "</text>";
-      svg += '<text x="' + cx.toFixed(1) + '" y="' + (y0 + side + 34).toFixed(1) +
-        '" text-anchor="middle" font-size="11" fill="' + C.muted + '">' + esc(p.note) + "</text>";
-    });
-    svg += "</svg>";
-    host.innerHTML = svg;
+    host.innerHTML = '<div class="tiles tiles--num">' + panels.map(function (p, i) {
+      return '<div class="tile numtile' + (i === 0 ? " numtile--bad" : "") + '">' +
+        '<div class="label">' + esc(p.title) + "</div>" +
+        '<div class="numtile-v">' + esc(p.label) + "</div>" +
+        '<div class="sub">' + esc(p.note) + "</div></div>";
+    }).join("") + "</div>";
   }
 
-  /* ---------- 母豚の一生（帯） ----------
-     広岡（2018）表1のベース条件から、妊娠・授乳・空胎を繰り返す帯を組み立てる。
-     ストールの使用そのものは同論文の対象外なので、色分けはあくまで
-     「妊娠期間」「授乳期間」であり、注記でその旨を示す。 */
+  /* ---------- 母豚の一生（横から見たコイル） ----------
+     時間は左から右へ進み、1巻き＝1回の繁殖サイクル（159日）。
+     手前に来る半周を太く濃く、奥へ回る半周を細く淡く描いて立体に見せる。
+     巻きどうしを重ねることで、同じ輪を何度もくぐらされる感じを出す。 */
   function renderSowLife(d, C) {
     var host = document.getElementById("chart-sow-life");
     if (!host) return;
@@ -932,72 +902,79 @@
         nc = s.breeding_cycles, end = s.cull_age_days;
     var dry = fi - preg - lact;
 
-    /* 螺旋で描く。1周＝1回の繁殖サイクル（159日）なので、
-       6周ぐるぐる回る形そのものが「繰り返し妊娠させられる」ことを示す。
-       角度は日数に正比例するため、1周のなかの妊娠・授乳・空胎の
-       角度の比は毎回まったく同じになる。 */
     var W = Math.max(280, Math.round(host.clientWidth) || 720);
-    var SIZE = Math.min(W, 380);
-    var cx = SIZE / 2, cy = SIZE / 2;
-    var BANDW = SIZE < 340 ? 11 : 15;      // 帯の太さ
-    var r0 = BANDW * 2.8;                   // 内側の半径（中央に文字を置く余白）
-    var pitch = (SIZE / 2 - BANDW - 16 - r0) / nc;  // 1周ごとに広がる量
+    var narrowH = W < 520;
+    var LEAD = W * 0.08, RIGHT = narrowH ? 10 : 16;
+    var coilW = W - LEAD - RIGHT;
+    var advance = coilW / nc;
+    var A = Math.min(narrowH ? 58 : 124, advance * 0.95);
+    var TOP = narrowH ? 30 : 34;
+    var cy = TOP + A + 4;
+    var H = cy + A + 26;
+    var BW = narrowH ? 9 : 13;
 
-    function pt(day) {
-      var turn = (day - mate) / fi;         // 何周目か（小数）
-      var th = turn * Math.PI * 2 - Math.PI / 2;   // 真上から時計回り
-      var r = r0 + turn * pitch;
-      return [cx + r * Math.cos(th), cy + r * Math.sin(th)];
+    function pos(day) {
+      var th = (day - mate) / fi * Math.PI * 2;
+      return {
+        x: LEAD + (day - mate) / (end - mate) * coilW,
+        y: cy - A * Math.cos(th),
+        front: Math.sin(th) >= 0
+      };
     }
-    function arcPath(from, to) {
-      var d = "", step = Math.max(1, (to - from) / 60);
-      for (var day = from; day < to + step / 2; day += step) {
-        var q = pt(Math.min(day, to));
-        d += (d ? "L" : "M") + q[0].toFixed(2) + " " + q[1].toFixed(2);
-      }
-      return d;
+    function phaseOf(day) {
+      var t = (day - mate) % fi;
+      return t < preg ? "preg" : (t < preg + lact ? "lact" : "dry");
+    }
+    var PHASE = { preg: [C.sows, 1], lact: [C.pigs, 1], dry: [C.pigs, 0.32] };
+
+    var runs = [], cur = null;
+    for (var day = mate; day <= end; day += 1) {
+      var q = pos(day), ph = phaseOf(day === end ? end - 0.5 : day);
+      if (!cur || cur.ph !== ph || cur.front !== q.front) {
+        if (cur) { cur.pts.push(q); runs.push(cur); }
+        cur = { ph: ph, front: q.front, pts: [q] };
+      } else { cur.pts.push(q); }
+    }
+    if (cur) runs.push(cur);
+    function dOf(r) {
+      return r.pts.map(function (q, i) {
+        return (i ? "L" : "M") + q.x.toFixed(2) + " " + q.y.toFixed(2);
+      }).join("");
     }
 
-    var STYLE = { preg: [C.sows, 1], lact: [C.pigs, 1], dry: [C.pigs, 0.3] };
-    var svg = '<svg viewBox="0 0 ' + SIZE + " " + SIZE + '" role="img" aria-label="' +
-      "母豚の一生。" + mate + "日齢の初回交配から" + fi + "日ごとに" + nc +
-      "回の妊娠と出産を繰り返し、" + end + '日齢で屠殺される">';
+    var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) +
+      '" role="img" aria-label="' + "母豚の一生。" + mate + "日齢の初回交配から" + fi +
+      "日ごとに" + nc + "回の妊娠と出産を繰り返し、" + end + '日齢で屠殺される">';
+
+    svg += '<path d="M0 ' + (cy - A).toFixed(2) + "L" + LEAD.toFixed(2) + " " + (cy - A).toFixed(2) +
+      '" fill="none" stroke="' + C.rule + '" stroke-width="' + BW + '"></path>';
+
+    [false, true].forEach(function (isFront) {
+      runs.filter(function (r) { return r.front === isFront; }).forEach(function (r) {
+        var st = PHASE[r.ph];
+        svg += '<path d="' + dOf(r) + '" fill="none" stroke="' + st[0] +
+          '" stroke-width="' + (isFront ? BW : BW * 0.62).toFixed(1) +
+          '" stroke-opacity="' + (st[1] * (isFront ? 1 : 0.5)).toFixed(2) +
+          '" stroke-linecap="round"></path>';
+      });
+    });
 
     for (var k = 0; k < nc; k++) {
-      var st = mate + k * fi;
-      var segs = [[st, st + preg, "preg"], [st + preg, st + preg + lact, "lact"]];
-      if (k < nc - 1) segs.push([st + preg + lact, st + fi, "dry"]);
-      segs.forEach(function (g) {
-        var sty = STYLE[g[2]];
-        svg += '<path d="' + arcPath(g[0], g[1]) + '" fill="none" stroke="' + sty[0] +
-          '" stroke-width="' + BANDW + '" stroke-opacity="' + sty[1] +
-          '" stroke-linecap="butt"></path>';
-      });
-      // 分娩のしるしと回数
-      var fp = pt(st + preg);
-      svg += '<circle cx="' + fp[0].toFixed(2) + '" cy="' + fp[1].toFixed(2) +
-        '" r="' + (BANDW * 0.32).toFixed(1) + '" fill="' + C.sheet + '"></circle>';
+      var q2 = pos(mate + k * fi + preg);
+      svg += '<circle cx="' + q2.x.toFixed(2) + '" cy="' + q2.y.toFixed(2) + '" r="' +
+        (BW * 0.3).toFixed(1) + '" fill="' + C.sheet + '"></circle>';
     }
 
-    // 中心のまとめ
-    var breeding = end - mate, confined = nc * (preg + lact);
-    svg += '<text x="' + cx + '" y="' + (cy - 6) + '" text-anchor="middle" font-size="' +
-      (SIZE < 340 ? 13 : 15) + '" font-weight="700" fill="' + C.ink + '">' + nc + "回</text>";
-    svg += '<text x="' + cx + '" y="' + (cy + 11) + '" text-anchor="middle" font-size="10.5" fill="' +
-      C.muted + '">の妊娠・出産</text>';
-    svg += '<text x="' + cx + '" y="' + (cy + 25) + '" text-anchor="middle" font-size="9.5" fill="' +
-      C.muted + '">' + mate + "日齢から</text>";
-
-    // 始まりと終わり
-    var p0 = pt(mate), pe = pt(end);
-    svg += '<circle cx="' + p0[0].toFixed(2) + '" cy="' + p0[1].toFixed(2) + '" r="3.5" fill="' +
-      C.ink + '"></circle>';
-    svg += '<line x1="' + pe[0].toFixed(2) + '" y1="' + pe[1].toFixed(2) + '" x2="' +
-      pe[0].toFixed(2) + '" y2="' + (pe[1] - 26).toFixed(2) + '" stroke="' + C.ink +
-      '" stroke-width="2"></line>';
-    svg += '<text x="' + pe[0].toFixed(2) + '" y="' + (pe[1] - 31).toFixed(2) +
-      '" text-anchor="middle" font-size="12" font-weight="700" fill="' + C.ink + '">屠殺 ' +
+    var pe = pos(end);
+    svg += '<line x1="' + pe.x.toFixed(2) + '" y1="' + (TOP - 6) + '" x2="' + pe.x.toFixed(2) +
+      '" y2="' + pe.y.toFixed(2) + '" stroke="' + C.ink + '" stroke-width="1.5"></line>';
+    svg += '<text x="' + W + '" y="' + (TOP - 11) +
+      '" text-anchor="end" font-size="12" font-weight="700" fill="' + C.ink + '">屠殺 ' +
       fmtPlain(end) + "日齢</text>";
+    svg += '<text x="0" y="' + (H - 6) + '" font-size="11" fill="' + C.muted +
+      '">交配前 ' + mate + "日齢</text>";
+    svg += '<text x="' + W + '" y="' + (H - 6) + '" text-anchor="end" font-size="11" fill="' +
+      C.muted + '">1巻き＝繁殖サイクル ' + fi + "日 × " + nc + "回</text>";
     svg += "</svg>";
 
     var lg = '<div class="legend">' +
@@ -1006,15 +983,15 @@
       '<span class="item"><span class="swatch sq" style="background:' + C.pigs +
       '"></span>授乳 ' + lact + "日（分娩ストール）</span>" +
       '<span class="item"><span class="swatch sq" style="background:' + C.pigs +
-      ';opacity:.3"></span>離乳から次の受胎まで ' + dry + "日</span></div>";
+      ';opacity:.32"></span>離乳から次の受胎まで ' + dry + "日</span></div>";
+    host.innerHTML = svg + lg;
 
-    host.innerHTML = '<div class="spiral">' + svg + "</div>" + lg;
-
+    var breeding = end - mate, confined = nc * (preg + lact);
     var note = document.getElementById("sowlife-note");
     if (note) {
-      note.innerHTML = "外側へ1周するごとに1回の妊娠・出産です。" +
-        "初回交配の" + mate + "日齢から" + fi + "日ごとに同じことが" + nc + "回繰り返され、" +
-        fmtPlain(end) + "日齢（約" + (end / 365).toFixed(1) + "歳）で屠殺されます。" +
+      note.innerHTML = "ひと巻きが1回の妊娠・出産です。初回交配の" + mate + "日齢から" + fi +
+        "日ごとに同じことが" + nc + "回繰り返され、" + fmtPlain(end) + "日齢（約" +
+        (end / 365).toFixed(1) + "歳）で屠殺されます。" +
         "繁殖に使われる" + fmtPlain(breeding) + "日のうち、妊娠か授乳にあたる期間が<strong>" +
         fmtPlain(confined) + "日（" + Math.round(confined / breeding * 100) + "%）</strong>。" +
         "日本では妊娠中の母豚の約9割が妊娠ストールに、授乳期は分娩ストールに入れられるため、" +
@@ -1024,7 +1001,7 @@
     }
     var sub = document.getElementById("sowlife-sub");
     if (sub) {
-      sub.textContent = "1周＝1回の繁殖サイクル（" + fi +
+      sub.textContent = "1巻き＝1回の繁殖サイクル（" + fi +
         "日）/ 出典: 広岡博之（2018）日本畜産学会報 89(4) のベース条件（生産現場への聞き取りによる）";
     }
   }
@@ -1095,37 +1072,11 @@
   /* ---------- 一生の年表 ----------
      出来事の数が多く説明も要るため、帯ではなく縦の年表で組む。
      上に日齢の目盛り帯を置いて、間隔の偏りが見えるようにする。 */
-  function renderTimeline(hostId, rows, C, opts) {
+  function renderTimeline(hostId, rows, C) {
     var host = document.getElementById(hostId);
     if (!host) return;
     if (!rows || !rows.length) { host.innerHTML = '<p class="empty-note">データを取得中です。</p>'; return; }
-    opts = opts || {};
     var items = rows.slice().sort(function (a, b) { return a.day - b.day; });
-    var end = opts.end || items[items.length - 1].day;
-
-    // 目盛り帯: 一生の長さのなかで各出来事がいつ起きるか
-    var W = Math.max(280, Math.round(host.clientWidth) || 720);
-    var BAR = 14, TICK = 26, H = BAR + TICK;
-    var svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' +
-      esc(opts.ariaLabel || "一生の年表") + '">';
-    svg += '<rect x="0" y="0" width="' + W + '" height="' + BAR + '" fill="' + C.rule + '" rx="2"></rect>';
-    if (opts.fillTo) {
-      svg += '<rect x="0" y="0" width="' + (W * opts.fillTo / end).toFixed(1) +
-        '" height="' + BAR + '" fill="' + opts.color + '" opacity="0.85" rx="2"></rect>';
-    }
-    items.forEach(function (it) {
-      var x = Math.min(W - 1, Math.max(1, it.day / end * W));
-      svg += '<line x1="' + x.toFixed(1) + '" y1="0" x2="' + x.toFixed(1) + '" y2="' +
-        (BAR + 5) + '" stroke="' + C.ink + '" stroke-width="1.5"></line>';
-    });
-    var step = end > 400 ? 200 : (end > 100 ? 20 : 10);
-    for (var t = 0; t <= end; t += step) {
-      svg += '<text x="' + (t / end * W).toFixed(1) + '" y="' + (BAR + TICK - 4) +
-        '" text-anchor="' + (t === 0 ? "start" : "middle") + '" font-size="11" fill="' + C.muted +
-        '" style="font-variant-numeric: tabular-nums">' + t + "</text>";
-    }
-    svg += '<text x="' + W + '" y="' + (BAR + TICK - 4) + '" text-anchor="end" font-size="11" fill="' +
-      C.muted + '">日齢</text></svg>';
 
     var list = '<ol class="tl">';
     items.forEach(function (it) {
@@ -1138,7 +1089,7 @@
     });
     list += "</ol>";
 
-    host.innerHTML = svg + list;
+    host.innerHTML = list;
   }
 
   /* ---------- 柱（縦組みの索引）の現在地表示 ---------- */
@@ -1248,12 +1199,8 @@
     renderBroilerDensity(d, C);
 
     /* 一生の年表 */
-    renderTimeline("chart-hen-life", d.hen_timeline, C, {
-      ariaLabel: "ケージ飼育された採卵鶏の一生", color: C.layers, fillTo: 708
-    });
-    renderTimeline("chart-broiler-life", d.broiler_timeline, C, {
-      ariaLabel: "ブロイラーの一生", color: C.broilers, fillTo: 50
-    });
+    renderTimeline("chart-hen-life", d.hen_timeline, C);
+    renderTimeline("chart-broiler-life", d.broiler_timeline, C);
     renderBroilerGrowth(d, C);
 
     /* 母豚の一生 */
