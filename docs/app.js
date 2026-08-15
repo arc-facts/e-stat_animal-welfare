@@ -1071,7 +1071,7 @@
 
   /* ---------- 一生の年表 ----------
      出来事の数が多く説明も要るため、帯ではなく縦の年表で組む。
-     上に日齢の目盛り帯を置いて、間隔の偏りが見えるようにする。 */
+     日齢は各項目に書くので、横方向の目盛りは置かない。 */
   function renderTimeline(hostId, rows, C) {
     var host = document.getElementById(hostId);
     if (!host) return;
