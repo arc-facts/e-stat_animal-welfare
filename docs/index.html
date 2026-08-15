@@ -6,164 +6,192 @@
 <meta name="color-scheme" content="light dark">
 <title>日本の畜産動物はいま — 数字で見るアニマルウェルフェア</title>
 <meta name="description" content="採卵鶏・ブロイラー・豚（母豚）の飼養数、年間の屠殺数、1戸当たり飼養数の推移を、日本の人口と対比して可視化。出典は農林水産省・総務省の政府統計（e-Stat）。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&amp;family=Zen+Maru+Gothic:wght@500;700&amp;display=swap">
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;text y='.9em' font-size='90'&gt;🐷&lt;/text&gt;&lt;/svg&gt;">
 </head>
 <body>
 
-<header class="site">
+<a class="skip" href="#killed">本文へ移動</a>
+
+<!-- 本の「柱（ランニングヘッド）」を画面端に置いた索引。縦組み。 -->
+<nav class="rail" id="rail" aria-label="ページ内の見出し">
+  <a href="#killed">殺される数</a>
+  <a href="#inventory">飼育数</a>
+  <a href="#sows">母豚</a>
+  <a href="#concentration">集約化</a>
+  <a href="#labor">労働力</a>
+  <a href="#density">飼育密度</a>
+  <a href="#sources">出典</a>
+</nav>
+
+<header class="masthead">
   <h1>日本の畜産動物はいま</h1>
   <p class="lede">
-    採卵鶏・ブロイラー（肉用鶏）・豚がどれだけ飼育され、屠殺され、
-    どれほど集約化が進んでいるのかを、政府統計（e-Stat）のデータで可視化しています。
-    国内のアニマルウェルフェアを考えるための基礎資料です。
+    採卵鶏・ブロイラー（肉用鶏）・豚が、日本でどれだけ飼育され、どれだけ殺されているか。
+    e-Stat（政府統計の総合窓口）で公表されている確報値だけを使い、そのままの数字で示します。
+    アニマルウェルフェアを考えるための、出典つきの基礎資料です。
   </p>
+  <dl class="stamp">
+    <div><dt>出典</dt><dd>農林水産省・総務省統計局（e-Stat）</dd></div>
+    <div><dt>更新</dt><dd id="meta-updated">—</dd></div>
+  </dl>
   <p class="notice" id="provisional-notice" hidden>
-    掲載している数値は政府統計の<strong>確報値</strong>です。確定値が未取得・未公表の
-    年次は、推計で埋めず<strong>空欄</strong>にしています（グラフは線が途切れ、表は「—」で表示）。
-    一部の系列は e-Stat API からの自動取得を順次進めています。詳細は
-    <a href="https://github.com/A-Watahiki/e-stat_animal-welfare/blob/HEAD/data/README.md">データについて</a>をご覧ください。
+    <span class="notice-label">データについて</span>
+    掲載している数値は政府統計の<strong>確報値</strong>です。確定値が未取得・未公表の年次は、
+    推計で埋めず<strong>空欄</strong>にしています（グラフは線が途切れ、表は「—」で表示）。
+    一部の系列は e-Stat API からの自動取得を順次進めています。
+    <a href="https://github.com/A-Watahiki/e-stat_animal-welfare/blob/HEAD/data/README.md">データの詳細</a>
   </p>
 </header>
 
 <main>
-  <div class="hero" id="hero">
-    <div class="figure" id="hero-figure">—</div>
-    <div class="caption" id="hero-caption">読み込み中…</div>
-  </div>
+  <section class="section section--lead" id="killed">
+    <div class="sheet sheet--thesis">
+      <h2 class="thesis" id="hero-figure">読み込み中…</h2>
+      <p class="thesis-note" id="hero-caption"></p>
 
-  <div class="card" style="margin-top:12px">
-    <h3>1年間に殺される動物の数（種類別の内訳）</h3>
-    <p class="sub" id="species-sub">出典: 畜産物流通調査・環境省</p>
-    <div class="waffle" id="chart-species"></div>
-    <p class="species-note" id="species-note"></p>
-  </div>
+      <hr class="hr">
 
-  <section>
-    <h2>飼育されている数 — 鶏は人口の2倍以上</h2>
+      <h3>1年間に殺される数の内訳</h3>
+      <p class="sub" id="species-sub">出典: 畜産物流通調査・環境省</p>
+      <div class="waffle" id="chart-species"></div>
+      <p class="species-note" id="species-note"></p>
+    </div>
+
+    <div class="prose">
+      <p>
+        ブロイラーだけで年間7億羽を超えます。日本の人口の約6倍にあたる鶏が、
+        生後およそ50日で出荷されています。採卵鶏も卵を産む量が落ちる1〜2年で
+        「廃鶏」として処理され、卵を産まない雄のひよこは孵化直後に殺処分されます。
+      </p>
+      <p>
+        年ごとの推移は、次の「飼育されている数」とおおむね連動します。
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="inventory">
+    <h2>飼育されている数</h2>
     <p class="desc">
-      毎年2月1日時点で飼育されている数の推移です。灰色の線は日本の総人口。
+      毎年2月1日時点で飼育されている数の推移です。灰色の破線は日本の総人口。
       採卵鶏（種鶏を除く成鶏めす）とブロイラーはそれぞれ1億羽を超え、
       合計すると日本の人口の2倍以上の鶏が、常時飼育されています。
       豚は頭数が人口よりずっと小さく対比の意味が薄いため、単独のグラフで示します。
     </p>
-    <div class="card">
-      <h3>鶏の飼養数と日本の人口（実数：羽・人）</h3>
-      <p class="sub">各年2月1日現在（人口は10月1日現在） / 出典: 畜産統計調査・人口推計</p>
+    <div class="sheet">
+      <h3>鶏の飼養数と日本の人口</h3>
+      <p class="sub">実数（羽・人） / 各年2月1日現在（人口は10月1日現在） / 出典: 畜産統計調査・人口推計</p>
       <div class="chart" id="chart-inventory-birds"></div>
     </div>
-    <div class="card" style="margin-top:12px">
-      <h3>豚の飼養頭数（実数：頭）</h3>
-      <p class="sub">各年2月1日現在 / 出典: 畜産統計調査</p>
+    <div class="sheet">
+      <h3>豚の飼養頭数</h3>
+      <p class="sub">実数（頭） / 各年2月1日現在 / 出典: 畜産統計調査</p>
       <div class="chart" id="chart-inventory-pigs"></div>
     </div>
   </section>
 
-  <section>
+  <section class="section" id="sows">
     <h2>母豚 — 繁殖の道具として飼われるメス豚</h2>
     <p class="desc">
       子取り用めす豚（母豚）は、繰り返し妊娠・出産させるために飼育される豚です。
       その多くが、体の向きも変えられない妊娠ストールで飼育されています。
       頭数は減っていますが、1頭当たりの生産性（年間離乳頭数）は上がり続けています。
     </p>
-    <div class="card">
-      <h3>子取り用めす豚（母豚）の飼養頭数（万頭）</h3>
-      <p class="sub">各年2月1日現在 / 出典: 畜産統計調査</p>
+    <div class="sheet">
+      <h3>子取り用めす豚（母豚）の飼養頭数</h3>
+      <p class="sub">万頭 / 各年2月1日現在 / 出典: 畜産統計調査</p>
       <div class="chart" id="chart-sows"></div>
     </div>
   </section>
 
-  <section>
-    <h2>年間の屠殺数 — 1年間に殺される数</h2>
-    <p class="desc">
-      1年間に食用として処理（屠殺）される数です。ブロイラーだけで年間7億羽超 ——
-      日本の人口の約6倍にあたる鶏が、生後およそ50日で出荷されています。
-      採卵鶏も卵を産む量が落ちる1〜2年で「廃鶏」として処理されるほか、
-      卵を産まない雄のひよこは孵化直後に殺処分されます。
-      種類別の内訳は冒頭の図をご覧ください。年ごとの推移は上の「飼育されている数」
-      セクションの飼養数の推移と概ね連動します。
-    </p>
-  </section>
-
-  <section>
+  <section class="section" id="concentration">
     <h2>集約化 — 1戸当たりの飼養数はこの数十年で数倍に</h2>
     <p class="desc">
       飼育する農家（経営体）の数は減り続ける一方、動物の数はほぼ減っていません。
       つまり1戸当たりの飼養数が急増し、少人数で大量の動物を管理する
       集約的（工場式）畜産への移行が進んでいます。単位が異なるため鶏（羽）と
       豚（頭）でグラフを分けています。
-      ※畜産統計に従業員数の系列がないため「1戸（経営体）当たり」で示しています。
+      なお畜産統計に従業員数の系列がないため、ここでは「1戸（経営体）当たり」で示しています。
     </p>
-    <div class="card">
-      <h3>鶏 1戸当たり飼養羽数（羽/戸）</h3>
-      <p class="sub">飼養羽数 ÷ 飼養戸数 / 出典: 畜産統計調査</p>
+    <div class="tiles" id="perfarm-tiles"></div>
+    <div class="sheet">
+      <h3>鶏 1戸当たり飼養羽数</h3>
+      <p class="sub">羽/戸 ＝ 飼養羽数 ÷ 飼養戸数 / 出典: 畜産統計調査</p>
       <div class="chart" id="chart-perfarm-birds"></div>
     </div>
-    <div class="card" style="margin-top:12px">
-      <h3>豚 1戸当たり飼養頭数（頭/戸）</h3>
-      <p class="sub">飼養頭数 ÷ 飼養戸数 / 出典: 畜産統計調査</p>
+    <div class="sheet">
+      <h3>豚 1戸当たり飼養頭数</h3>
+      <p class="sub">頭/戸 ＝ 飼養頭数 ÷ 飼養戸数 / 出典: 畜産統計調査</p>
       <div class="chart" id="chart-perfarm-pigs"></div>
     </div>
-    <div class="tiles" id="perfarm-tiles"></div>
   </section>
 
-  <section>
-    <h2>労働力当たりの飼養数 — 1人（フルタイム換算）で何頭・何羽を担うか</h2>
+  <section class="section" id="labor">
+    <h2>労働力当たりの飼養数 — 1人で何頭・何羽を担うか</h2>
     <p class="desc">
       「1戸当たり」は経営体の数だけを見ているため、共同経営や雇用労働力の増加で
-      規模が変わらなくても数値が動きうる。そこで農林水産省「営農類型別経営統計」
-      から実際の自営農業労働時間を取得し、1FTE（フルタイム換算＝年間2,080時間、
-      週40時間×52週）当たりの飼養頭数・羽数を算出した。データが確認できる
-      平成22年（2010年）と令和4年（2022年）の比較。
+      規模が変わらなくても数値が動きえます。そこで農林水産省「営農類型別経営統計」
+      から実際の自営農業労働時間を取り、1FTE（フルタイム換算＝年間2,080時間、
+      週40時間×52週）当たりの飼養頭数・羽数を算出しました。
+      データが確認できる平成22年（2010年）と令和4年（2022年）の比較です。
     </p>
     <div class="tiles" id="fte-cards"></div>
   </section>
 
-  <section>
+  <section class="section" id="density">
     <h2>飼育密度 — 統計には表れない「過密」</h2>
     <p class="desc">
       1羽・1頭当たりの飼育面積（飼育密度）は全国統計が存在しません。
-      ここでは飼養実態調査などで知られている飼育方式の実態を参考情報として示します。
+      ここでは飼養実態調査などで知られている飼育方式の実態を、参考情報として示します。
     </p>
     <div class="facts">
       <div class="fact">
         <h3><span class="key" style="background:var(--layers)"></span>採卵鶏 — ケージ飼育が9割超</h3>
-        <div class="big">約430〜555cm²/羽</div>
+        <p class="fact-big">約430〜555cm²/羽</p>
         <p>国内の採卵鶏の9割以上はケージ（主にバタリーケージ）で飼育されています。
-        1羽当たりの面積は一般にB5用紙1枚ほどで、羽を広げることもできません。
-        （畜産技術協会「採卵鶏の飼養実態アンケート調査」等）</p>
+        1羽当たりの面積は一般にB5用紙1枚ほどで、羽を広げることもできません。</p>
+        <p class="fact-src">畜産技術協会「採卵鶏の飼養実態アンケート調査」等</p>
       </div>
       <div class="fact">
         <h3><span class="key" style="background:var(--broilers)"></span>ブロイラー — 1m²に十数羽</h3>
-        <div class="big">約50日で出荷</div>
+        <p class="fact-big">約50日で出荷</p>
         <p>ブロイラーは出荷直前には1m²当たり十数羽という過密状態になります。
-        急速に成長するよう品種改良され、生後およそ50日で屠殺されます。
-        （畜産技術協会「ブロイラーの飼養実態アンケート調査」等）</p>
+        急速に成長するよう品種改良され、生後およそ50日で屠殺されます。</p>
+        <p class="fact-src">畜産技術協会「ブロイラーの飼養実態アンケート調査」等</p>
       </div>
       <div class="fact">
         <h3><span class="key" style="background:var(--sows)"></span>母豚 — 妊娠ストールが約9割</h3>
-        <div class="big">体の向きも変えられない</div>
+        <p class="fact-big">体の向きも変えられない</p>
         <p>妊娠中の母豚の約9割は、方向転換もできない幅約60cmの妊娠ストール
-        （檻）で飼育されています。EUなどでは使用が制限されています。
-        （日本養豚協会「養豚基礎調査」等）</p>
+        （檻）で飼育されています。EUなどでは使用が制限されています。</p>
+        <p class="fact-src">日本養豚協会「養豚基礎調査」等</p>
       </div>
     </div>
   </section>
 </main>
 
-<footer class="site">
-  <h2>出典・注記</h2>
-  <ul>
-    <li>飼養数・飼養戸数: 農林水産省「畜産統計調査」（各年2月1日現在）。採卵鶏は種鶏を除く成鶏めす羽数。</li>
-    <li>屠殺数: 農林水産省「畜産物流通調査」（と畜統計・食鳥流通統計、暦年）。</li>
-    <li>人口: 総務省統計局「人口推計」（各年10月1日現在）。</li>
-    <li>データはいずれも政府統計の総合窓口 <a href="https://www.e-stat.go.jp/">e-Stat</a> で公開されているものです。</li>
-    <li>「1戸当たり」は飼養数を飼養戸数で割った値です（畜産統計に従業員数の統計はありません）。</li>
-    <li id="meta-note"></li>
-  </ul>
-  <p>
-    ソースコード・データ: <a href="https://github.com/A-Watahiki/e-stat_animal-welfare">GitHub — A-Watahiki/e-stat_animal-welfare</a>
-  </p>
+<footer class="site" id="sources">
+  <div class="foot-inner">
+    <h2>出典・注記</h2>
+    <ul>
+      <li>飼養数・飼養戸数: 農林水産省「畜産統計調査」（各年2月1日現在）。採卵鶏は種鶏を除く成鶏めす羽数。</li>
+      <li>屠殺数: 農林水産省「畜産物流通調査」（と畜統計・食鳥流通統計、暦年）。</li>
+      <li>人口: 総務省統計局「人口推計」（各年10月1日現在）。</li>
+      <li>労働時間: 農林水産省「営農類型別経営統計」。1FTE = 年間2,080時間で換算。</li>
+      <li>犬猫の殺処分: 環境省「犬・猫の引取り及び負傷動物の収容状況」（年度）。</li>
+      <li>「1戸当たり」は飼養数を飼養戸数で割った値です（畜産統計に従業員数の統計はありません）。</li>
+      <li>ブロイラーの統計は2011年に調査対象基準が変わっており、それ以前の年次とは単純比較できません。</li>
+      <li id="meta-note"></li>
+    </ul>
+    <p class="colophon">
+      データはすべて政府統計の総合窓口 <a href="https://www.e-stat.go.jp/">e-Stat</a> で公開されているものです。
+      ソースコードと元データ:
+      <a href="https://github.com/A-Watahiki/e-stat_animal-welfare">github.com/A-Watahiki/e-stat_animal-welfare</a>
+    </p>
+  </div>
 </footer>
 
 <script src="app.js"></script>

@@ -1,196 +1,530 @@
-:root {
-  --page: #f5f8fc;
-  --surface: #ffffff;
-  --ink: #12151c;
-  --ink-2: #495467;
-  --muted: #8a93a3;
-  --grid: #e9edf3;
-  --axis: #cdd5e0;
-  --border: rgba(18, 21, 28, 0.07);
-  --shadow: 0 1px 2px rgba(30, 41, 59, 0.04), 0 8px 20px -6px rgba(30, 41, 59, 0.10);
-  --layers: #2a78d6;   /* 採卵鶏 */
-  --broilers: #14ae76; /* ブロイラー */
-  --pigs: #f0980a;     /* 豚 */
-  --sows: #0a9a2e;     /* 母豚 */
-  --population: #8a93a3; /* 人口（文脈系列） */
-  --dogcat: #a8338c;   /* 犬猫（殺処分・比較用） */
-  --dairy: #0a8a9a;    /* 酪農 */
-  --beef: #b5541c;     /* 肉用牛（肥育牛） */
-  --notice-bg: #fff6e0;
+/* ============================================================
+   日本の畜産動物はいま — スタイル
 
-  /* ネイティブUI（スクロールバー・フォームのアクセント色等）をシステム設定に
-     自動追従させつつ、サイトのブランドカラーに揃える */
+   方向性: 「学校の資料室に置かれた統計冊子」。
+   地色は若草鼠（学校の壁・古い教科書の表紙）、その上に生成りの紙を置く。
+   見出しは丸ゴシック（日本の公共物の書体）、本文はユニバーサルデザイン
+   書体（公文書の読みやすさ）。系列色は日本の伝統色から取り、
+   「色相＝動物種 / 明度＝下位区分」で意味を持たせる（母豚は豚の濃色）。
+   ============================================================ */
+
+:root {
+  /* --- 紙と墨 --- */
+  --paper: #e6e5d9;      /* 地色: 若草鼠 */
+  --sheet: #fcfbf6;      /* 紙: 生成り */
+  --sheet-2: #f3f1e6;    /* 紙の凹み（表の縞・トラック） */
+  --ink: #23241e;        /* 墨 */
+  --ink-2: #53554a;
+  --muted: #6e6f63;
+  --rule: #d9d7c6;       /* 罫 */
+  --rule-2: #c4c2ad;
+
+  /* --- 系列色（色相＝種、明度＝下位区分） --- */
+  --layers: #1f4e79;     /* 採卵鶏 — 藍 */
+  --layers-2: #47739b;   /* 採卵鶏の下位（雄ひよこ） — 薄縹 */
+  --broilers: #3d6b45;   /* ブロイラー — 苔緑 */
+  --pigs: #a2495c;       /* 豚 — 蘇芳 */
+  --sows: #6e3040;       /* 母豚（豚の濃色） — 深蘇芳 */
+  --population: #8a8578; /* 人口（文脈系列） — 鈍色 */
+  --dogcat: #8c4a8e;     /* 犬猫 — 紫 */
+  --dairy: #2a7676;      /* 酪農 — 錆浅葱 */
+  --beef: #8a5a2e;       /* 肉用牛 — 煎茶 */
+
+  --accent: var(--layers);
+  --on-fill: #fffdf7;    /* 塗りの上に載せる文字色 */
+
   color-scheme: light dark;
-  accent-color: var(--layers);
-  scrollbar-color: var(--axis) var(--page);
+  accent-color: var(--accent);
+  scrollbar-color: var(--rule-2) var(--paper);
 }
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --page: #0c0f14;
-    --surface: #171b23;
-    --ink: #f4f6fa;
-    --ink-2: #b9c2d0;
-    --muted: #8993a3;
-    --grid: #262b35;
-    --axis: #3a4150;
-    --border: rgba(255, 255, 255, 0.08);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px -6px rgba(0, 0, 0, 0.4);
-    --layers: #3987e5;
-    --broilers: #199e70;
-    --pigs: #c98500;
-    --sows: #008300;
-    --dogcat: #c96bb0;
-    --dairy: #2ba8b8;
-    --beef: #d97a3f;
-    --notice-bg: #2a2416;
+    --paper: #171814;
+    --sheet: #222319;
+    --sheet-2: #2b2c21;
+    --ink: #f1efe3;
+    --ink-2: #c3c2b1;
+    --muted: #94937f;
+    --rule: #35362b;
+    --rule-2: #4a4b3d;
+
+    /* 暗い地の上でも「大きな面」がぎらつかない中間調に寄せる */
+    --layers: #5e9ad0;
+    --layers-2: #3a6a90;
+    --broilers: #4e8c58;
+    --pigs: #b7677a;
+    --sows: #a85c70;
+    --population: #8e8c7e;
+    --dogcat: #a86daa;
+    --dairy: #3d918f;
+    --beef: #a87a4c;
+    --on-fill: #14150f;
   }
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
-  background: var(--page);
+  background: var(--paper);
   color: var(--ink);
-  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
-  line-height: 1.65;
+  font-family: "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.95;
+  letter-spacing: 0.015em;
+  /* 日本語の行末禁則を素直に効かせる */
+  line-break: strict;
+  overflow-wrap: break-word;
 }
-main { max-width: 980px; margin: 0 auto; padding: 0 20px 64px; }
 
-header.site { max-width: 980px; margin: 0 auto; padding: 44px 20px 8px; }
-header.site h1 { font-size: 1.7rem; margin: 0 0 8px; line-height: 1.4; }
-header.site .lede { color: var(--ink-2); max-width: 44em; margin: 0; }
+h1, h2, h3, .thesis, .rail a, .tile .value, .fact-big, .hero-num {
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic",
+               "Hiragino Sans", system-ui, sans-serif;
+  font-feature-settings: "palt" 1;   /* 見出しの約物を詰める */
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+a { color: var(--accent); text-underline-offset: 0.22em; }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible {
+  outline: 2.5px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.skip {
+  position: fixed; left: 12px; top: -60px; z-index: 20;
+  background: var(--sheet); color: var(--ink);
+  border: 1px solid var(--rule-2); border-radius: 4px;
+  padding: 8px 16px; text-decoration: none;
+  transition: top 0.15s;
+}
+.skip:focus { top: 12px; }
+
+/* ============================================================
+   柱（ランニングヘッド）— 縦組みの索引
+   本の小口に立つ見出しをそのまま画面端に置いた、このページの目次。
+   ============================================================ */
+.rail {
+  position: fixed;
+  left: max(16px, calc(50% - 574px));
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 1px solid var(--rule-2);
+  padding-left: 2px;
+}
+.rail a {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 12px 7px 12px 6px;
+  border-left: 2px solid transparent;
+  margin-left: -3px;
+  transition: color 0.18s, border-color 0.18s;
+}
+.rail a:hover { color: var(--ink); }
+.rail a[aria-current="true"] {
+  color: var(--ink);
+  border-left-color: var(--accent);
+}
+@media (max-width: 1179px) { .rail { display: none; } }
+
+/* ============================================================
+   マストヘッド
+   ============================================================ */
+.masthead {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vw, 76px) 24px 0;
+}
+.masthead h1 {
+  margin: 0 0 14px;
+  font-size: clamp(1.9rem, 1.2rem + 2.6vw, 2.9rem);
+  letter-spacing: 0.005em;
+}
+.lede {
+  margin: 0;
+  max-width: 38em;
+  color: var(--ink-2);
+}
+
+/* 出典・更新日のスタンプ（本の奥付） */
+.stamp {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 22px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--rule-2);
+  font-size: 0.84rem;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.stamp div { display: flex; gap: 10px; }
+.stamp dt {
+  color: var(--muted);
+  letter-spacing: 0.16em;
+  flex: none;
+}
+.stamp dd { margin: 0; }
 
 .notice {
-  background: var(--notice-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 0.85rem;
-  color: var(--ink-2);
   margin: 20px 0 0;
+  padding: 14px 18px;
+  max-width: 46em;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--rule-2);
+  border-radius: 3px;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: var(--ink-2);
 }
 .notice[hidden] { display: none; }
-
-section { margin-top: 44px; }
-section > h2 { font-size: 1.2rem; margin: 0 0 4px; }
-section > .desc { color: var(--ink-2); font-size: 0.92rem; margin: 0 0 16px; max-width: 46em; }
-
-/* ---- hero ---- */
-.hero {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  padding: 28px 28px 24px;
-  margin-top: 28px;
+.notice-label {
+  display: inline-block;
+  margin-right: 0.6em;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
 }
-.hero .figure { font-size: 52px; font-weight: 650; line-height: 1.15; letter-spacing: -0.01em; }
-.hero .figure small { font-size: 0.45em; font-weight: 500; color: var(--ink-2); }
-.hero .caption { color: var(--ink-2); margin-top: 6px; font-size: 0.95rem; }
 
-/* ---- KPI tiles ---- */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
-.tile {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 16px 18px 14px;
+/* ============================================================
+   セクション
+   ============================================================ */
+main {
+  max-width: 940px;
+  margin: 0 auto;
+  padding: 0 24px;
 }
-.tile .label { font-size: 0.82rem; color: var(--ink-2); display: flex; align-items: center; gap: 7px; }
-.tile .label .key { width: 10px; height: 10px; border-radius: 3px; flex: none; }
-.tile .value { font-size: 1.65rem; font-weight: 650; margin-top: 2px; }
-.tile .sub { font-size: 0.78rem; color: var(--muted); }
-
-/* ---- FTE比較カード ---- */
-.fte-card .fte-bars { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.fte-bar-row { display: grid; grid-template-columns: 3.2em 1fr auto; align-items: center; gap: 8px; }
-.fte-bar-year { font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.fte-bar-track { background: var(--grid); border-radius: 4px; height: 14px; overflow: hidden; }
-.fte-bar-fill { height: 100%; border-radius: 4px; }
-.fte-bar-val { font-size: 0.85rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.fte-card .sub { margin-top: 8px; }
-
-/* ---- chart cards ---- */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 20px 20px 12px;
+.section {
+  margin-top: clamp(52px, 7vw, 84px);
+  scroll-margin-top: 24px;
 }
-.card h3 { margin: 0 0 2px; font-size: 1.02rem; }
-.card .sub { color: var(--muted); font-size: 0.82rem; margin: 0 0 10px; }
+.section--lead { margin-top: clamp(32px, 4vw, 48px); }
+
+.section > h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1.3rem, 1.1rem + 0.8vw, 1.62rem);
+  letter-spacing: 0.01em;
+}
+.section > .desc {
+  margin: 0 0 24px;
+  max-width: 40em;
+  color: var(--ink-2);
+  font-size: 0.97rem;
+}
+
+.prose { margin: 24px 0 0; max-width: 40em; color: var(--ink-2); font-size: 0.97rem; }
+.prose p { margin: 0 0 0.9em; }
+.prose p:last-child { margin-bottom: 0; }
+
+/* ============================================================
+   紙（カード）— 角丸は最小限。紙は丸まらない。
+   ============================================================ */
+.sheet {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 22px 24px 16px;
+  margin-top: 14px;
+}
+/* 見出し・リード文のすぐ下に来る1枚目は、余白を重ねない */
+.section > .sheet:first-child,
+.section > h2 + .sheet,
+.section > .desc + .sheet { margin-top: 0; }
+.sheet h3 {
+  margin: 0 0 2px;
+  font-size: 1.06rem;
+  letter-spacing: 0.01em;
+}
+.sheet .sub,
+.fact .fact-src {
+  margin: 0 0 14px;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 26px 0 22px;
+}
+
+/* --- 主張（ヒーロー）--- */
+.sheet--thesis { padding: clamp(24px, 4vw, 40px) clamp(22px, 4vw, 40px) 22px; }
+.thesis {
+  margin: 0;
+  font-size: clamp(1.45rem, 0.95rem + 2.4vw, 2.3rem);
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+}
+.thesis .hero-num {
+  font-size: 1.65em;
+  font-weight: 700;
+  color: var(--accent);
+  padding: 0 0.06em;
+  line-height: 1;
+}
+.thesis-note {
+  margin: 14px 0 0;
+  max-width: 38em;
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--ink-2);
+}
+/* 数字と単位を行末で切り離さない */
+.nw { white-space: nowrap; }
+
+/* ============================================================
+   グラフ
+   ============================================================ */
 .chart { position: relative; }
 .chart svg { display: block; width: 100%; height: auto; }
-.chart:focus-visible { outline: 2px solid var(--layers); outline-offset: 4px; border-radius: 6px; }
+.chart:focus-visible { outline-offset: 6px; }
 
-.legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 8px 2px 2px; font-size: 0.82rem; color: var(--ink-2); }
-.legend .item { display: inline-flex; align-items: center; gap: 6px; }
-.legend .swatch { width: 14px; height: 3px; border-radius: 2px; }
-.legend .swatch.sq { width: 12px; height: 12px; border-radius: 3px; }
-
-.multiples { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-
-/* ---- 種別比較（面積比のツリーマップ）---- */
-.waffle svg { border-radius: 10px; overflow: hidden; }
-.species-legend { gap: 10px 18px; margin-top: 12px; }
-.species-note {
-  margin: 12px 0 2px; font-size: 0.9rem; line-height: 1.7;
-  color: var(--ink-2); border-left: 3px solid var(--dogcat);
-  padding: 6px 0 6px 12px; background: transparent;
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  padding: 10px 2px 2px;
+  font-size: 0.85rem;
+  color: var(--ink-2);
 }
-.empty-note { color: var(--muted); font-size: 0.85rem; padding: 24px 4px; text-align: center; }
+.legend .item { display: inline-flex; align-items: center; gap: 7px; }
+.legend .swatch { width: 16px; height: 3px; border-radius: 2px; flex: none; }
+.legend .swatch.dash {
+  height: 0; border-top: 3px dashed currentColor; background: none !important;
+  border-radius: 0;
+}
+.legend .swatch.sq { width: 12px; height: 12px; border-radius: 2px; }
 
 .tooltip {
   position: absolute;
   pointer-events: none;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.8rem;
-  min-width: 140px;
+  background: var(--sheet);
+  border: 1px solid var(--rule-2);
+  box-shadow: 0 4px 14px rgba(35, 36, 30, 0.14);
+  border-radius: 3px;
+  padding: 9px 13px;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  min-width: 150px;
   z-index: 5;
   display: none;
 }
-.tooltip .t-year { font-weight: 650; margin-bottom: 3px; }
-.tooltip .t-row { display: flex; align-items: center; gap: 6px; justify-content: space-between; color: var(--ink-2); }
-.tooltip .t-row .t-name { display: inline-flex; align-items: center; gap: 6px; }
+.tooltip .t-year { font-weight: 700; margin-bottom: 3px; }
+.tooltip .t-row {
+  display: flex; align-items: center; gap: 10px;
+  justify-content: space-between; color: var(--ink-2);
+}
+.tooltip .t-row .t-name { display: inline-flex; align-items: center; gap: 7px; }
 .tooltip .t-row .t-val { font-variant-numeric: tabular-nums; color: var(--ink); }
-.tooltip .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.tooltip .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
 
-details.table-view { margin-top: 8px; font-size: 0.85rem; }
-details.table-view summary { cursor: pointer; color: var(--ink-2); padding: 4px 0; }
-details.table-view table { border-collapse: collapse; width: 100%; margin-top: 8px; }
-details.table-view th, details.table-view td {
-  text-align: right; padding: 4px 10px;
-  border-bottom: 1px solid var(--grid);
+/* --- 面積比の図（種別内訳）--- */
+.waffle svg { display: block; width: 100%; height: auto; }
+.waffle .blk { transition: opacity 0.15s; }
+.waffle svg:hover .blk { opacity: 0.82; }
+.waffle svg .blk:hover { opacity: 1; }
+
+/* 種別の凡例は表組みにして読みやすく */
+.species-key {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 2px 14px;
+  align-items: baseline;
+  margin: 16px 0 0;
+  font-size: 0.88rem;
+}
+.species-key .k-sw {
+  width: 12px; height: 12px; border-radius: 2px;
+  align-self: start;
+  transform: translateY(0.42em);
+}
+.species-key .k-name { color: var(--ink); }
+.species-key .k-year { color: var(--muted); font-size: 0.82rem; }
+.species-key .k-num,
+.species-key .k-share {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.species-key .k-share { color: var(--ink-2); }
+@media (max-width: 560px) {
+  .species-key { gap: 4px 10px; font-size: 0.84rem; }
+  .species-key .k-year { display: none; }
+}
+
+.species-note {
+  margin: 18px 0 2px;
+  padding: 2px 0 2px 14px;
+  border-left: 3px solid var(--dogcat);
+  font-size: 0.9rem;
+  line-height: 1.9;
+  color: var(--ink-2);
+}
+.empty-note {
+  color: var(--muted); font-size: 0.88rem;
+  padding: 28px 4px; text-align: center;
+}
+
+/* --- 表ビュー（グラフのアクセシブルな双子）--- */
+details.table-view { margin-top: 10px; font-size: 0.86rem; }
+details.table-view summary {
+  cursor: pointer;
+  color: var(--muted);
+  padding: 4px 0;
+  font-size: 0.84rem;
+  letter-spacing: 0.06em;
+}
+details.table-view summary:hover { color: var(--ink-2); }
+details.table-view table {
+  border-collapse: collapse; width: 100%; margin-top: 10px;
   font-variant-numeric: tabular-nums;
 }
-details.table-view th:first-child, details.table-view td:first-child { text-align: left; }
-details.table-view th { color: var(--ink-2); font-weight: 600; }
+details.table-view th,
+details.table-view td {
+  text-align: right; padding: 5px 10px;
+  border-bottom: 1px solid var(--rule);
+}
+details.table-view tbody tr:nth-child(odd) { background: var(--sheet-2); }
+details.table-view th:first-child,
+details.table-view td:first-child { text-align: left; }
+details.table-view th { color: var(--ink-2); font-weight: 700; }
 
-/* ---- info cards (飼育密度・飼育方式) ---- */
-.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+/* ============================================================
+   数値タイル / FTE 比較
+   ============================================================ */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 0 0 14px;
+}
+.tile {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 16px 18px 14px;
+}
+.tile .label {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.85rem; line-height: 1.5; color: var(--ink-2);
+}
+.tile .label .key { width: 11px; height: 11px; border-radius: 2px; flex: none; }
+.tile .value {
+  margin-top: 4px;
+  font-size: 1.7rem;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+}
+.tile .sub { font-size: 0.8rem; line-height: 1.7; color: var(--muted); }
+
+.fte-card .fte-bars {
+  margin-top: 12px; display: flex; flex-direction: column; gap: 7px;
+}
+.fte-bar-row {
+  display: grid; grid-template-columns: 3.4em 1fr auto;
+  align-items: center; gap: 9px;
+}
+.fte-bar-year {
+  font-size: 0.79rem; color: var(--muted); font-variant-numeric: tabular-nums;
+}
+.fte-bar-track {
+  background: var(--sheet-2);
+  border: 1px solid var(--rule);
+  border-radius: 2px; height: 15px; overflow: hidden;
+}
+.fte-bar-fill { height: 100%; }
+.fte-bar-val {
+  font-size: 0.86rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.fte-card .sub { margin-top: 10px; }
+
+/* ============================================================
+   参考情報カード（飼育密度）
+   ============================================================ */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+  gap: 12px;
+}
 .fact {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 18px 20px;
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 20px 22px 18px;
 }
-.fact h3 { margin: 0 0 6px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; }
-.fact h3 .key { width: 10px; height: 10px; border-radius: 3px; flex: none; }
-.fact p { margin: 0; font-size: 0.88rem; color: var(--ink-2); }
-.fact .big { font-size: 1.5rem; font-weight: 650; color: var(--ink); margin: 2px 0 6px; }
+.fact h3 {
+  margin: 0 0 10px; font-size: 0.98rem; line-height: 1.6;
+  display: flex; align-items: baseline; gap: 9px;
+}
+.fact h3 .key {
+  width: 11px; height: 11px; border-radius: 2px; flex: none;
+  transform: translateY(-1px);
+}
+.fact .fact-big {
+  margin: 0 0 10px;
+  font-size: 1.28rem;
+  line-height: 1.45;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.fact p { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.85; color: var(--ink-2); }
+.fact .fact-src { margin: 0; }
 
+/* ============================================================
+   奥付
+   ============================================================ */
 footer.site {
-  max-width: 980px; margin: 0 auto; padding: 0 20px 60px;
-  color: var(--muted); font-size: 0.8rem;
+  margin-top: clamp(56px, 8vw, 96px);
+  border-top: 1px solid var(--rule-2);
+  background: var(--sheet);
+  scroll-margin-top: 24px;
 }
-footer.site h2 { font-size: 0.95rem; color: var(--ink-2); }
-footer.site a { color: inherit; }
-footer.site ul { padding-left: 1.2em; }
+.foot-inner {
+  max-width: 940px; margin: 0 auto;
+  padding: 34px 24px 64px;
+  color: var(--ink-2); font-size: 0.86rem; line-height: 1.85;
+}
+footer.site h2 { margin: 0 0 12px; font-size: 1.02rem; color: var(--ink); }
+footer.site ul { padding-left: 1.3em; margin: 0 0 18px; }
+footer.site li { margin-bottom: 4px; }
+footer.site li:empty { display: none; }
+.colophon { margin: 0; color: var(--muted); }
+
+/* ============================================================
+   動きの配慮・印刷
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+@media print {
+  .rail, .skip, details.table-view { display: none; }
+  body { background: #fff; font-size: 11pt; }
+  .sheet, .tile, .fact, footer.site { border-color: #bbb; background: #fff; }
+  .section { break-inside: avoid; margin-top: 24pt; }
+  .sheet { break-inside: avoid; }
+}
