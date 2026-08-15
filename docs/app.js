@@ -695,13 +695,6 @@
         e.message + " 時間をおいて再読み込みしてください。";
     });
 
-  // ダーク/ライト切り替え時に再描画（色はCSS変数から都度読む）
-  if (window.matchMedia) {
-    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
-      if (DATA) render();
-    });
-  }
-
   // 幅が変わったら引き直す（グラフは画面幅に合わせて実寸で描いているため）
   var rt, lastW = window.innerWidth;
   window.addEventListener("resize", function () {
