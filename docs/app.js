@@ -934,8 +934,9 @@
 
     var W = Math.max(280, Math.round(host.clientWidth) || 720);
     var narrowS = W < 520;
-    // 帯の上には「屠殺」の見出しが載るので、狭い画面でも切れない余白を確保する
-    var BAND = 46, TOP = narrowS ? 26 : 34, AXIS = 30;
+    // 帯の上に「屠殺」の見出しを独立した段として置くため、余白を広めに取る。
+    // 分娩の▼と同じ高さに置くと、最後の分娩が屠殺の位置だと読めてしまう。
+    var BAND = 46, KILL_Y = 11, TOP = narrowS ? 34 : 42, AXIS = 30;
     var H = TOP + BAND + AXIS;
     function X(day) { return day / end * W; }
 
@@ -971,15 +972,16 @@
         " " + (TOP - 5) + "L" + fx.toFixed(2) + " " + TOP + 'Z" fill="' + C.ink + '"></path>';
     }
     // 帯の終わり＝屠殺。淘汰された母豚は廃用母豚として食肉に回る。
+    // 見出しを分娩の▼より上の段に置き、帯の右端まで縦線で結んで位置を示す。
     var ex = W - 1;
-    svg += '<line x1="' + ex + '" y1="' + (TOP - 7) + '" x2="' + ex + '" y2="' + (TOP + BAND) +
+    svg += '<line x1="' + ex + '" y1="' + (KILL_Y + 5) + '" x2="' + ex + '" y2="' + (TOP + BAND) +
       '" stroke="' + C.ink + '" stroke-width="2"></line>';
-    svg += '<text x="' + W + '" y="' + (TOP - 11) + '" text-anchor="end" font-size="11.5" ' +
+    svg += '<text x="' + W + '" y="' + KILL_Y + '" text-anchor="end" font-size="11.5" ' +
       'font-weight="700" fill="' + C.ink + '">屠殺</text>';
 
     // 繰り返しの単位が読み取れるよう、1サイクル目に寸法線を渡す
     if (!narrowS) {
-      var bx1 = X(mate), bx2 = X(mate + fi), by = 18;
+      var bx1 = X(mate), bx2 = X(mate + fi), by = TOP - 16;
       svg += '<path d="M' + bx1.toFixed(2) + " " + (by + 5) + "L" + bx1.toFixed(2) + " " + by +
         "L" + bx2.toFixed(2) + " " + by + "L" + bx2.toFixed(2) + " " + (by + 5) +
         '" fill="none" stroke="' + C.muted + '" stroke-width="1"></path>';
