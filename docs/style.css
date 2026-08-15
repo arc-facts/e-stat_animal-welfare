@@ -509,6 +509,17 @@ details.qa > summary::before { font-size: 1.1rem; }
 }
 .grid-2 .fact h3 { font-size: 1rem; margin-bottom: 8px; }
 
+/* --- 大項目の見出し（畜種別のまとまりを区切る）--- */
+.part { margin-top: clamp(60px, 9vw, 104px); }
+.part-title {
+  margin: 0 0 12px;
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);
+  letter-spacing: 0.02em;
+  padding-top: 18px;
+  border-top: 3px solid var(--ink);
+}
+.part > .desc { max-width: 40em; }
+
 /* --- 節の中の小見出し --- */
 .subhead {
   margin: 44px 0 12px;
@@ -551,6 +562,12 @@ details.qa > summary::before { font-size: 1.1rem; }
   font-size: 0.97rem;
   line-height: 1.95;
   color: var(--ink);
+}
+.sheet--conc .fact-src {
+  margin: 12px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--muted);
 }
 
 /* 主張の中心になるカード */
