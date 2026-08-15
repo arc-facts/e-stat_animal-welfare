@@ -8,7 +8,7 @@
 #   https://docs.google.com/spreadsheets/d/【ここ】/edit
 
 [sheet]
-spreadsheet_id = ""
+spreadsheet_id = "1lkm9RcNnTCb6bZcqUOIgKmJbOhHsxLVLTeStc_ls3pk"
 
 # タブ名 = 書き出し先のCSV名。タブ名はシート側のタブ名と完全一致させる。
 # ここに無いタブは無視される（メモ用のタブを自由に足してよい）。
