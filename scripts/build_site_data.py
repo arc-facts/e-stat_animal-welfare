@@ -291,8 +291,8 @@ def main() -> None:
         "cagefree": read_cagefree(),
         # 各国のケージフリー割合 — Our World in Data（CC BY）。日本のみ ARC 調査
         "cagefree_world": read_cagefree_world(),
-        # 東南アジア6か国 — 割合の統計がないため規模と企業の宣言で示す
-        "cagefree_sea": read_cagefree_sea(),
+        # アジア各国のケージフリー率 — GCAW の集計（日本の値は国内調査と食い違う）
+        "cagefree_asia": read_rows("cagefree_asia.csv", floats=("share_pct",)),
         # 母豚の繁殖サイクル — 広岡（2018）のシミュレーションモデルのベース条件
         "sow_cycle": read_sow_cycle(),
         # 1羽当たり飼養面積（実面積比の図）

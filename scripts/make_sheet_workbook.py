@@ -29,7 +29,7 @@ TABS = [
     ("cagefree", "日本のケージフリー割合の推計（出典ごと）"),
     ("cagefree_types", "ケージフリーの飼養形態別内訳"),
     ("cagefree_world", "各国のケージフリー割合"),
-    ("cagefree_sea", "東南アジア6か国の規模と企業の宣言"),
+    ("cagefree_asia", "アジア各国のケージフリー率（GCAW）"),
     ("space_per_hen", "1羽当たり飼養面積（実面積比の図）"),
     ("pain_hours", "ケージフリー移行で減る痛みの時間"),
     ("broiler_density", "ブロイラーの飼養密度"),
@@ -42,7 +42,7 @@ TABS = [
 ]
 
 GUIDE = [
-    ("日本の畜産動物はいま — データ管理シート", "head"),
+    ("データで見る日本のアニマルウェルフェア — データ管理シート", "head"),
     ("", None),
     ("このシートを編集すると、GitHub Actions が取り込んで公開サイトに反映します。", None),
     ("https://arc-facts.github.io/e-stat_animal-welfare/", None),

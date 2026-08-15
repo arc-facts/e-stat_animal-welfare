@@ -1,4 +1,4 @@
-/* 日本の畜産動物はいま — グラフ描画（依存ライブラリなし・SVG手描き） */
+/* データで見る日本のアニマルウェルフェア — グラフ描画（依存ライブラリなし・SVG手描き） */
 (function () {
   "use strict";
 
@@ -745,28 +745,45 @@
     arc: "アニマルライツセンター「ケージフリー羽数調査」(2025)"
   };
 
-  /* ---------- 東南アジア6か国 ----------
-     割合の統計が存在しないため、規模（羽数）と企業の宣言数を表で示す。 */
-  function renderCagefreeSea(d) {
-    var host = document.getElementById("cagefree-sea");
+  /* ---------- アジア各国のケージフリー率 ----------
+     出典（GCAW）が日本を8%としており、国内調査の1.48%と大きく食い違う。
+     数値はそのまま出したうえで、その食い違いを図の中でも示す。 */
+  function renderCagefreeAsia(d, C) {
+    var host = document.getElementById("cagefree-asia");
     if (!host) return;
-    var sea = d.cagefree_sea || [];
-    if (!sea.length) { host.innerHTML = ""; return; }
-    var totalHens = sea.reduce(function (a, c) { return a + c.hens; }, 0);
-    var totalCom = sea.reduce(function (a, c) { return a + c.commitments; }, 0);
-    var totalLoc = sea.reduce(function (a, c) { return a + c.local; }, 0);
+    var rows = d.cagefree_asia || [];
+    if (!rows.length) { host.innerHTML = ""; return; }
+    rows = rows.slice().sort(function (a, b) { return b.share_pct - a.share_pct; });
 
-    host.innerHTML = '<div class="table-wrap"><table class="datatable">' +
-      "<thead><tr><th>国</th><th>採卵鶏の羽数</th><th>ケージフリー宣言</th><th>うち現地企業</th></tr></thead><tbody>" +
-      sea.map(function (c) {
-        return "<tr><td>" + esc(c.country) + "</td><td>" + fmtOkuMan(c.hens) + "羽</td><td>" +
-          c.commitments + "件</td><td>" + c.local + "件（" +
-          Math.round(c.local / c.commitments * 100) + "%）</td></tr>";
-      }).join("") +
-      "<tr><td><strong>6か国合計</strong></td><td><strong>" + fmtOkuMan(totalHens) +
-      "羽</strong></td><td><strong>" + totalCom + "件</strong></td><td><strong>" + totalLoc +
-      "件（" + Math.round(totalLoc / totalCom * 100) + "%）</strong></td></tr>" +
-      "</tbody></table></div>";
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var narrow = W < 520;
+    var BAR = narrow ? 16 : 19, GAP = narrow ? 8 : 9;
+    var nameSize = narrow ? 11.5 : 13;
+    var labelW = Math.min(narrow ? 92 : 130,
+      Math.round(widest(rows.map(function (r) { return r.country; }), nameSize)) + 12);
+    var valueW = narrow ? 40 : 48;
+    var track = Math.max(60, W - labelW - valueW - 10);
+    var maxV = 20;
+    var H = rows.length * (BAR + GAP) - GAP;
+
+    var svg = '<svg viewBox="0 0 ' + W + " " + H +
+      '" role="img" aria-label="アジア各国の採卵鶏に占めるケージフリーの割合">';
+    rows.forEach(function (r, i) {
+      var y = i * (BAR + GAP), jp = r.code === "JPN";
+      svg += '<text x="' + (labelW - 8) + '" y="' + (y + BAR * 0.5 + 4.5) + '" text-anchor="end" font-size="' +
+        nameSize + '" font-weight="' + (jp ? 700 : 400) + '" fill="' + (jp ? C.ink : C.ink2) + '">' +
+        esc(r.country) + "</text>";
+      svg += '<rect x="' + labelW + '" y="' + y + '" width="' + track + '" height="' + BAR +
+        '" fill="' + C.rule + '" rx="2"></rect>';
+      svg += '<rect x="' + labelW + '" y="' + y + '" width="' +
+        Math.max(1.5, track * r.share_pct / maxV).toFixed(1) + '" height="' + BAR + '" fill="' +
+        C.layers + '" opacity="' + (jp ? 1 : 0.45) + '" rx="2"></rect>';
+      svg += '<text x="' + (labelW + track + 8) + '" y="' + (y + BAR * 0.5 + 4.5) + '" font-size="' +
+        nameSize + '" font-weight="' + (jp ? 700 : 400) + '" fill="' + (jp ? C.ink : C.ink2) +
+        '" style="font-variant-numeric: tabular-nums">' + trim(r.share_pct.toFixed(1)) + "%</text>";
+    });
+    svg += "</svg>";
+    host.innerHTML = svg;
   }
 
   /* ---------- 1羽が使える面積（実面積比で描く） ----------
@@ -1255,7 +1272,7 @@
     /* ケージフリーの割合と、各国との比較 */
     renderCagefree(d, C);
     renderCagefreeWorld(d, C);
-    renderCagefreeSea(d);
+    renderCagefreeAsia(d, C);
 
     /* ケージとケージフリーで鶏の一生はどう変わるか（Our World in Data の内容） */
     renderSpace(d, C);

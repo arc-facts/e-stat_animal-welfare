@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>日本の畜産動物はいま — 数字で見るアニマルウェルフェア</title>
+<title>データで見る日本のアニマルウェルフェア</title>
 <meta name="description" content="採卵鶏・ブロイラー・豚（母豚）の飼養数、年間の屠殺数、ケージフリーの割合、1戸当たり飼養数の推移を、日本の人口と対比して可視化。出典は農林水産省・総務省の政府統計（e-Stat）ほか。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +30,7 @@
 </nav>
 
 <header class="masthead">
-  <h1>日本の畜産動物はいま</h1>
+  <h1>データで見る日本のアニマルウェルフェア</h1>
   <p class="lede">
     採卵鶏・ブロイラー（肉用鶏）・豚が、日本でどれだけ飼育され、どれだけ殺され、
     どんな飼われ方をしているか。飼養数や屠殺数は e-Stat（政府統計の総合窓口）の
@@ -286,40 +286,42 @@
     </div>
 
     <div class="sheet">
-      <h3>東アジア・東南アジアの状況</h3>
-      <p class="sub">上のグラフに東南アジアの国が出てこないのは、羽数ベースの割合が公表されていないためです</p>
-      <div id="cagefree-sea"></div>
+      <h3>アジア各国のケージフリー率</h3>
+      <p class="sub">採卵鶏に占める割合 / 出典: Global Coalition for Animal Welfare（2022年の値）</p>
+      <div class="chart" id="cagefree-asia"></div>
       <p class="species-note">
-        東南アジア6か国の採卵鶏は合計7億6,787万羽（FAO 2021年）で、日本の約6倍にあたります。
-        しかしこの地域には<strong>ケージフリー割合の統計が存在しません</strong>。
-        分かっているのは企業の宣言の数で、域内326件のケージフリー宣言のうち大半は
-        国際企業の現地法人によるものです。宣言が最も多いインドネシアでも、
-        67件中49件（73%）が国際企業でした。現地企業が牽引しているとは言いがたい状況です。
+        アジアはどの国も低い水準にとどまっています。ベトナムとロシアは0%、韓国は5%。
+        比較的高いインド20%も、その多くは商業養鶏ではなく庭先養鶏によるものと考えられます。
       </p>
+
       <details class="info">
-        <summary>「ケージフリー宣言」とは</summary>
+        <summary>この数字は慎重に読む必要があります — 日本の値が国内調査と食い違う</summary>
         <p>
-          企業が「自社で使う卵を、いつまでにすべてケージフリーに切り替える」と
-          期限を切って公表する約束のことです。スーパー、外食チェーン、食品メーカー、ホテルなどが出しています。
-          法規制ではなく企業が自主的に行うものですが、期限と対象範囲（自社ブランドのみか、
-          国内のみか、全世界か）を明示するのが通例で、達成状況は
-          <a href="https://chickenwatch.org/">Chicken Watch</a> などの第三者サイトで追跡・公開されています。
+          この出典は<strong>日本を8%</strong>としています。しかし国内の調査では、
+          アニマルライツセンターが農場を積み上げて数えた値が<strong>1.48%</strong>、
+          麻布大学のアンケート回答内の比率が3.17%、WEOが3.5%です。
+          いずれとも大きく食い違い、最も高い国内の推計と比べても2倍以上あります。
         </p>
         <p>
-          鶏卵は、消費者が直接買う量より、加工品や外食を通じて使われる量のほうが大きいため、
-          こうした調達方針の変更が実際の飼育方法を動かす力を持ちます。
-          EUやアメリカでケージフリーが伸びた背景にも、法規制と並んでこの企業宣言があります。
-          一方、宣言はあくまで約束であり、期限までに実行されるかどうかは別の問題です。
+          GCAWの資料には各国の値の算出根拠が示されていないため、この差がどこから来るのかを
+          確かめられません。<strong>日本という、国内に複数の調査がある国でこれだけずれる以上、
+          他の国の数値にも同程度の不確かさがあるとみて読むべきです</strong>。
+          上の「世界との比較」で使っている Our World in Data のデータセットとも一致しません
+          （同データセットでの日本は5.4%・2018年）。
+        </p>
+        <p>
+          それでも掲載しているのは、東アジア・東南アジアには羽数ベースの公的統計がほとんど存在せず、
+          国際的な集計以外に比較の手がかりがないためです。おおよその水準感として読んでください。
         </p>
       </details>
 
       <div class="srcbox">
-        <h4>この項目の出典</h4>
+        <h4>この図の出典</h4>
         <ul>
-          <li>Zeng, W., Statharas, L., Kan, R.-H. (2023).
-            <em>State of Animal Farming in Southeast Asia</em>. Welfare Matters.
-            採卵鶏の羽数はFAO（2021年）、ケージフリー宣言の数はChicken Watchによる。
-            出典を明示すれば利用・複製が認められています</li>
+          <li>Global Coalition for Animal Welfare.
+            <a href="https://www.gc-animalwelfare.org/wp-content/uploads/2024/02/GCAW-Knowledge-Share-Cage-Free-Eggs-Global-Landscape-Review-Infographics.pdf"><em>Cage Free Eggs: A Global Landscape Review</em></a>
+            の「Cage-Free Eggs in Asia」（2022年の値、2024年2月公表）。
+            フィリピンとパキスタンは同資料でも「データなし」とされています</li>
         </ul>
       </div>
     </div>

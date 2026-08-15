@@ -62,3 +62,5 @@ c244,ブロイラー,1957年の品種と同条件で比べると、2005年の品
 c245,ブロイラー,"同一条件で56日齢まで育てた体重は1957年品種905g・1978年品種1,808g・2005年品種4,202g","Zuidhof et al. (2014) Figure 1 の併記体重。0日齢は34/42/44g、28日齢は316/632/1,396g",https://doi.org/10.3382/ps.2014-04291,FALSE,,,
 c246,ブロイラー,1957年から2005年にかけてブロイラーの成長は400%以上増加し、飼料要求率は50%低下した,"Zuidhof et al. (2014) Abstract「From 1957 to 2005, broiler growth increased by over 400%, with a concurrent 50% reduction in feed conversion ratio」",https://doi.org/10.3382/ps.2014-04291,FALSE,,,
 c407,ブロイラー,EUは飼養密度の上限を33kg/m²と定めている（条件を満たす場合39kg/m²まで）,EU指令 2007/43/EC,https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32007L0043,FALSE,,,
+c251,採卵鶏,アジア各国のケージフリー率（GCAW 2022年）はインド20%・台湾15%・トルコ12%・中国10%・インドネシア10%・日本8%・タイ8%・韓国5%・ベトナム0%・ロシア0%,Global Coalition for Animal Welfare「Cage Free Eggs: A Global Landscape Review」の Cage-Free Eggs in Asia より（2022年の値、2024年2月公表）,https://www.gc-animalwelfare.org/wp-content/uploads/2024/02/GCAW-Knowledge-Share-Cage-Free-Eggs-Global-Landscape-Review-Infographics.pdf,FALSE,,,
+c252,採卵鶏,GCAWは日本を8%としているが、国内の調査（ARC 1.48%、麻布大3.17%）やWEO（3.5%）とは大きく食い違う,本サイトによる比較。GCAWの数値の算出根拠は資料上示されていない,,FALSE,,,

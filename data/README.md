@@ -197,15 +197,20 @@ ARC 2025年）を主として描きます。「他の推計ではこのあたり
 `show=0` の行として残してあります。表示する国は、100%から0%までの幅が
 分かるように選んだもので、恣意を避けるため表ビューでは全件を開示しています。
 
-### cagefree_sea.csv — 東南アジア6か国の規模と企業の宣言
+### cagefree_asia.csv — アジア各国のケージフリー率
 
-**この地域には羽数ベースのケージフリー割合の公表統計がありません。** そのため
-割合の代わりに、採卵鶏の羽数（FAO 2021年）と企業のケージフリー宣言の数
-（Chicken Watch）を収録しています。`country` / `code` / `layer_hens` /
-`commitments_total` / `commitments_local` / `commitments_intl` の6列。
+出典: Global Coalition for Animal Welfare「Cage Free Eggs: A Global Landscape Review」の
+「Cage-Free Eggs in Asia」（2022年の値、2024年2月公表）。
 
-出典: Zeng, W., Statharas, L., Kan, R.-H. (2023). *State of Animal Farming in
-Southeast Asia*. Welfare Matters（出典を明示すれば利用・複製が認められています）。
+**この数値は慎重に扱ってください。** 同資料は日本を8%としていますが、国内の調査
+（ARC 1.48%、麻布大 3.17%、WEO 3.5%）のいずれとも大きく食い違います。算出根拠が
+資料上示されておらず、差の理由を確かめられません。日本という複数の調査がある国で
+これだけずれる以上、他国の数値にも同程度の不確かさがあるとみるべきです。
+それでも収録しているのは、東アジア・東南アジアには羽数ベースの公的統計が
+ほとんど存在せず、国際的な集計以外に比較の手がかりがないためです。
+
+`country` / `code` / `share_pct` / `source_text` / `source_url` / `claim_id` / `note` の7列。
+フィリピンとパキスタンは同資料でも「データなし」のため収録していません。
 
 ### sow_cycle.csv — 母豚の繁殖サイクル
 
