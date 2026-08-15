@@ -655,8 +655,8 @@
         return b.year - a.year ||
           (a.scope === b.scope ? b.share - a.share : (a.scope === "national" ? -1 : 1));
       }).map(function (e) {
-        return "<tr><td>" + esc(CF_SOURCE[e.source] || e.source) + "</td><td>" + e.year + "年</td><td>" +
-          pct(e.share) + "</td><td>" +
+        return "<tr><td>" + esc(CF_SOURCE[e.source] || e.source) + "</td><td>" + e.year + "年</td><td><strong>" +
+          pct(e.share) + "</strong></td><td>" +
           (e.scope === "sample" ? "調査回答内" : "全国") + "</td><td>" + esc(e.note || "") + "</td></tr>";
       }).join("");
       estHost.innerHTML = '<div class="table-wrap"><table class="datatable">' +
@@ -716,24 +716,57 @@
       C.layers + ';opacity:.45"></span>その他の国</span>';
     host.appendChild(lg);
 
-    // 表ビューには掲載していない国も含めて全件出す
+    // 表ビューには掲載していない国も含めて全件、出典の区分つきで出す
     var det = document.createElement("details");
     det.className = "table-view";
-    det.innerHTML = "<summary>データを表で見る（全" + all.length + "件）</summary><table><thead>" +
-      "<tr><th>国</th><th>年</th><th>割合</th></tr></thead><tbody>" +
+    det.innerHTML = "<summary>データを表で見る（全" + all.length + "件・出典つき）</summary><table><thead>" +
+      "<tr><th>国</th><th>年</th><th>割合</th><th>一次出典</th></tr></thead><tbody>" +
       all.map(function (c) {
-        return "<tr><td>" + esc(c.country) + (c.source === "arc" ? "（ARC調査）" : "") +
-          "</td><td>" + c.year + "</td><td>" + trim(c.share.toFixed(1)) + "%</td></tr>";
+        return "<tr><td>" + esc(c.country) + "</td><td>" + c.year + "</td><td>" +
+          trim(c.share.toFixed(1)) + "%</td><td>" + esc(CF_BASIS[c.basis] || "—") + "</td></tr>";
       }).join("") + "</tbody></table></details>";
     host.appendChild(det);
 
     var sub = document.getElementById("cfworld-sub");
     if (sub) {
       var yrs = rows.map(function (c) { return c.year; });
-      sub.textContent = "羽数ベース。国によって最新年が異なります（" +
-        Math.min.apply(null, yrs) + "〜" + Math.max.apply(null, yrs) +
-        "年） / 出典: Our World in Data（CC BY）。日本のみアニマルライツセンター2025年調査";
+      sub.textContent = "羽数ベース。国によって年が異なります（" +
+        Math.min.apply(null, yrs) + "〜" + Math.max.apply(null, yrs) + "年）";
     }
+  }
+
+  /* 各国の値がどの一次資料に由来するかの区分。OWIDは集約元であって
+     一次出典ではないため、国ごとの出所を表に出す。 */
+  var CF_BASIS = {
+    official_ec: "欧州委員会「Laying hens by way of keeping」",
+    official_defra: "英国 Defra「UK egg statistics」",
+    official_usda: "米国 USDA「Egg Markets Overview」",
+    compilation_wfi: "Welfare Footprint Institute「Global hen inventory」(2022)",
+    arc: "アニマルライツセンター「ケージフリー羽数調査」(2025)"
+  };
+
+  /* ---------- 東南アジア6か国 ----------
+     割合の統計が存在しないため、規模（羽数）と企業の宣言数を表で示す。 */
+  function renderCagefreeSea(d) {
+    var host = document.getElementById("cagefree-sea");
+    if (!host) return;
+    var sea = d.cagefree_sea || [];
+    if (!sea.length) { host.innerHTML = ""; return; }
+    var totalHens = sea.reduce(function (a, c) { return a + c.hens; }, 0);
+    var totalCom = sea.reduce(function (a, c) { return a + c.commitments; }, 0);
+    var totalLoc = sea.reduce(function (a, c) { return a + c.local; }, 0);
+
+    host.innerHTML = '<div class="table-wrap"><table class="datatable">' +
+      "<thead><tr><th>国</th><th>採卵鶏の羽数</th><th>ケージフリー宣言</th><th>うち現地企業</th></tr></thead><tbody>" +
+      sea.map(function (c) {
+        return "<tr><td>" + esc(c.country) + "</td><td>" + fmtOkuMan(c.hens) + "羽</td><td>" +
+          c.commitments + "件</td><td>" + c.local + "件（" +
+          Math.round(c.local / c.commitments * 100) + "%）</td></tr>";
+      }).join("") +
+      "<tr><td><strong>6か国合計</strong></td><td><strong>" + fmtOkuMan(totalHens) +
+      "羽</strong></td><td><strong>" + totalCom + "件</strong></td><td><strong>" + totalLoc +
+      "件（" + Math.round(totalLoc / totalCom * 100) + "%）</strong></td></tr>" +
+      "</tbody></table></div>";
   }
 
   /* ---------- 1羽が使える面積（実面積比で描く） ----------
@@ -1098,6 +1131,7 @@
     /* ケージフリーの割合と、各国との比較 */
     renderCagefree(d, C);
     renderCagefreeWorld(d, C);
+    renderCagefreeSea(d);
 
     /* ケージとケージフリーで鶏の一生はどう変わるか（Our World in Data の内容） */
     renderSpace(d, C);

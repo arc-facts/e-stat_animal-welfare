@@ -20,8 +20,7 @@
 <nav class="rail" id="rail" aria-label="ページ内の見出し">
   <a href="#killed">殺される数</a>
   <a href="#inventory">飼育数</a>
-  <a href="#cagefree">ケージフリー</a>
-  <a href="#welfare">鶏の一生</a>
+  <a href="#cagefree">採卵鶏</a>
   <a href="#sows">母豚</a>
   <a href="#concentration">集約化</a>
   <a href="#labor">労働力</a>
@@ -96,13 +95,23 @@
   </section>
 
   <section class="section" id="cagefree">
-    <h2>ケージフリーの割合 — 日本は1.5%</h2>
+    <h2>採卵鶏 — ケージという飼い方</h2>
     <p class="desc">
       上のグラフの採卵鶏1億2,973万羽が、どんな飼い方をされているか。
       ケージを使わない飼育（平飼い・エイビアリー・放牧）は、
       アニマルライツセンターが農場を1件ずつ積み上げた2025年の調査で
-      192万4,435羽、全体の1.48%でした。
+      192万4,435羽、全体の1.48%でした。残りはすべてケージの中にいます。
     </p>
+    <p class="desc">
+      ケージには、日本で主流のバタリーケージのほかに、巣箱や止まり木をつけた
+      「エンリッチドケージ」もあります。ただし、どちらのケージであっても、
+      鶏が羽を広げる・砂浴びをする・止まり木で眠るといった行動は、
+      面積と構造の制約から<strong>原理的にとれません</strong>。
+      ケージフリーにも限界はありますが、これらを可能にする方法は
+      ケージをやめること以外にありません。以下、順に数字で見ていきます。
+    </p>
+
+    <h3 class="subhead">日本のケージフリー率</h3>
     <div class="sheet">
       <h3>採卵鶏に占めるケージフリーの割合</h3>
       <p class="sub" id="cagefree-sub">1マス＝全体の0.1%</p>
@@ -145,22 +154,98 @@
       </details>
     </div>
 
+    <h3 class="subhead">世界との比較</h3>
     <div class="sheet">
-      <h3>世界との比較</h3>
+      <h3>各国の採卵鶏に占めるケージフリーの割合</h3>
       <p class="sub" id="cfworld-sub">羽数ベースのケージフリー割合</p>
       <div class="chart" id="chart-cagefree-world"></div>
       <p class="species-note">
         オーストリア・スイス・ドイツ・スウェーデンはすでにほぼ全量がケージフリーです。
         EUは2012年に従来型（バタリー）ケージを禁止し、いくつかの国はさらにケージそのものを廃止しました。
         アメリカも州法と企業の調達方針の変更で45%まで進んでいます。
+        なおこれは<strong>商業養鶏を数えた数字</strong>で、庭先養鶏の多い国（インドなど）は実際より低く出ます。
       </p>
-    </div>
-  </section>
 
-  <section class="section" id="welfare">
-    <h2>ケージとケージフリーで、鶏の一生はどう変わるか</h2>
+      <details class="info">
+        <summary>この数字は何を数えたものか — インドの0%について</summary>
+        <p>
+          このデータが数えているのは、<strong>商業的な採卵養鶏場で飼われている鶏</strong>です。
+          自家消費や近所へのおすそ分けが中心の庭先養鶏（バックヤード）は、
+          実質的にケージフリーであっても集計に入っていません。
+        </p>
+        <p>
+          そのため、庭先養鶏の比重が大きい国では実際より低く出ます。
+          インドが0%と表示されるのは、商業養鶏場のほとんどがバタリーケージだという意味であって、
+          <strong>インドにケージフリーの鶏がいないという意味ではありません</strong>。
+          インドの2022〜23年度の鶏卵生産1,383.8億個のうち、
+          <strong>202.0億個（14.6%）は庭先養鶏</strong>によるものです。
+          庭先養鶏は1羽当たりの産卵数が商業鶏よりずっと少ないため、
+          羽数で見た割合は、この14.6%よりさらに大きくなります。
+        </p>
+        <p>
+          また、EU加盟国・イギリス・アメリカ以外の値は参照年が2013〜2018年と古く、
+          その後の変化が反映されていません。日本を含め、国どうしを比べるときは年の違いに注意してください。
+        </p>
+      </details>
+
+      <div class="srcbox">
+        <h4>この図の出典</h4>
+        <p class="srcbox-lead">
+          Our World in Data はこれらをまとめた集約元です。国ごとの一次出典は次のとおりで、
+          表ビューでは国ごとにどれに当たるかを示しています。
+        </p>
+        <ul>
+          <li><strong>EU加盟国</strong> — 欧州委員会「Laying hens by way of keeping」。加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別の羽数</li>
+          <li><strong>イギリス</strong> — Defra「UK egg statistics」。包装施設への四半期調査から推計</li>
+          <li><strong>アメリカ</strong> — USDA「Egg Markets Overview」</li>
+          <li><strong>その他の国</strong> — Welfare Footprint Institute「Global hen inventory」（2022年）。各国統計と業界資料をまとめたもの</li>
+          <li><strong>日本</strong> — アニマルライツセンター「<a href="https://arcj.org/issues/farm-animals/layer-chicken/cagefreesurvey2025/">ケージフリー羽数調査</a>」（2025年）。この項目のみ他国と出典が異なります</li>
+          <li>収集・整形 — Our World in Data「<a href="https://ourworldindata.org/grapher/eggs-cage-free">Share of egg-laying hens in cage-free systems</a>」（CC BY、2026年6月11日更新版）</li>
+          <li>インドの庭先養鶏の数値 — Rokade et al. (2024)
+            <a href="https://www.frontiersin.org/journals/veterinary-science/articles/10.3389/fvets.2024.1442580/full"><em>The cage-free egg sector: perspectives of Indian poultry producers</em></a>,
+            Frontiers in Veterinary Science（インド政府畜産・酪農省の統計による）</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <h3>東アジア・東南アジアの状況</h3>
+      <p class="sub">上のグラフに東南アジアの国が出てこないのは、羽数ベースの割合が公表されていないためです</p>
+      <div id="cagefree-sea"></div>
+      <p class="species-note">
+        東南アジア6か国の採卵鶏は合計7億6,787万羽（FAO 2021年）で、日本の約6倍にあたります。
+        しかしこの地域には<strong>ケージフリー割合の統計が存在しません</strong>。
+        分かっているのは企業の宣言の数で、域内326件のケージフリー宣言のうち大半は
+        国際企業の現地法人によるものです。宣言が最も多いインドネシアでも、
+        67件中49件（73%）が国際企業でした。現地企業が牽引しているとは言いがたい状況です。
+      </p>
+      <p class="species-note">
+        中国・日本・インドネシア・マレーシア・フィリピン・タイの採卵養鶏業者を対象にした調査では、
+        <strong>65%が自国でケージフリーは実現可能</strong>と答えています。
+        一方でタイでは75%が「自国では実現不可能」と回答し、域内でも見方が割れています。
+        72%の生産者が、人材育成や資源の面での支援が必要だと答えました。
+        タイをはじめ、この地域には「ケージフリー」の法的な定義がありません。
+        インドネシアのジョグジャカルタには、3,000羽規模のケージフリーのモデル農場兼研修拠点
+        （Cage-free Innovation and Welfare Hub）が置かれ、アジアの生産者向けの研究拠点になっています。
+      </p>
+
+      <div class="srcbox">
+        <h4>この項目の出典</h4>
+        <ul>
+          <li>Zeng, W., Statharas, L., Kan, R.-H. (2023).
+            <em>State of Animal Farming in Southeast Asia</em>. Welfare Matters.
+            採卵鶏の羽数はFAO（2021年）、ケージフリー宣言の数はChicken Watchによる。
+            出典を明示すれば利用・複製が認められています</li>
+          <li>生産者への調査 — de Luna, M. C. T., Yang, Q., Agus, A., Ito, S., Idrus, Z., Iman, R. H. S., et al. (2022).
+            <em>Cage egg producers' perspectives on the adoption of cage-free systems in China, Japan, Indonesia, Malaysia, Philippines, and Thailand</em>.
+            Frontiers in Veterinary Science 9: 1038362</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="subhead" id="welfare">ケージの中では何ができないのか</h3>
     <p class="desc">
-      「ケージをやめれば鶏は幸せになるのか」「広いケージでは足りないのか」。
+      「広いケージにすれば足りるのか」「ケージをやめれば解決するのか」。
       この問いを、鶏が一生のうちどれだけの時間を痛みの中で過ごすかという物差しで
       比べた研究があります。以下は Our World in Data の記事
       「Do better cages or cage-free environments really improve the lives of hens?」
@@ -195,40 +280,54 @@
     </div>
 
     <div class="grid-2">
-      <div class="fact">
-        <h3>広いケージでは足りないのか</h3>
+      <div class="fact fact--key">
+        <h3>ケージの中では、できないことがある</h3>
         <p>
-          エンリッチドケージはバタリーケージより明確にましですが、面積はA4用紙より2割広い程度です。
-          羽づくろい、羽ばたき、砂浴びといった行動には足りず、
-          痛みの削減幅もケージフリーに移した場合に比べるとかなり小さくなります。
+          羽を左右に広げる、砂を浴びて羽の寄生虫を落とす、止まり木の上で眠る、
+          暗がりの巣箱にこもって卵を産む。いずれも鶏が強い欲求を持つ行動ですが、
+          <strong>ケージの中では面積と構造の制約からとれません</strong>。
+          これは管理の巧拙の問題ではなく、ケージという形そのものに由来します。
         </p>
       </div>
       <div class="fact">
-        <h3>ケージフリーなら問題は解決するのか</h3>
+        <h3>エンリッチドケージも「ケージ」のまま</h3>
         <p>
-          しません。ケージフリーに移しても、鶏は産卵期間の3分の1以上を
-          何らかの痛みの中で過ごすと推定されています。
-          最も強い痛み（Excruciating）は、どの方式でも卵管炎・腹膜炎が主な原因で、
-          5万羽の群あたり約2,000時間発生します。
+          巣箱や止まり木をつけたエンリッチドケージは、バタリーケージよりましです。
+          しかし1羽750cm²はA4用紙より2割広いだけで、羽ばたきや砂浴びには届きません。
+          痛みの削減幅も、ケージフリーに移した場合に比べるとかなり小さいままです。
+          EUは2012年にバタリーケージを禁じましたが、オーストリアやルクセンブルクは
+          そこで止まらず、ケージそのものを廃止しました。
         </p>
       </div>
       <div class="fact">
-        <h3>エイビアリー特有の課題</h3>
+        <h3>ケージフリーにも限界はある</h3>
         <p>
-          多段構造からの落下や衝突による竜骨（キールボーン）の骨折が、
-          エイビアリーで最大の福祉課題とされています。
-          死亡率も、農場が方式にどれだけ習熟しているかで大きく変わります。
+          ケージをやめれば十分、ということではありません。
+          多段構造からの落下や衝突による竜骨（キールボーン）の骨折は、
+          エイビアリーで最大の福祉課題とされています。死亡率も農場の習熟度で大きく変わります。
+          ケージフリーに移しても、鶏は産卵期間の3分の1以上を何らかの痛みの中で過ごすと推定されています。
         </p>
       </div>
       <div class="fact">
-        <h3>そもそも産みすぎている</h3>
+        <h3>飼い方を変えても残る負担</h3>
         <p>
           原種のセキショクヤケイは年に約12個しか産みません。
-          現代の採卵鶏は年に約300個産むよう改良され、
-          カルシウムを失って骨がもろくなります。
-          飼い方を変えても、この負担そのものは残ります。
+          現代の採卵鶏は年に約300個産むよう改良され、カルシウムを失って骨がもろくなります。
+          最も強い痛み（Excruciating）の主因である卵管炎・腹膜炎は、
+          どの飼い方でも5万羽の群あたり約2,000時間発生します。
+          産卵数そのものの負担は、ケージをやめても残ります。
         </p>
       </div>
+    </div>
+
+    <div class="sheet sheet--conc">
+      <p>
+        つまり、ケージフリーは<strong>十分条件ではありませんが、必要条件</strong>です。
+        骨折や死亡率、産みすぎの負担といった課題は、ケージをやめただけでは解決しません。
+        しかし、羽を広げる・砂を浴びる・止まり木で眠る・巣箱で産むという行動は、
+        ケージの中では<strong>どれだけ管理を工夫しても実現できません</strong>。
+        エンリッチドケージへの置き換えは、この壁を越えないままの改善です。
+      </p>
     </div>
 
     <div class="sheet sheet--cite">

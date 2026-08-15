@@ -140,6 +140,16 @@ ARC 2025年）を主として描きます。「他の推計ではこのあたり
 `show=0` の行として残してあります。表示する国は、100%から0%までの幅が
 分かるように選んだもので、恣意を避けるため表ビューでは全件を開示しています。
 
+### cagefree_sea.csv — 東南アジア6か国の規模と企業の宣言
+
+**この地域には羽数ベースのケージフリー割合の公表統計がありません。** そのため
+割合の代わりに、採卵鶏の羽数（FAO 2021年）と企業のケージフリー宣言の数
+（Chicken Watch）を収録しています。`country` / `code` / `layer_hens` /
+`commitments_total` / `commitments_local` / `commitments_intl` の6列。
+
+出典: Zeng, W., Statharas, L., Kan, R.-H. (2023). *State of Animal Farming in
+Southeast Asia*. Welfare Matters（出典を明示すれば利用・複製が認められています）。
+
 ### sow_cycle.csv — 母豚の繁殖サイクル
 
 出典: 広岡博之「ブタの繁殖肥育一貫生産に関するシミュレーションモデルの開発」

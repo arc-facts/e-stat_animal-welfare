@@ -402,7 +402,6 @@ main {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.datatable td:nth-child(3) { font-weight: 700; }
 .datatable td:last-child { color: var(--ink-2); }
 
 /* 狭い画面では横スクロールをやめ、1件を1ブロックに積み直す */
@@ -503,6 +502,53 @@ details.qa > summary::before { font-size: 1.1rem; }
   margin-top: 14px;
 }
 .grid-2 .fact h3 { font-size: 1rem; margin-bottom: 8px; }
+
+/* --- 節の中の小見出し --- */
+.subhead {
+  margin: 44px 0 12px;
+  font-size: 1.1rem;
+  color: var(--ink);
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--rule-2);
+}
+.subhead + .desc { margin-top: 0; }
+
+/* --- 出典の内訳（一次資料がどれか）--- */
+.srcbox {
+  margin-top: 16px;
+  padding: 16px 18px;
+  background: var(--sheet-2);
+  border-radius: 3px;
+  font-size: 0.84rem;
+  line-height: 1.8;
+  color: var(--ink-2);
+}
+.srcbox h4 {
+  margin: 0 0 6px;
+  font-size: 0.86rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
+}
+.srcbox-lead { margin: 0 0 10px; }
+.srcbox ul { margin: 0; padding-left: 1.2em; }
+.srcbox li { margin-bottom: 5px; }
+.srcbox li:last-child { margin-bottom: 0; }
+
+/* --- 論旨をまとめる一枚 --- */
+.sheet--conc {
+  border-left: 3px solid var(--accent);
+  margin-top: 14px;
+}
+.sheet--conc p {
+  margin: 0;
+  font-size: 0.97rem;
+  line-height: 1.95;
+  color: var(--ink);
+}
+
+/* 主張の中心になるカード */
+.fact--key { border-color: var(--rule-2); background: var(--sheet-2); }
 
 /* --- 出典カード --- */
 .sheet--cite { background: transparent; border-style: dashed; }

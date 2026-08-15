@@ -130,9 +130,36 @@ def read_cagefree_world() -> list[dict]:
                 "year": int(r["year"]),
                 "share": float(r["share_pct"]),
                 "source": r["source"],
+                "basis": r.get("basis", ""),
                 "show": r["show"] == "1",
             })
     out.sort(key=lambda c: -c["share"])
+    return out
+
+
+def read_cagefree_sea() -> list[dict]:
+    """東南アジア6か国の採卵鶏羽数と、企業のケージフリー宣言の数。
+
+    この地域には羽数ベースのケージフリー割合の公表統計がないため、
+    割合の代わりに「規模」と「企業の宣言」を並べる。
+    出典: Welfare Matters「State of Animal Farming in Southeast Asia」(2023.6)。
+    羽数は FAO(2021)、宣言数は Chicken Watch。
+    """
+    path = DATA_DIR / "cagefree_sea.csv"
+    if not path.exists():
+        return []
+    out = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            out.append({
+                "country": r["country"],
+                "code": r["code"],
+                "hens": int(r["layer_hens"]),
+                "commitments": int(r["commitments_total"]),
+                "local": int(r["commitments_local"]),
+                "intl": int(r["commitments_intl"]),
+            })
+    out.sort(key=lambda c: -c["hens"])
     return out
 
 
@@ -218,6 +245,8 @@ def main() -> None:
         "cagefree": read_cagefree(),
         # 各国のケージフリー割合 — Our World in Data（CC BY）。日本のみ ARC 調査
         "cagefree_world": read_cagefree_world(),
+        # 東南アジア6か国 — 割合の統計がないため規模と企業の宣言で示す
+        "cagefree_sea": read_cagefree_sea(),
         # 母豚の繁殖サイクル — 広岡（2018）のシミュレーションモデルのベース条件
         "sow_cycle": read_sow_cycle(),
     }
