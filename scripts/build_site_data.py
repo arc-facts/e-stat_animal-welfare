@@ -110,6 +110,55 @@ def read_cagefree() -> dict[str, list[dict]]:
     return out
 
 
+def read_cagefree_world() -> list[dict]:
+    """各国のケージフリー割合（羽数ベース）。
+
+    出典は Our World in Data のデータセット（CC BY）。各国の最新年の値だけを
+    持つ。`show` は既定のグラフに出す国の目印で、表ビューには全件を出す。
+    日本だけは、サイト内の他の項目と数字を揃えるため ARC の調査値を使う
+    （OWID のデータセット上の日本の値も参考として残してある）。
+    """
+    path = DATA_DIR / "cagefree_world.csv"
+    if not path.exists():
+        return []
+    out = []
+    with open(path, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            out.append({
+                "country": r["country"],
+                "code": r["code"],
+                "year": int(r["year"]),
+                "share": float(r["share_pct"]),
+                "source": r["source"],
+                "show": r["show"] == "1",
+            })
+    out.sort(key=lambda c: -c["share"])
+    return out
+
+
+def read_sow_cycle() -> dict[str, float]:
+    """母豚の繁殖サイクルのパラメータ（広岡 2018 のベース条件）。
+
+    生涯タイムラインの図は、ここの値から組み立てる。淘汰日齢は同論文の
+    式(1) D_c = 初回交配日齢 + 妊娠期間 + (繁殖サイクル数 - 1) × 分娩間隔
+    + 授乳期間 で計算する。
+    """
+    path = DATA_DIR / "sow_cycle.csv"
+    if not path.exists():
+        return {}
+    out: dict[str, float] = {}
+    with open(path, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            out[r["parameter"]] = float(r["value"])
+    if out:
+        out["cull_age_days"] = (
+            out["first_mating_age_days"] + out["gestation_days"]
+            + (out["breeding_cycles"] - 1) * out["farrowing_interval_days"]
+            + out["lactation_days"]
+        )
+    return out
+
+
 def total_series(table: dict[int, dict[str, float]]) -> list[list[float]]:
     """犬猫殺処分の合計系列。total 列があればそれを、無ければ dogs+cats を使う。"""
     out = []
@@ -167,6 +216,10 @@ def main() -> None:
         "fte": read_fte(),
         # ケージフリー（非ケージ）飼育の割合 — 政府統計に系列がないため民間・大学の推計
         "cagefree": read_cagefree(),
+        # 各国のケージフリー割合 — Our World in Data（CC BY）。日本のみ ARC 調査
+        "cagefree_world": read_cagefree_world(),
+        # 母豚の繁殖サイクル — 広岡（2018）のシミュレーションモデルのベース条件
+        "sow_cycle": read_sow_cycle(),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)

@@ -107,12 +107,12 @@ a:hover { text-decoration-thickness: 2px; }
 .rail a {
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  font-size: 0.8rem;
+  font-size: 0.77rem;
   font-weight: 500;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
   text-decoration: none;
   color: var(--muted);
-  padding: 12px 7px 12px 6px;
+  padding: 8px 7px 8px 6px;
   border-left: 2px solid transparent;
   margin-left: -3px;
   transition: color 0.18s, border-color 0.18s;
@@ -122,7 +122,8 @@ a:hover { text-decoration-thickness: 2px; }
   color: var(--ink);
   border-left-color: var(--accent);
 }
-@media (max-width: 1179px) { .rail { display: none; } }
+/* 画面が狭い・低いときは柱を出さない（本文にかぶるため） */
+@media (max-width: 1179px), (max-height: 620px) { .rail { display: none; } }
 
 /* ============================================================
    マストヘッド
@@ -425,6 +426,90 @@ main {
 }
 
 .prose--tight { margin-top: 18px; font-size: 0.92rem; }
+
+/* --- 補足の折りたたみ（用語説明・推計の幅など）--- */
+details.info,
+details.qa {
+  border-top: 1px solid var(--rule);
+  margin-top: 14px;
+}
+details.info > summary,
+details.qa > summary {
+  cursor: pointer;
+  padding: 12px 0 12px 22px;
+  position: relative;
+  list-style: none;
+  color: var(--ink);
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", sans-serif;
+  font-feature-settings: "palt" 1;
+}
+details.info > summary::-webkit-details-marker,
+details.qa > summary::-webkit-details-marker { display: none; }
+details.info > summary::before,
+details.qa > summary::before {
+  content: "＋";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+details.info[open] > summary::before,
+details.qa[open] > summary::before { content: "−"; }
+details.info > summary:hover,
+details.qa > summary:hover { color: var(--accent); }
+details.info > summary { font-size: 0.9rem; color: var(--ink-2); }
+details.info > p,
+details.info > div { margin: 0 0 12px; font-size: 0.88rem; color: var(--ink-2); }
+details.info > *:last-child { margin-bottom: 14px; }
+
+/* --- よくある質問 --- */
+details.qa {
+  background: var(--sheet);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  margin-top: 12px;
+  padding: 0 20px;
+}
+details.qa > summary {
+  font-size: 1.02rem;
+  font-weight: 700;
+  padding-left: 26px;
+}
+details.qa > summary::before { font-size: 1.1rem; }
+.qa-body { padding-bottom: 8px; }
+.qa-body p { margin: 0 0 1em; font-size: 0.94rem; color: var(--ink-2); }
+.qa-body .chart { margin: 18px 0; }
+.qa-src {
+  font-size: 0.82rem !important;
+  color: var(--muted) !important;
+  border-top: 1px solid var(--rule);
+  padding-top: 10px;
+}
+
+/* --- ケージフリーの内訳（一行の注）--- */
+.breakdown {
+  margin: 10px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.85;
+  color: var(--ink-2);
+}
+.breakdown strong { color: var(--ink); }
+
+/* --- 2列に並べる説明カード --- */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.grid-2 .fact h3 { font-size: 1rem; margin-bottom: 8px; }
+
+/* --- 出典カード --- */
+.sheet--cite { background: transparent; border-style: dashed; }
+.cite-list { margin: 0; padding-left: 1.2em; font-size: 0.86rem; line-height: 1.85; color: var(--ink-2); }
+.cite-list li { margin-bottom: 8px; }
+.cite-list li:last-child { margin-bottom: 0; }
+.cite-lic { color: var(--muted); }
 
 /* --- 表ビュー（グラフのアクセシブルな双子）--- */
 details.table-view { margin-top: 10px; font-size: 0.86rem; }

@@ -11,7 +11,8 @@
       broilers: v("--broilers"),
       pigs: v("--pigs"), sows: v("--sows"), population: v("--population"),
       dogcat: v("--dogcat"), dairy: v("--dairy"), beef: v("--beef"),
-      rule: v("--rule"), rule2: v("--rule-2"), sheet: v("--sheet"),
+      rule: v("--rule"), rule2: v("--rule-2"),
+      sheet: v("--sheet"), sheet2: v("--sheet-2"),
       ink: v("--ink"), ink2: v("--ink-2"), muted: v("--muted")
     };
   }
@@ -634,22 +635,16 @@
         "最も多く見積もった推計でも" + pct(maxShare) + "にとどまります。";
     }
 
-    /* --- 飼養形態別の内訳 --- */
+    /* --- 飼養形態別の内訳（一行の注として添える） --- */
     var typeHost = document.getElementById("cagefree-types");
     var types = (cf.types || []).filter(function (t) { return t.source === main.source; });
     if (typeHost && types.length) {
       var tTotal = types.reduce(function (a, t) { return a + t.birds; }, 0);
-      // どれも採卵鶏なので、同じ藍の濃淡で示す（色相＝動物種）
-      var tints = [C.layers, C.layers2, C.layers3];
-      var html = '<div class="species-key">';
-      types.forEach(function (t, i) {
-        html += '<span class="k-sw" style="background:' + tints[i % tints.length] + '"></span>' +
-          '<span class="k-name">' + esc(CF_TYPE[t.type] || t.type) +
-          (t.farms ? ' <span class="k-meta">' + t.farms + "農場</span>" : "") + "</span>" +
-          '<span class="k-num">' + fmtPlain(t.birds) + "羽</span>" +
-          '<span class="k-share">' + (t.birds / tTotal * 100).toFixed(1) + "%</span>";
-      });
-      typeHost.innerHTML = html + "</div>";
+      typeHost.innerHTML = "内訳は " + types.map(function (t) {
+        return "<strong>" + esc(CF_TYPE[t.type] || t.type) + "</strong> " +
+          fmtPlain(t.birds) + "羽（" + (t.birds / tTotal * 100).toFixed(1) + "%・" +
+          t.farms + "農場）";
+      }).join("、") + "。";
     }
 
     /* --- 推計の一覧（数え方が違うことが要点なので表で示す） --- */
@@ -667,6 +662,340 @@
       estHost.innerHTML = '<div class="table-wrap"><table class="datatable">' +
         "<thead><tr><th>出典</th><th>年</th><th>割合</th><th>対象</th><th>数え方</th></tr></thead>" +
         "<tbody>" + rowsHtml + "</tbody></table></div>";
+    }
+  }
+
+  /* ---------- 各国のケージフリー割合（横棒） ---------- */
+  function renderCagefreeWorld(d, C) {
+    var host = document.getElementById("chart-cagefree-world");
+    if (!host) return;
+    var all = d.cagefree_world || [];
+    var rows = all.filter(function (c) { return c.show; });
+    if (!rows.length) { host.innerHTML = '<p class="empty-note">データを取得中です。</p>'; return; }
+    host.innerHTML = "";
+
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var narrow = W < 520;
+    var BAR = narrow ? 17 : 20, GAP = narrow ? 9 : 10;
+    var nameSize = narrow ? 11 : 13;
+    var names = rows.map(function (c) { return c.country; });
+    var labelW = Math.min(narrow ? 108 : 150, Math.round(widest(names, nameSize)) + 12);
+    var valueW = narrow ? 42 : 94;
+    var track = Math.max(60, W - labelW - valueW - 12);
+    var H = rows.length * (BAR + GAP) - GAP;
+
+    var svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img",
+      "aria-label": "各国の採卵鶏に占めるケージフリーの割合" });
+
+    rows.forEach(function (c, i) {
+      var y = i * (BAR + GAP);
+      var jp = c.code === "JPN";
+      var lb = el("text", { x: labelW - 8, y: y + BAR * 0.5 + 4.5, "text-anchor": "end",
+        "font-size": nameSize, fill: jp ? C.ink : C.ink2,
+        "font-weight": jp ? 700 : 400 });
+      lb.textContent = c.country;
+      svg.appendChild(lb);
+
+      svg.appendChild(el("rect", { x: labelW, y: y, width: track, height: BAR,
+        fill: C.rule, rx: 2 }));
+      svg.appendChild(el("rect", { x: labelW, y: y, width: Math.max(1.5, track * c.share / 100),
+        height: BAR, fill: C.layers, opacity: jp ? 1 : 0.45, rx: 2 }));
+
+      var vt = el("text", { x: labelW + track + 8, y: y + BAR * 0.5 + 4.5,
+        "font-size": nameSize, fill: jp ? C.ink : C.ink2,
+        "font-weight": jp ? 700 : 400, style: "font-variant-numeric: tabular-nums" });
+      vt.textContent = trim(c.share.toFixed(1)) + "%" + (narrow ? "" : "  " + c.year);
+      svg.appendChild(vt);
+    });
+    host.appendChild(svg);
+
+    var lg = document.createElement("div");
+    lg.className = "legend";
+    lg.innerHTML = '<span class="item"><span class="swatch sq" style="background:' + C.layers +
+      '"></span>日本</span><span class="item"><span class="swatch sq" style="background:' +
+      C.layers + ';opacity:.45"></span>その他の国</span>';
+    host.appendChild(lg);
+
+    // 表ビューには掲載していない国も含めて全件出す
+    var det = document.createElement("details");
+    det.className = "table-view";
+    det.innerHTML = "<summary>データを表で見る（全" + all.length + "件）</summary><table><thead>" +
+      "<tr><th>国</th><th>年</th><th>割合</th></tr></thead><tbody>" +
+      all.map(function (c) {
+        return "<tr><td>" + esc(c.country) + (c.source === "arc" ? "（ARC調査）" : "") +
+          "</td><td>" + c.year + "</td><td>" + trim(c.share.toFixed(1)) + "%</td></tr>";
+      }).join("") + "</tbody></table></details>";
+    host.appendChild(det);
+
+    var sub = document.getElementById("cfworld-sub");
+    if (sub) {
+      var yrs = rows.map(function (c) { return c.year; });
+      sub.textContent = "羽数ベース。国によって最新年が異なります（" +
+        Math.min.apply(null, yrs) + "〜" + Math.max.apply(null, yrs) +
+        "年） / 出典: Our World in Data（CC BY）。日本のみアニマルライツセンター2025年調査";
+    }
+  }
+
+  /* ---------- 1羽が使える面積（実面積比で描く） ----------
+     すべて同じ縮尺（cm→px）で並べるので、図形の大小がそのまま面積の差になる。 */
+  var SPACE_ITEMS = [
+    { name: "バタリーケージ", cm2: 448.9, note: "日本の実測平均", fill: true },
+    { name: "A4用紙", cm2: 623.7, note: "比較の目安", w: 21.0, h: 29.7, fill: false, ref: true },
+    { name: "エンリッチドケージ", cm2: 750, note: "EUの下限", fill: true },
+    { name: "ケージフリー（屋内）", cm2: 1111, note: "EU 9羽/m²", fill: true }
+  ];
+
+  function renderSpace(d, C) {
+    var host = document.getElementById("chart-space");
+    if (!host) return;
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var cols = W < 560 ? 2 : 4;
+    var rows = Math.ceil(SPACE_ITEMS.length / cols);
+    var maxCm = 0;
+    SPACE_ITEMS.forEach(function (it) {
+      maxCm = Math.max(maxCm, it.h || Math.sqrt(it.cm2), it.w || Math.sqrt(it.cm2));
+    });
+    var cellW = W / cols;
+    var scale = (cellW - 22) / maxCm;      // px / cm
+    var shapeH = maxCm * scale;
+    var LABEL = 52;
+    var rowH = shapeH + LABEL;
+    var H = rows * rowH;
+
+    var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) +
+      '" role="img" aria-label="飼育方式ごとの1羽当たり面積を実面積比で比べた図">';
+    SPACE_ITEMS.forEach(function (it, i) {
+      var cx = (i % cols) * cellW + cellW / 2;
+      var baseY = Math.floor(i / cols) * rowH + shapeH;
+      var w = (it.w || Math.sqrt(it.cm2)) * scale;
+      var h = (it.h || Math.sqrt(it.cm2)) * scale;
+      var x = cx - w / 2, y = baseY - h;
+      if (it.fill) {
+        svg += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) +
+          '" height="' + h.toFixed(1) + '" fill="' + C.layers + '" opacity="0.85" rx="2"></rect>';
+      } else {
+        svg += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1) +
+          '" height="' + h.toFixed(1) + '" fill="none" stroke="' + C.ink2 +
+          '" stroke-width="1.5" stroke-dasharray="5 4" rx="2"></rect>';
+      }
+      svg += '<text x="' + cx.toFixed(1) + '" y="' + (baseY + 20).toFixed(1) +
+        '" text-anchor="middle" font-size="12.5" font-weight="700" fill="' + C.ink + '">' +
+        esc(it.name) + "</text>";
+      svg += '<text x="' + cx.toFixed(1) + '" y="' + (baseY + 37).toFixed(1) +
+        '" text-anchor="middle" font-size="12" fill="' + C.ink2 +
+        '" style="font-variant-numeric: tabular-nums">' +
+        trim(it.cm2.toFixed(1)).replace(/\B(?=(\d{3})+(?!\d))/, ",") + "cm²</text>";
+      svg += '<text x="' + cx.toFixed(1) + '" y="' + (baseY + 51).toFixed(1) +
+        '" text-anchor="middle" font-size="11" fill="' + C.muted + '">' + esc(it.note) + "</text>";
+    });
+    svg += "</svg>";
+    host.innerHTML = svg;
+  }
+
+  /* ---------- ケージフリーへの移行で減る痛みの時間 ----------
+     出典: Welfare Footprint Institute。エンリッチドケージとの比較では
+     Disabling の推定値が示されていないため、その棒は描かない。 */
+  var PAIN_ROWS = [
+    { name: "身動きが取れないほどの痛み", en: "Disabling", vsConv: 275, vsEnr: null },
+    { name: "はっきり苦痛な痛み", en: "Hurtful", vsConv: 2313, vsEnr: 1410 },
+    { name: "気になる程度の不快", en: "Annoying", vsConv: 4645, vsEnr: 4065 }
+  ];
+
+  function renderPain(d, C) {
+    var host = document.getElementById("chart-pain");
+    if (!host) return;
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var maxV = 4645;
+    var BAR = 18, GAPB = 6, HEAD = 22, BLOCK = HEAD + BAR * 2 + GAPB + 20;
+    var valueW = 74;
+    var track = Math.max(60, W - valueW - 6);
+    var H = PAIN_ROWS.length * BLOCK;
+
+    var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) +
+      '" role="img" aria-label="ケージフリーへの移行で減る痛みの時間">';
+    PAIN_ROWS.forEach(function (r, i) {
+      var top = i * BLOCK;
+      svg += '<text x="0" y="' + (top + 13) + '" font-size="12.5" font-weight="700" fill="' +
+        C.ink + '">' + esc(r.name) + '<tspan font-size="11" font-weight="400" fill="' +
+        C.muted + '">  ' + r.en + "</tspan></text>";
+      [{ v: r.vsConv, op: 1, label: "従来型ケージと比べて" },
+       { v: r.vsEnr, op: 0.45, label: "エンリッチドケージと比べて" }].forEach(function (b, j) {
+        var y = top + HEAD + j * (BAR + GAPB);
+        if (b.v == null) {
+          svg += '<text x="0" y="' + (y + BAR * 0.5 + 4) + '" font-size="11.5" fill="' +
+            C.muted + '">エンリッチドケージとの比較は推定値の公表なし</text>';
+          return;
+        }
+        svg += '<rect x="0" y="' + y + '" width="' + (track * b.v / maxV).toFixed(1) +
+          '" height="' + BAR + '" fill="' + C.layers + '" opacity="' + b.op + '" rx="2"></rect>';
+        svg += '<text x="' + (track + 8) + '" y="' + (y + BAR * 0.5 + 4.5) +
+          '" font-size="12.5" fill="' + C.ink2 +
+          '" style="font-variant-numeric: tabular-nums">' + fmtPlain(b.v) + "時間</text>";
+      });
+    });
+    svg += "</svg>";
+
+    host.innerHTML = svg +
+      '<div class="legend"><span class="item"><span class="swatch sq" style="background:' +
+      C.layers + '"></span>従来型（バタリー）ケージと比べて</span>' +
+      '<span class="item"><span class="swatch sq" style="background:' + C.layers +
+      ';opacity:.45"></span>エンリッチドケージと比べて</span></div>';
+  }
+
+  /* ---------- ブロイラーの飼養密度 ---------- */
+  function renderBroilerDensity(d, C) {
+    var host = document.getElementById("chart-broiler-density");
+    if (!host) return;
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var panels = [
+      { title: "日本（出荷直前）", birds: 15, label: "十数羽 / 1m²",
+        note: "日本には法的な上限がありません（図は15羽で作図）" },
+      { title: "ベターチキンコミットメント", birds: 10, label: "約10羽 / 1m²",
+        note: "30kg/m²以下。出荷体重3kgとして換算" }
+    ];
+    var cols = W < 480 ? 1 : 2;
+    var cellW = W / cols;
+    var side = Math.min(cellW - 24, 200);
+    var LABEL = 62;
+    var rowsN = Math.ceil(panels.length / cols);
+    var H = rowsN * (side + LABEL);
+
+    var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) +
+      '" role="img" aria-label="ブロイラーの飼養密度の比較。1平方メートル当たりの羽数">';
+    panels.forEach(function (p, i) {
+      var cx = (i % cols) * cellW + cellW / 2;
+      var top = Math.floor(i / cols) * (side + LABEL);
+      var x0 = cx - side / 2;
+      svg += '<text x="' + cx.toFixed(1) + '" y="' + (top + 14) +
+        '" text-anchor="middle" font-size="12.5" font-weight="700" fill="' + C.ink + '">' +
+        esc(p.title) + "</text>";
+      var y0 = top + 24;
+      svg += '<rect x="' + x0.toFixed(1) + '" y="' + y0 + '" width="' + side.toFixed(1) +
+        '" height="' + side.toFixed(1) + '" fill="' + C.sheet2 + '" stroke="' + C.rule2 +
+        '" stroke-width="1"></rect>';
+      // 鶏を格子状に並べる（正確な配置ではなく、羽数の密度を示すための図）
+      var n = p.birds, gc = Math.ceil(Math.sqrt(n));
+      var cell = side / gc, r = cell * 0.31;
+      for (var k = 0; k < n; k++) {
+        var gx = x0 + (k % gc) * cell + cell / 2;
+        var gy = y0 + Math.floor(k / gc) * cell + cell / 2;
+        svg += '<ellipse cx="' + gx.toFixed(1) + '" cy="' + gy.toFixed(1) + '" rx="' +
+          (r * 1.15).toFixed(1) + '" ry="' + r.toFixed(1) + '" fill="' + C.broilers +
+          '" opacity="0.85"></ellipse>';
+      }
+      svg += '<text x="' + cx.toFixed(1) + '" y="' + (y0 + side + 18).toFixed(1) +
+        '" text-anchor="middle" font-size="12.5" font-weight="700" fill="' + C.ink + '">' +
+        esc(p.label) + "</text>";
+      svg += '<text x="' + cx.toFixed(1) + '" y="' + (y0 + side + 34).toFixed(1) +
+        '" text-anchor="middle" font-size="11" fill="' + C.muted + '">' + esc(p.note) + "</text>";
+    });
+    svg += "</svg>";
+    host.innerHTML = svg;
+  }
+
+  /* ---------- 母豚の一生（帯） ----------
+     広岡（2018）表1のベース条件から、妊娠・授乳・空胎を繰り返す帯を組み立てる。
+     ストールの使用そのものは同論文の対象外なので、色分けはあくまで
+     「妊娠期間」「授乳期間」であり、注記でその旨を示す。 */
+  function renderSowLife(d, C) {
+    var host = document.getElementById("chart-sow-life");
+    if (!host) return;
+    var s = d.sow_cycle || {};
+    if (!s.cull_age_days) { host.innerHTML = '<p class="empty-note">データを取得中です。</p>'; return; }
+
+    var mate = s.first_mating_age_days, preg = s.gestation_days,
+        lact = s.lactation_days, fi = s.farrowing_interval_days,
+        nc = s.breeding_cycles, end = s.cull_age_days;
+    var dry = fi - preg - lact;   // 離乳から次の受胎まで
+
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var narrowS = W < 520;
+    var BAND = 46, TOP = narrowS ? 20 : 34, AXIS = 30;
+    var H = TOP + BAND + AXIS;
+    function X(day) { return day / end * W; }
+
+    var segs = [{ from: 0, to: mate, kind: "rear" }];
+    for (var k = 0; k < nc; k++) {
+      var st = mate + k * fi;
+      segs.push({ from: st, to: st + preg, kind: "preg" });
+      segs.push({ from: st + preg, to: st + preg + lact, kind: "lact" });
+      if (k < nc - 1) segs.push({ from: st + preg + lact, to: st + fi, kind: "dry" });
+    }
+    var STYLE = {
+      rear: { fill: C.rule, op: 1 },
+      preg: { fill: C.sows, op: 1 },
+      lact: { fill: C.pigs, op: 1 },
+      dry: { fill: C.pigs, op: 0.28 }
+    };
+
+    var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H +
+      '" role="img" aria-label="母豚の一生。' + end + "日齢で淘汰されるまでに" + nc +
+      '回の妊娠と出産を繰り返す">';
+    segs.forEach(function (g) {
+      var st = STYLE[g.kind];
+      // 区画のあいだに紙色の細い切れ目を入れて、短い区間も見分けられるようにする
+      svg += '<rect x="' + X(g.from).toFixed(2) + '" y="' + TOP + '" width="' +
+        Math.max(0.6, X(g.to) - X(g.from)).toFixed(2) + '" height="' + BAND +
+        '" fill="' + st.fill + '" opacity="' + st.op + '" stroke="' + C.sheet +
+        '" stroke-width="0.75"></rect>';
+    });
+    // 分娩のしるし
+    for (var k2 = 0; k2 < nc; k2++) {
+      var fx = X(mate + k2 * fi + preg);
+      svg += '<path d="M' + (fx - 5).toFixed(2) + " " + (TOP - 5) + "L" + (fx + 5).toFixed(2) +
+        " " + (TOP - 5) + "L" + fx.toFixed(2) + " " + TOP + 'Z" fill="' + C.ink + '"></path>';
+    }
+    // 繰り返しの単位が読み取れるよう、1サイクル目に寸法線を渡す
+    if (!narrowS) {
+      var bx1 = X(mate), bx2 = X(mate + fi), by = 18;
+      svg += '<path d="M' + bx1.toFixed(2) + " " + (by + 5) + "L" + bx1.toFixed(2) + " " + by +
+        "L" + bx2.toFixed(2) + " " + by + "L" + bx2.toFixed(2) + " " + (by + 5) +
+        '" fill="none" stroke="' + C.muted + '" stroke-width="1"></path>';
+      svg += '<text x="' + ((bx1 + bx2) / 2).toFixed(2) + '" y="' + (by - 4) +
+        '" text-anchor="middle" font-size="11" fill="' + C.muted + '">1サイクル ' + fi + "日</text>";
+      svg += '<text x="' + X(mate + fi + 12).toFixed(2) + '" y="' + (by + 3) +
+        '" font-size="11" fill="' + C.muted + '">▼ 分娩（生涯' + nc + "回）</text>";
+    }
+    // 日齢の目盛り
+    for (var t = 0, tstep = narrowS ? 400 : 200; t <= end; t += tstep) {
+      svg += '<line x1="' + X(t).toFixed(2) + '" y1="' + (TOP + BAND) + '" x2="' + X(t).toFixed(2) +
+        '" y2="' + (TOP + BAND + 5) + '" stroke="' + C.rule2 + '" stroke-width="1"></line>';
+      svg += '<text x="' + X(t).toFixed(2) + '" y="' + (TOP + BAND + 20) +
+        '" text-anchor="' + (t === 0 ? "start" : "middle") + '" font-size="11.5" fill="' + C.muted +
+        '" style="font-variant-numeric: tabular-nums">' + t + "</text>";
+    }
+    svg += '<text x="' + W + '" y="' + (TOP + BAND + 20) + '" text-anchor="end" font-size="11.5" fill="' +
+      C.muted + '">日齢</text>';
+    svg += "</svg>";
+
+    var lg = '<div class="legend">' +
+      '<span class="item"><span class="swatch sq" style="background:' + C.sows +
+      '"></span>妊娠 ' + preg + "日 × " + nc + "回（妊娠ストール）</span>" +
+      '<span class="item"><span class="swatch sq" style="background:' + C.pigs +
+      '"></span>授乳 ' + lact + "日 × " + nc + "回（分娩ストール）</span>" +
+      '<span class="item"><span class="swatch sq" style="background:' + C.pigs +
+      ';opacity:.28"></span>離乳から次の受胎まで ' + dry + "日</span>" +
+      '<span class="item"><span class="swatch sq" style="background:' + C.rule +
+      '"></span>交配前（' + mate + "日齢まで）</span></div>";
+
+    host.innerHTML = svg + lg;
+
+    var breeding = end - mate;
+    var confined = nc * (preg + lact);
+    var note = document.getElementById("sowlife-note");
+    if (note) {
+      note.innerHTML = "繁殖に使われる" + fmtPlain(breeding) + "日のうち、" +
+        "妊娠か授乳のどちらかにあたる期間が<strong>" + fmtPlain(confined) + "日（" +
+        Math.round(confined / breeding * 100) + "%）</strong>を占めます。" +
+        "日本では妊娠中の母豚の約9割が妊娠ストールに、授乳期は分娩ストールに入れられるため、" +
+        "この期間の大半で母豚は向きを変えることができません。" +
+        "分娩は" + fi + "日ごと、およそ" + (fi / 30.4).toFixed(1) + "か月に1回のペースで" +
+        nc + "回繰り返され、" + fmtPlain(end) + "日齢（約" + (end / 365).toFixed(1) +
+        "歳）で淘汰されます。";
+    }
+    var sub = document.getElementById("sowlife-sub");
+    if (sub) {
+      sub.textContent = "日齢 / 出典: 広岡博之（2018）日本畜産学会報 89(4) のベース条件（生産現場への聞き取りによる）";
     }
   }
 
@@ -766,8 +1095,17 @@
     /* 種別の屠殺数比較（面積比） */
     renderSpecies(d, C);
 
-    /* ケージフリーの割合 */
+    /* ケージフリーの割合と、各国との比較 */
     renderCagefree(d, C);
+    renderCagefreeWorld(d, C);
+
+    /* ケージとケージフリーで鶏の一生はどう変わるか（Our World in Data の内容） */
+    renderSpace(d, C);
+    renderPain(d, C);
+    renderBroilerDensity(d, C);
+
+    /* 母豚の一生 */
+    renderSowLife(d, C);
 
     /* 1戸当たり飼養数 — 単位が異なる鶏（羽/戸）と豚（頭/戸）を別グラフに分ける */
     var pf = d.per_farm;

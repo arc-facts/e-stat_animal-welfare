@@ -1,0 +1,8 @@
+parameter,value,unit,label
+purchase_age_days,160,日,母豚として導入される日齢
+first_mating_age_days,240,日,初回交配日齢
+gestation_days,114,日,妊娠期間
+lactation_days,21,日,授乳期間（分娩から離乳まで）
+farrowing_interval_days,159,日,分娩間隔（分娩から次の分娩まで）
+breeding_cycles,6,回,繁殖サイクル数（生涯の分娩回数）
+litter_born_alive,11,頭,一腹生存産子数（生時）
