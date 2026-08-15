@@ -7,7 +7,8 @@
   function colors() {
     css = getComputedStyle(document.documentElement);
     return {
-      layers: v("--layers"), layers2: v("--layers-2"), broilers: v("--broilers"),
+      layers: v("--layers"), layers2: v("--layers-2"), layers3: v("--layers-3"),
+      broilers: v("--broilers"),
       pigs: v("--pigs"), sows: v("--sows"), population: v("--population"),
       dogcat: v("--dogcat"), dairy: v("--dairy"), beef: v("--beef"),
       rule: v("--rule"), rule2: v("--rule-2"), sheet: v("--sheet"),
@@ -48,6 +49,17 @@
     return Math.round(n).toLocaleString("ja-JP") + unit;
   }
   function trim(s) { return s.indexOf(".") >= 0 ? s.replace(/\.?0+$/, "") : s; }
+
+  /* 実数を「1億2,973万」のように、桁を落とさず日本語表記にする */
+  function fmtOkuMan(n) {
+    n = Math.round(n);
+    if (n >= 1e8) {
+      var oku = Math.floor(n / 1e8), man = Math.round((n % 1e8) / 1e4);
+      return oku + "億" + (man ? man.toLocaleString("ja-JP") + "万" : "");
+    }
+    if (n >= 1e4) return Math.round(n / 1e4).toLocaleString("ja-JP") + "万";
+    return n.toLocaleString("ja-JP");
+  }
   function fmtPlain(x) { return Math.round(x).toLocaleString("ja-JP"); }
 
   /* 軸ラベル用: 実数（1羽・1頭・1人単位）を億・万の日本語表記にする。
@@ -540,6 +552,124 @@
     });
   }
 
+  /* ---------- ケージフリーの割合 ----------
+     政府統計にケージフリーの系列が存在しないため確定値がない。出典ごとに
+     数え方も対象範囲も違うので、1つの数字に丸めず、主たる推計を1,000マスの
+     升目で示したうえで、推計の幅と数え方を表で併記する。 */
+  var CF_SOURCE = {
+    arc: "アニマルライツセンター",
+    azabu: "麻布大学（大木茂）",
+    weo: "World Egg Organization"
+  };
+  var CF_TYPE = { barn: "平飼い", aviary: "エイビアリー", free_range: "放牧" };
+
+  function renderCagefree(d, C) {
+    var host = document.getElementById("chart-cagefree");
+    if (!host) return;
+    var cf = d.cagefree || {};
+    var est = (cf.estimates || []).slice();
+    if (!est.length) { host.innerHTML = '<p class="empty-note">データを取得中です。</p>'; return; }
+
+    // 主たる推計 = 全国推計のうち最新のもの（現状はARC）
+    var main = est.filter(function (e) { return e.scope === "national" && e.birds; })
+      .sort(function (a, b) { return b.year - a.year; })[0] || est[0];
+    // 推計の幅は「出典ごとの最新値」で取る。古い年次（WEOの5.9%など）は
+    // その出典自身が後に更新しているので、幅の上限には使わない。
+    var latest = {};
+    est.forEach(function (e) {
+      if (!latest[e.source] || e.year > latest[e.source].year) latest[e.source] = e;
+    });
+    var maxShare = Object.keys(latest).reduce(function (m, k) {
+      return Math.max(m, latest[k].share);
+    }, 0);
+    function pct(x) { return trim(x.toFixed(2)) + "%"; }
+
+    /* --- 1,000マスの升目（1マス = 全体の0.1%） --- */
+    var CELLS = 1000, GAP = 2;
+    var W = Math.max(280, Math.round(host.clientWidth) || 720);
+    var cols = W < 520 ? 25 : 50;
+    var rows = CELLS / cols;
+    var size = (W - (cols - 1) * GAP) / cols;
+    var H = rows * (size + GAP) - GAP;
+    var filled = main.share / 100 * CELLS;      // 14.83 マス
+    var rangeCells = maxShare / 100 * CELLS;    // 35 マス
+
+    var svg = '<svg viewBox="0 0 ' + W.toFixed(1) + " " + H.toFixed(1) + '" role="img" aria-label="' +
+      "採卵鶏1,000羽あたりに換算した飼い方の内訳。1マスが全体の0.1%にあたり、" +
+      "ケージフリーは" + main.share + "%（" + Math.round(filled * 10) / 10 + "マス分）" + '">';
+    for (var i = 0; i < CELLS; i++) {
+      var x = (i % cols) * (size + GAP), y = Math.floor(i / cols) * (size + GAP);
+      var base = i < rangeCells ? C.layers : C.rule;
+      var op = i < Math.floor(filled) ? 1 : (i < rangeCells ? 0.18 : 1);
+      svg += '<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + size.toFixed(2) +
+        '" height="' + size.toFixed(2) + '" fill="' + base + '" opacity="' + op + '"></rect>';
+      // 端数のマスは、実数どおりの幅だけ塗る
+      if (i === Math.floor(filled)) {
+        svg += '<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' +
+          (size * (filled - Math.floor(filled))).toFixed(2) + '" height="' + size.toFixed(2) +
+          '" fill="' + C.layers + '"></rect>';
+      }
+    }
+    svg += "</svg>";
+
+    var lg = '<div class="legend">' +
+      '<span class="item"><span class="swatch sq" style="background:' + C.layers + '"></span>' +
+      "ケージフリー " + pct(main.share) + "（" + fmtPlain(main.birds) + "羽・" + main.year + "年）</span>" +
+      '<span class="item"><span class="swatch sq" style="background:' + C.layers + ';opacity:.18"></span>' +
+      "他の推計ではこのあたりまで（最大 " + pct(maxShare) + "）</span>" +
+      '<span class="item"><span class="swatch sq" style="background:' + C.rule + '"></span>' +
+      "ケージ飼育</span></div>";
+
+    host.innerHTML = svg + lg;
+
+    var subEl = document.getElementById("cagefree-sub");
+    if (subEl && main.total) {
+      subEl.textContent = "1マス＝全体の0.1%（約" + fmtOkuMan(main.total / CELLS) + "羽）。" +
+        "1,000マスで採卵鶏 " + fmtOkuMan(main.total) + "羽（畜産統計） / 出典: " +
+        CF_SOURCE[main.source] + "（" + main.year + "年調査）";
+    }
+    var noteEl = document.getElementById("cagefree-note");
+    if (noteEl) {
+      noteEl.textContent = "淡いマスはすべてケージ飼育です。ケージフリーの数え方は出典によって違いますが、" +
+        "最も多く見積もった推計でも" + pct(maxShare) + "にとどまります。";
+    }
+
+    /* --- 飼養形態別の内訳 --- */
+    var typeHost = document.getElementById("cagefree-types");
+    var types = (cf.types || []).filter(function (t) { return t.source === main.source; });
+    if (typeHost && types.length) {
+      var tTotal = types.reduce(function (a, t) { return a + t.birds; }, 0);
+      // どれも採卵鶏なので、同じ藍の濃淡で示す（色相＝動物種）
+      var tints = [C.layers, C.layers2, C.layers3];
+      var html = '<div class="species-key">';
+      types.forEach(function (t, i) {
+        html += '<span class="k-sw" style="background:' + tints[i % tints.length] + '"></span>' +
+          '<span class="k-name">' + esc(CF_TYPE[t.type] || t.type) +
+          (t.farms ? ' <span class="k-meta">' + t.farms + "農場</span>" : "") + "</span>" +
+          '<span class="k-num">' + fmtPlain(t.birds) + "羽</span>" +
+          '<span class="k-share">' + (t.birds / tTotal * 100).toFixed(1) + "%</span>";
+      });
+      typeHost.innerHTML = html + "</div>";
+    }
+
+    /* --- 推計の一覧（数え方が違うことが要点なので表で示す） --- */
+    var estHost = document.getElementById("cagefree-estimates");
+    if (estHost) {
+      // 新しい年次を上に、同じ年なら全国推計を先に置く
+      var rowsHtml = est.slice().sort(function (a, b) {
+        return b.year - a.year ||
+          (a.scope === b.scope ? b.share - a.share : (a.scope === "national" ? -1 : 1));
+      }).map(function (e) {
+        return "<tr><td>" + esc(CF_SOURCE[e.source] || e.source) + "</td><td>" + e.year + "年</td><td>" +
+          pct(e.share) + "</td><td>" +
+          (e.scope === "sample" ? "調査回答内" : "全国") + "</td><td>" + esc(e.note || "") + "</td></tr>";
+      }).join("");
+      estHost.innerHTML = '<div class="table-wrap"><table class="datatable">' +
+        "<thead><tr><th>出典</th><th>年</th><th>割合</th><th>対象</th><th>数え方</th></tr></thead>" +
+        "<tbody>" + rowsHtml + "</tbody></table></div>";
+    }
+  }
+
   /* ---------- 柱（縦組みの索引）の現在地表示 ---------- */
   function initRail() {
     var rail = document.getElementById("rail");
@@ -635,6 +765,9 @@
 
     /* 種別の屠殺数比較（面積比） */
     renderSpecies(d, C);
+
+    /* ケージフリーの割合 */
+    renderCagefree(d, C);
 
     /* 1戸当たり飼養数 — 単位が異なる鶏（羽/戸）と豚（頭/戸）を別グラフに分ける */
     var pf = d.per_farm;

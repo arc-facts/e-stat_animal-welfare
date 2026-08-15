@@ -20,6 +20,7 @@
 <nav class="rail" id="rail" aria-label="ページ内の見出し">
   <a href="#killed">殺される数</a>
   <a href="#inventory">飼育数</a>
+  <a href="#cagefree">ケージフリー</a>
   <a href="#sows">母豚</a>
   <a href="#concentration">集約化</a>
   <a href="#labor">労働力</a>
@@ -93,6 +94,48 @@
     </div>
   </section>
 
+  <section class="section" id="cagefree">
+    <h2>ケージフリーの割合 — 最も多く見積もっても3.5%</h2>
+    <p class="desc">
+      上のグラフの採卵鶏1億2,973万羽が、どんな飼い方をされているか。
+      ケージを使わない飼育（平飼い・エイビアリー・放牧）は、
+      アニマルライツセンターが農場を1件ずつ積み上げた2025年の調査で
+      192万4,435羽、全体の1.48%でした。
+    </p>
+    <div class="sheet">
+      <h3>採卵鶏に占めるケージフリーの割合</h3>
+      <p class="sub" id="cagefree-sub">1マス＝全体の0.1%</p>
+      <div class="unitgrid" id="chart-cagefree"></div>
+      <p class="species-note" id="cagefree-note"></p>
+    </div>
+
+    <div class="sheet">
+      <h3>ケージフリーの内訳</h3>
+      <p class="sub">羽数と農場数 / 出典: アニマルライツセンター「ケージフリー羽数調査」（2025年）</p>
+      <div id="cagefree-types"></div>
+    </div>
+
+    <div class="sheet">
+      <h3>推計は出典によって1.48%〜3.5%と幅がある</h3>
+      <p class="sub">政府統計にケージフリーの系列がないため、確定値が存在しません</p>
+      <div id="cagefree-estimates"></div>
+      <div class="prose prose--tight">
+        <p>
+          麻布大学の大木茂教授は、この報告書の冒頭で
+          「基本的数値に関し、専門家間で評価が定まっていないことは、大きな問題である」
+          と指摘しています。ケージフリーの羽数構成比は、消費者ニーズを把握し、
+          今後の採卵鶏産業のあり方や政策を検討するうえで基本となる数字だからです。
+        </p>
+        <p>
+          このサイトでは、農場を1件ずつ積み上げて数えたアニマルライツセンターの調査を主に据えました。
+          同調査は、ケージフリーの鶏群があると分かっていながら連絡がつかず確認できなかった農場が
+          31件あるため、1.48%は<strong>最低値</strong>だとしています。
+          なお同調査では、各農場が増やす予定と回答した33万295羽を含めると1.74%になります。
+        </p>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="sows">
     <h2>母豚 — 繁殖の道具として飼われるメス豚</h2>
     <p class="desc">
@@ -149,11 +192,12 @@
     </p>
     <div class="facts">
       <div class="fact">
-        <h3><span class="key" style="background:var(--layers)"></span>採卵鶏 — ケージ飼育が9割超</h3>
-        <p class="fact-big">約430〜555cm²/羽</p>
-        <p>国内の採卵鶏の9割以上はケージ（主にバタリーケージ）で飼育されています。
-        1羽当たりの面積は一般にB5用紙1枚ほどで、羽を広げることもできません。</p>
-        <p class="fact-src">畜産技術協会「採卵鶏の飼養実態アンケート調査」等</p>
+        <h3><span class="key" style="background:var(--layers)"></span>採卵鶏 — バタリーケージが9割超</h3>
+        <p class="fact-big">1羽あたり約449cm²</p>
+        <p>ケージ飼育の羽数のうち93.9%が、最も狭いバタリーケージです。
+        1羽当たりの面積は平均448.9cm²で、B5用紙1枚（約468cm²）より狭く、
+        羽を広げることはできません。</p>
+        <p class="fact-src">麻布大学「ケージフリー採卵養鶏調査」報告書（2025年、ケージ専業43経営の平均）</p>
       </div>
       <div class="fact">
         <h3><span class="key" style="background:var(--broilers)"></span>ブロイラー — 1m²に十数羽</h3>
@@ -182,6 +226,10 @@
       <li>人口: 総務省統計局「人口推計」（各年10月1日現在）。</li>
       <li>労働時間: 農林水産省「営農類型別経営統計」。1FTE = 年間2,080時間で換算。</li>
       <li>犬猫の殺処分: 環境省「犬・猫の引取り及び負傷動物の収容状況」（年度）。</li>
+      <li>ケージフリーの割合・飼養スペース: <strong>政府統計に系列が存在しない</strong>ため、民間・大学の調査による推計です。
+        アニマルライツセンター「<a href="https://arcj.org/issues/farm-animals/layer-chicken/cagefreesurvey2025/">ケージフリー羽数調査</a>」（2025年、調査期間6月1日〜10月12日）、
+        大木茂「2025年 麻布大学『ケージフリー採卵養鶏調査』報告書」（麻布大学獣医学部動物応用科学科 動物資源経済学研究室、2025年8月）、
+        World Egg Organization。分母の採卵鶏羽数は畜産統計（2024年）です。</li>
       <li>「1戸当たり」は飼養数を飼養戸数で割った値です（畜産統計に従業員数の統計はありません）。</li>
       <li>ブロイラーの統計は2011年に調査対象基準が変わっており、それ以前の年次とは単純比較できません。</li>
       <li id="meta-note"></li>

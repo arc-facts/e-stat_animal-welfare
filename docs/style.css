@@ -26,7 +26,8 @@
      大きな面が「重い塊」に見えないよう、紙に載せた刷り色くらいの明度に
      とどめる。塗りの上に白文字を置くため、白とのコントラストは全色5.0以上。 */
   --layers: #27598a;     /* 採卵鶏 — 藍 */
-  --layers-2: #47739b;   /* 採卵鶏の下位（雄ひよこ） — 薄縹 */
+  --layers-2: #47739b;   /* 採卵鶏の下位（雄ひよこ・エイビアリー） — 薄縹 */
+  --layers-3: #7fa3c2;   /* 採卵鶏の下位（放牧） — 淡縹 */
   --broilers: #457a4e;   /* ブロイラー — 苔緑 */
   --pigs: #ab5062;       /* 豚 — 蘇芳 */
   --sows: #7d3849;       /* 母豚（豚の濃色） — 深蘇芳 */
@@ -340,7 +341,10 @@ main {
   transform: translateY(0.42em);
 }
 .species-key .k-name { color: var(--ink); }
-.species-key .k-year { color: var(--muted); font-size: 0.82rem; }
+/* k-year は狭い画面で省略される補足（年）。k-meta は省略しない実データ（農場数）。 */
+.species-key .k-year,
+.species-key .k-meta { color: var(--muted); font-size: 0.82rem; }
+.species-key .k-meta { white-space: nowrap; }
 .species-key .k-num,
 .species-key .k-share {
   font-variant-numeric: tabular-nums;
@@ -365,6 +369,62 @@ main {
   color: var(--muted); font-size: 0.88rem;
   padding: 28px 4px; text-align: center;
 }
+
+/* --- 升目（1マス＝全体の0.1%）--- */
+.unitgrid svg { display: block; width: 100%; height: auto; }
+
+/* --- 本文中に置く表（開閉しない）--- */
+.table-wrap { overflow-x: auto; }
+.datatable {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 460px;
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+.datatable th,
+.datatable td {
+  text-align: left;
+  padding: 8px 12px 8px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+}
+.datatable th {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.datatable td:nth-child(2),
+.datatable td:nth-child(3) {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.datatable td:nth-child(3) { font-weight: 700; }
+.datatable td:last-child { color: var(--ink-2); }
+
+/* 狭い画面では横スクロールをやめ、1件を1ブロックに積み直す */
+@media (max-width: 620px) {
+  .table-wrap { overflow-x: visible; }
+  .datatable { display: block; min-width: 0; }
+  .datatable thead { display: none; }
+  .datatable tbody, .datatable tr { display: block; }
+  .datatable tr {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .datatable td { display: block; border: 0; padding: 0; }
+  .datatable td:first-child { font-weight: 700; }
+  .datatable td:nth-child(2),
+  .datatable td:nth-child(3),
+  .datatable td:nth-child(4) { display: inline; }
+  .datatable td:nth-child(3)::before,
+  .datatable td:nth-child(4)::before { content: " ・ "; color: var(--muted); }
+  .datatable td:last-child { margin-top: 4px; font-size: 0.84rem; }
+}
+
+.prose--tight { margin-top: 18px; font-size: 0.92rem; }
 
 /* --- 表ビュー（グラフのアクセシブルな双子）--- */
 details.table-view { margin-top: 10px; font-size: 0.86rem; }

@@ -67,6 +67,49 @@ def read_fte() -> dict[str, dict[int, dict[str, float]]]:
     return out
 
 
+def read_cagefree() -> dict[str, list[dict]]:
+    """ケージフリー（非ケージ）飼育の推計値と、その飼養形態別内訳。
+
+    政府統計にはケージフリーの系列が存在しないため、民間・大学の調査に
+    よる推計を出典ごとにそのまま並べて持つ（どれか1つに寄せない）。
+    scope は national（全国推計）か sample（調査回答内の比率）。
+    """
+    out: dict[str, list[dict]] = {"estimates": [], "types": []}
+
+    est_path = DATA_DIR / "cagefree.csv"
+    if est_path.exists():
+        with open(est_path, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                rec = {
+                    "source": r["source"],
+                    "year": int(r["year"]),
+                    "scope": r["scope"],
+                    "share": float(r["share_pct"]),
+                    "note": r.get("note", ""),
+                }
+                if r.get("cagefree_birds"):
+                    rec["birds"] = int(r["cagefree_birds"])
+                if r.get("total_birds"):
+                    rec["total"] = int(r["total_birds"])
+                out["estimates"].append(rec)
+        out["estimates"].sort(key=lambda e: (e["source"], e["year"]))
+
+    type_path = DATA_DIR / "cagefree_types.csv"
+    if type_path.exists():
+        with open(type_path, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                out["types"].append({
+                    "source": r["source"],
+                    "year": int(r["year"]),
+                    "type": r["type"],
+                    "birds": int(r["birds"]),
+                    "farms": int(r["farms"]) if r.get("farms") else None,
+                })
+        out["types"].sort(key=lambda t: -t["birds"])
+
+    return out
+
+
 def total_series(table: dict[int, dict[str, float]]) -> list[list[float]]:
     """犬猫殺処分の合計系列。total 列があればそれを、無ければ dogs+cats を使う。"""
     out = []
@@ -122,6 +165,8 @@ def main() -> None:
         },
         # 労働力（FTE）当たり飼養頭数・羽数 — 農業経営統計調査「営農類型別経営統計」
         "fte": read_fte(),
+        # ケージフリー（非ケージ）飼育の割合 — 政府統計に系列がないため民間・大学の推計
+        "cagefree": read_cagefree(),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
