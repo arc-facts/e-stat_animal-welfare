@@ -1,4 +1,4 @@
-source,year,type,birds,farms
-arc,2025,barn,1335261,258
-arc,2025,aviary,561400,9
-arc,2025,free_range,27774,36
+source,year,type,birds,farms,source_text,source_url
+arc,2025,barn,1335261,258,"ケージフリー羽数調査2025の飼養形態別内訳より「平飼い 1,335,261羽（69.38%）・258農場（85.15%）」",https://arcj.org/issues/farm-animals/layer-chicken/cagefreesurvey2025/
+arc,2025,aviary,561400,9,"ケージフリー羽数調査2025の飼養形態別内訳より「エイビアリー 561,400羽（29.17%）・9農場（2.97%）」",https://arcj.org/issues/farm-animals/layer-chicken/cagefreesurvey2025/
+arc,2025,free_range,27774,36,"ケージフリー羽数調査2025の飼養形態別内訳より「放牧 27,774羽（1.44%）・36農場（11.88%）」",https://arcj.org/issues/farm-animals/layer-chicken/cagefreesurvey2025/

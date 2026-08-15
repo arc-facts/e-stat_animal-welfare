@@ -1,3 +1,3 @@
-key,title,birds,label,note
-japan,日本（出荷直前）,15,十数羽 / 1m²,日本には法的な上限がありません（図は15羽で作図）
-bcc,ベターチキンコミットメント,10,約10羽 / 1m²,30kg/m²以下。出荷体重3kgとして換算
+key,title,birds,label,note,source_text,source_url
+japan,日本（出荷直前）,15,十数羽 / 1m²,日本には法的な上限がありません（図は15羽で作図）,出荷直前には1m²当たり十数羽になるとされる（畜産技術協会「ブロイラーの飼養実態アンケート調査」等）。日本には飼養密度の法的上限がない。※一次資料のURL未確認,
+bcc,ベターチキンコミットメント,10,約10羽 / 1m²,30kg/m²以下。出荷体重3kgとして換算,Better Chicken Commitment の要件「Maximum stocking density of 30kg/m²」。出荷体重3kgとして1m²当たり約10羽に換算,https://betterchickencommitment.com/

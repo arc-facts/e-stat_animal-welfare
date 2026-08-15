@@ -18,12 +18,19 @@ DATA_DIR = ROOT / "data"
 OUT = ROOT / "docs" / "data" / "data.json"
 
 
+#: 出典を書き留めるための列。数値ではないので時系列の読み取りからは外す。
+NOTE_COLUMNS = ("source_text", "source_url", "note")
+
+
 def read_csv(name: str) -> dict[int, dict[str, float]]:
     rows: dict[int, dict[str, float]] = {}
     with open(DATA_DIR / name, newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
             year = int(r.pop("year"))
-            rows[year] = {k: float(v) for k, v in r.items() if v not in ("", None)}
+            rows[year] = {
+                k: float(v) for k, v in r.items()
+                if v not in ("", None) and k not in NOTE_COLUMNS
+            }
     return rows
 
 
@@ -67,6 +74,14 @@ def read_fte() -> dict[str, dict[int, dict[str, float]]]:
     return out
 
 
+def with_source(rec: dict, row: dict) -> dict:
+    """出典の引用と URL をレコードに添える（空欄なら付けない）。"""
+    for key in ("source_text", "source_url"):
+        if row.get(key):
+            rec[key] = row[key].strip()
+    return rec
+
+
 def read_cagefree() -> dict[str, list[dict]]:
     """ケージフリー（非ケージ）飼育の推計値と、その飼養形態別内訳。
 
@@ -91,20 +106,20 @@ def read_cagefree() -> dict[str, list[dict]]:
                     rec["birds"] = int(r["cagefree_birds"])
                 if r.get("total_birds"):
                     rec["total"] = int(r["total_birds"])
-                out["estimates"].append(rec)
+                out["estimates"].append(with_source(rec, r))
         out["estimates"].sort(key=lambda e: (e["source"], e["year"]))
 
     type_path = DATA_DIR / "cagefree_types.csv"
     if type_path.exists():
         with open(type_path, newline="", encoding="utf-8") as f:
             for r in csv.DictReader(f):
-                out["types"].append({
+                out["types"].append(with_source({
                     "source": r["source"],
                     "year": int(r["year"]),
                     "type": r["type"],
                     "birds": int(r["birds"]),
                     "farms": int(r["farms"]) if r.get("farms") else None,
-                })
+                }, r))
         out["types"].sort(key=lambda t: -t["birds"])
 
     return out
@@ -124,7 +139,7 @@ def read_cagefree_world() -> list[dict]:
     out = []
     with open(path, newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
-            out.append({
+            out.append(with_source({
                 "country": r["country"],
                 "code": r["code"],
                 "year": int(r["year"]),
@@ -132,7 +147,7 @@ def read_cagefree_world() -> list[dict]:
                 "source": r["source"],
                 "basis": r.get("basis", ""),
                 "show": r["show"] == "1",
-            })
+            }, r))
     out.sort(key=lambda c: -c["share"])
     return out
 
@@ -151,14 +166,14 @@ def read_cagefree_sea() -> list[dict]:
     out = []
     with open(path, newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
-            out.append({
+            out.append(with_source({
                 "country": r["country"],
                 "code": r["code"],
                 "hens": int(r["layer_hens"]),
                 "commitments": int(r["commitments_total"]),
                 "local": int(r["commitments_local"]),
                 "intl": int(r["commitments_intl"]),
-            })
+            }, r))
     out.sort(key=lambda c: -c["hens"])
     return out
 
@@ -201,9 +216,13 @@ def read_sow_cycle() -> dict[str, float]:
     if not path.exists():
         return {}
     out: dict[str, float] = {}
+    src = ""
     with open(path, newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
             out[r["parameter"]] = float(r["value"])
+            src = src or r.get("source_url", "")
+    if src:
+        out["source_url"] = src
     if out:
         out["cull_age_days"] = (
             out["first_mating_age_days"] + out["gestation_days"]

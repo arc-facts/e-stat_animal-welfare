@@ -1,70 +1,70 @@
-country,code,year,share_pct,source,basis,show
-オーストリア,AUT,2025,100,owid,official_ec,1
-ルクセンブルク,LUX,2025,100,owid,official_ec,0
-スイス,CHE,2018,100,owid,compilation_wfi,1
-スウェーデン,SWE,2025,99.3,owid,official_ec,1
-ドイツ,DEU,2025,99.3,owid,official_ec,1
-ノルウェー,NOR,2020,91,owid,compilation_wfi,0
-デンマーク,DNK,2025,90.2,owid,official_ec,1
-オランダ,NLD,2025,85.2,owid,official_ec,1
-スロベニア,SVN,2025,85.2,owid,official_ec,0
-イギリス,GBR,2025,82.7,owid,official_defra,1
-フィンランド,FIN,2025,81,owid,official_ec,0
-アイルランド,IRL,2025,75,owid,official_ec,0
-フランス,FRA,2023,69.9,owid,official_ec,1
-イタリア,ITA,2025,66.8,owid,official_ec,1
-ベルギー,BEL,2024,66,owid,official_ec,0
-ルーマニア,ROU,2025,58.2,owid,official_ec,0
-クロアチア,HRV,2025,58,owid,official_ec,0
-チェコ,CZE,2025,57.2,owid,official_ec,0
-ラトビア,LVA,2025,54.4,owid,official_ec,0
-スロバキア,SVK,2025,50.1,owid,official_ec,0
-エジプト,EGY,2013,50,owid,compilation_wfi,0
-ガーナ,GHA,2013,50,owid,compilation_wfi,0
-オーストラリア,AUS,2018,45.5,owid,compilation_wfi,1
-アメリカ,USA,2025,45.3,owid,official_usda,1
-キプロス,CYP,2025,40.3,owid,official_ec,0
-スペイン,ESP,2025,40.2,owid,official_ec,1
-ポーランド,POL,2025,37.8,owid,official_ec,0
-ブルガリア,BGR,2025,35.5,owid,official_ec,0
-ニュージーランド,NZL,2018,33.6,owid,compilation_wfi,1
-ポルトガル,PRT,2024,32.9,owid,official_ec,0
-ハンガリー,HUN,2024,32.4,owid,official_ec,0
-コロンビア,COL,2018,30,owid,compilation_wfi,0
-ナイジェリア,NGA,2017,30,owid,compilation_wfi,0
-ギリシャ,GRC,2020,23.5,owid,official_ec,0
-リトアニア,LTU,2024,23.4,owid,official_ec,0
-エストニア,EST,2025,22.9,owid,official_ec,0
-カザフスタン,KAZ,2018,15,owid,compilation_wfi,0
-南アフリカ,ZAF,2018,14,owid,compilation_wfi,0
-カナダ,CAN,2018,13,owid,compilation_wfi,1
-トルコ,TUR,2018,12,owid,compilation_wfi,0
-ウルグアイ,URY,2016,12,owid,compilation_wfi,0
-アルゼンチン,ARG,2018,11,owid,compilation_wfi,0
-ペルー,PER,2018,7,owid,compilation_wfi,0
-日本,JPN,2018,5.4,owid,compilation_wfi,0
-ブラジル,BRA,2018,5,owid,compilation_wfi,1
-中国,CHN,2018,3,owid,compilation_wfi,1
-チリ,CHL,2016,2,owid,compilation_wfi,0
-日本,JPN,2025,1.5,arc,arc,1
-マルタ,MLT,2025,1,owid,official_ec,0
-メキシコ,MEX,2020,0.5,owid,compilation_wfi,0
-ロシア,RUS,2018,0.1,owid,compilation_wfi,1
-アルジェリア,DZA,2013,0,owid,compilation_wfi,0
-アルメニア,ARM,2013,0,owid,compilation_wfi,0
-アゼルバイジャン,AZE,2013,0,owid,compilation_wfi,0
-ベラルーシ,BLR,2013,0,owid,compilation_wfi,0
-キューバ,CUB,2013,0,owid,compilation_wfi,0
-エクアドル,ECU,2013,0,owid,compilation_wfi,0
-ジョージア,GEO,2013,0,owid,compilation_wfi,0
-インド,IND,2017,0,owid,compilation_wfi,1
-イラン,IRN,2018,0,owid,compilation_wfi,0
-キルギス,KGZ,2013,0,owid,compilation_wfi,0
-リビア,LBY,2013,0,owid,compilation_wfi,0
-モロッコ,MAR,2013,0,owid,compilation_wfi,0
-タジキスタン,TJK,2013,0,owid,compilation_wfi,0
-トルクメニスタン,TKM,2013,0,owid,compilation_wfi,0
-ウクライナ,UKR,2017,0,owid,compilation_wfi,0
-アラブ首長国連邦,ARE,2013,0,owid,compilation_wfi,0
-ウズベキスタン,UZB,2013,0,owid,compilation_wfi,0
-ベネズエラ,VEN,2013,0,owid,compilation_wfi,0
+country,code,year,share_pct,source,basis,show,source_text,source_url
+オーストリア,AUT,2025,100,owid,official_ec,1,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ルクセンブルク,LUX,2025,100,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+スイス,CHE,2018,100,owid,compilation_wfi,1,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+スウェーデン,SWE,2025,99.3,owid,official_ec,1,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ドイツ,DEU,2025,99.3,owid,official_ec,1,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ノルウェー,NOR,2020,91,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+デンマーク,DNK,2025,90.2,owid,official_ec,1,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+オランダ,NLD,2025,85.2,owid,official_ec,1,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+スロベニア,SVN,2025,85.2,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+イギリス,GBR,2025,82.7,owid,official_defra,1,登録された27の包装施設への四半期調査（英国で包装される卵の約75%をカバー、回答率はほぼ100%）による飼養方式別の取扱量から英国全体を推計,https://www.gov.uk/government/statistics/egg-statistics
+フィンランド,FIN,2025,81,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+アイルランド,IRL,2025,75,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+フランス,FRA,2023,69.9,owid,official_ec,1,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+イタリア,ITA,2025,66.8,owid,official_ec,1,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ベルギー,BEL,2024,66,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ルーマニア,ROU,2025,58.2,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+クロアチア,HRV,2025,58,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+チェコ,CZE,2025,57.2,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ラトビア,LVA,2025,54.4,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+スロバキア,SVK,2025,50.1,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+エジプト,EGY,2013,50,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ガーナ,GHA,2013,50,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+オーストラリア,AUS,2018,45.5,owid,compilation_wfi,1,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+アメリカ,USA,2025,45.3,owid,official_usda,1,USDA 農業マーケティング局が週次で公表する Egg Markets Overview のケージフリー羽数,https://esmis.nal.usda.gov/concern/publications/73667q50n
+キプロス,CYP,2025,40.3,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+スペイン,ESP,2025,40.2,owid,official_ec,1,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ポーランド,POL,2025,37.8,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ブルガリア,BGR,2025,35.5,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ニュージーランド,NZL,2018,33.6,owid,compilation_wfi,1,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ポルトガル,PRT,2024,32.9,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+ハンガリー,HUN,2024,32.4,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+コロンビア,COL,2018,30,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ナイジェリア,NGA,2017,30,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ギリシャ,GRC,2020,23.5,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+リトアニア,LTU,2024,23.4,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+エストニア,EST,2025,22.9,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+カザフスタン,KAZ,2018,15,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+南アフリカ,ZAF,2018,14,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+カナダ,CAN,2018,13,owid,compilation_wfi,1,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+トルコ,TUR,2018,12,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ウルグアイ,URY,2016,12,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+アルゼンチン,ARG,2018,11,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ペルー,PER,2018,7,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+日本,JPN,2018,5.4,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ブラジル,BRA,2018,5,owid,compilation_wfi,1,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+中国,CHN,2018,3,owid,compilation_wfi,1,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+チリ,CHL,2016,2,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+日本,JPN,2025,1.5,arc,arc,1,"ケージフリー羽数調査2025「現在の羽数 1,924,435／1.483%」。他国と出典が異なる",https://arcj.org/issues/farm-animals/layer-chicken/cagefreesurvey2025/
+マルタ,MLT,2025,1,owid,official_ec,0,加盟国が実施規則 (EU) 2017/1185 にもとづき報告した飼養方式別（非エンリッチドケージ／エンリッチドケージ／平飼い／放し飼い／有機）の採卵鶏羽数。非ケージ分の合計から算出,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+メキシコ,MEX,2020,0.5,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ロシア,RUS,2018,0.1,owid,compilation_wfi,1,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+アルジェリア,DZA,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+アルメニア,ARM,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+アゼルバイジャン,AZE,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ベラルーシ,BLR,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+キューバ,CUB,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+エクアドル,ECU,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ジョージア,GEO,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+インド,IND,2017,0,owid,compilation_wfi,1,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+イラン,IRN,2018,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+キルギス,KGZ,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+リビア,LBY,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+モロッコ,MAR,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+タジキスタン,TJK,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+トルクメニスタン,TKM,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ウクライナ,UKR,2017,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+アラブ首長国連邦,ARE,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ウズベキスタン,UZB,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
+ベネズエラ,VEN,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/
