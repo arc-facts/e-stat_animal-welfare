@@ -432,6 +432,10 @@ main {
 
 .prose--tight { margin-top: 18px; font-size: 0.92rem; }
 
+/* --- 螺旋（母豚の繁殖サイクル）--- */
+.spiral { display: flex; justify-content: center; }
+.spiral svg { display: block; width: 100%; max-width: 420px; height: auto; }
+
 /* --- 一生の年表 --- */
 .timeline svg { display: block; width: 100%; height: auto; margin-bottom: 6px; }
 .tl {
