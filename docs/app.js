@@ -934,7 +934,8 @@
 
     var W = Math.max(280, Math.round(host.clientWidth) || 720);
     var narrowS = W < 520;
-    var BAND = 46, TOP = narrowS ? 20 : 34, AXIS = 30;
+    // 帯の上には「屠殺」の見出しが載るので、狭い画面でも切れない余白を確保する
+    var BAND = 46, TOP = narrowS ? 26 : 34, AXIS = 30;
     var H = TOP + BAND + AXIS;
     function X(day) { return day / end * W; }
 
@@ -969,6 +970,13 @@
       svg += '<path d="M' + (fx - 5).toFixed(2) + " " + (TOP - 5) + "L" + (fx + 5).toFixed(2) +
         " " + (TOP - 5) + "L" + fx.toFixed(2) + " " + TOP + 'Z" fill="' + C.ink + '"></path>';
     }
+    // 帯の終わり＝屠殺。淘汰された母豚は廃用母豚として食肉に回る。
+    var ex = W - 1;
+    svg += '<line x1="' + ex + '" y1="' + (TOP - 7) + '" x2="' + ex + '" y2="' + (TOP + BAND) +
+      '" stroke="' + C.ink + '" stroke-width="2"></line>';
+    svg += '<text x="' + W + '" y="' + (TOP - 11) + '" text-anchor="end" font-size="11.5" ' +
+      'font-weight="700" fill="' + C.ink + '">屠殺</text>';
+
     // 繰り返しの単位が読み取れるよう、1サイクル目に寸法線を渡す
     if (!narrowS) {
       var bx1 = X(mate), bx2 = X(mate + fi), by = 18;
@@ -1015,7 +1023,8 @@
         "この期間の大半で母豚は向きを変えることができません。" +
         "分娩は" + fi + "日ごと、およそ" + (fi / 30.4).toFixed(1) + "か月に1回のペースで" +
         nc + "回繰り返され、" + fmtPlain(end) + "日齢（約" + (end / 365).toFixed(1) +
-        "歳）で淘汰されます。";
+        "歳）で淘汰されます。淘汰された母豚は<strong>廃用母豚として屠殺され、食肉になります</strong>。" +
+        "豚の寿命は10〜15年とされますが、その3分の1にも満たない年齢です。";
     }
     var sub = document.getElementById("sowlife-sub");
     if (sub) {
