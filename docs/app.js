@@ -742,7 +742,8 @@
     official_defra: "英国 Defra「UK egg statistics」",
     official_usda: "米国 USDA「Egg Markets Overview」",
     compilation_wfi: "Welfare Footprint Institute「Global hen inventory」(2022)",
-    arc: "アニマルライツセンター「ケージフリー羽数調査」(2025)"
+    arc: "アニマルライツセンター「ケージフリー羽数調査」(2025)",
+    official_qia: "韓国 農林畜産検疫本部「동물복지 축산농장 인증 현황」(2024)"
   };
 
   /* ---------- アジア各国のケージフリー率 ----------

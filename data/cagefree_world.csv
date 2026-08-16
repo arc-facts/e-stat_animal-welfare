@@ -68,3 +68,4 @@ country,code,year,share_pct,source,basis,show,source_text,source_url,claim_id
 アラブ首長国連邦,ARE,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/,c211
 ウズベキスタン,UZB,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/,c211
 ベネズエラ,VEN,2013,0,owid,compilation_wfi,0,Welfare Footprint Institute が各国統計と業界資料をまとめた集計（2022年）。参照年は国により2013〜2018年と古い,https://welfarefootprint.org/research-projects/laying-hens/,c211
+韓国,KOR,2024,7.5,qia,official_qia,1,"農林畜産検疫本部(QIA)「2024년 동물복지 축산농장 인증 현황」より「전체 가축사육두수 중 동물복지 사육두수는 … 산란계 7.5」（認証産卵鶏 5,797千羽、2024年12月31日現在）。韓国の動物福祉畜産農場認証は産卵鶏のケージ飼育を認めておらず、認証羽数＝ケージフリー羽数。未認証のケージフリー農場は含まないため下限値",https://www.qia.go.kr/viewwebQiaCom.do?id=66055&type=7_depart,c261

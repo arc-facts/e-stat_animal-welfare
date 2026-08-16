@@ -10,7 +10,7 @@
     "cagefree": "政府統計に系列がないため民間・大学の調査による推計。アニマルライツセンター「ケージフリー羽数調査」、麻布大学 大木茂「ケージフリー採卵養鶏調査」報告書（2025.8）、World Egg Organization",
     "cagefree_world": "Our World in Data「Share of egg-laying hens in cage-free systems」（CC BY）。日本のみアニマルライツセンター2025年調査",
     "sow_cycle": "広岡博之「ブタの繁殖肥育一貫生産に関するシミュレーションモデルの開発」日本畜産学会報 89(4): 415-421, 2018（表1のベース条件）",
-    "cagefree_sea": "Zeng, W., Statharas, L., Kan, R.-H. (2023) State of Animal Farming in Southeast Asia, Welfare Matters（羽数はFAO 2021、宣言数はChicken Watch）",
+    "cagefree_sea": "Zeng, W., Statharas, L., Kan, R.-H. (2023) State of Animal Farming in Southeast Asia, Welfare Matters（羽数はFAO 2021、宣言数はChicken Watch）。https://www.welfarematters.org/s/State-of-Animal-Farming-in-Southeast-Asia-v12-July-2023.pdf",
     "figures": "図表の定数（1羽当たり面積・痛みの時間・ブロイラー飼養密度）は data/space_per_hen.csv, pain_hours.csv, broiler_density.csv。出典は各項目のカード参照"
   },
   "fetched_series": [
