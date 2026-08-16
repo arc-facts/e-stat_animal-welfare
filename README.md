@@ -1,4 +1,4 @@
-# 日本の畜産動物はいま — e-Stat Animal Welfare
+# データで見る日本のアニマルウェルフェア — e-Stat Animal Welfare
 
 採卵鶏・ブロイラー（肉用鶏）・豚（特に母豚）について、
 

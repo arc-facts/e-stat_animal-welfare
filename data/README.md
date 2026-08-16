@@ -202,6 +202,15 @@ ARC 2025年）を主として描きます。「他の推計ではこのあたり
 出典: Global Coalition for Animal Welfare「Cage Free Eggs: A Global Landscape Review」の
 「Cage-Free Eggs in Asia」（2022年の値、2024年2月公表）。
 
+**分母が何かは出典に書かれていません。** 表の見出しは「% of cage-free production」ですが
+定義はなく、羽数・生産量・戸数のどれを指すか特定できません。
+
+**`cagefree_world.csv` とは独立した裏づけではありません。** GCAW表の脚注6は
+「Figures mainly taken from Welfare Footprint Project, Center for Welfare Metrics」とあり、
+`cagefree_world.csv`（OWID）の集計元と同じ団体です。ただし値は食い違います
+（日本 8% / 5.4%、中国 10% / 3%、インド 20% / 0%、トルコは両方12%で一致）。
+国別の一次資料が示されていないため、差の原因は特定できません。大まかな傾向としてのみ扱ってください。
+
 **この数値は慎重に扱ってください。** 同資料は日本を8%としていますが、国内の調査
 （ARC 1.48%、麻布大 3.17%、WEO 3.5%）のいずれとも大きく食い違います。算出根拠が
 資料上示されておらず、差の理由を確かめられません。日本という複数の調査がある国で

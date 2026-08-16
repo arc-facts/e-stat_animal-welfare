@@ -125,6 +125,120 @@ a:hover { text-decoration-thickness: 2px; }
 /* 画面が狭い・低いときは柱を出さない（本文にかぶるため） */
 @media (max-width: 1179px), (max-height: 620px) { .rail { display: none; } }
 
+/* 目で見るには不要だが、読み上げには必要な文言 */
+.vh {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ── 狭い画面用の目次帯（柱の代わり）───────────────────── */
+.topbar {
+  display: none;               /* 柱が出ている幅では不要 */
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 30;
+  background: var(--sheet);
+  border-bottom: 1px solid var(--rule-2);
+  transform: translateY(-102%);
+  transition: transform 0.22s ease;
+}
+.topbar.is-on { transform: translateY(0); }
+.topbar.is-open { box-shadow: 0 6px 20px rgba(35, 36, 30, 0.1); }
+
+.topbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 16px;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.topbar-here {
+  font-family: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic",
+               "Hiragino Sans", system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* 現在地の左に、柱と同じ意味の短い罫を置く */
+.topbar-here::before {
+  content: "";
+  display: inline-block;
+  width: 3px; height: 0.86em;
+  margin-right: 9px;
+  vertical-align: -0.08em;
+  background: var(--accent);
+}
+.topbar-word {
+  flex: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.topbar-word::after {
+  content: "▾";
+  margin-left: 5px;
+  font-size: 0.86em;
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+.topbar.is-open .topbar-word::after { transform: rotate(180deg); }
+.topbar.is-open .topbar-word { color: var(--ink-2); }
+
+.topbar-panel {
+  border-top: 1px solid var(--rule);
+  background: var(--sheet-2);
+  max-height: 62vh;
+  overflow-y: auto;
+}
+.topbar-panel ul {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--rule);      /* 隙間が細い罫に見える */
+}
+.topbar-panel li { background: var(--sheet-2); }
+.topbar-panel a {
+  display: block;
+  padding: 13px 14px;
+  min-height: 44px;             /* 指で押せる大きさ */
+  box-sizing: border-box;
+  font-size: 0.9rem;
+  color: var(--ink-2);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+}
+.topbar-panel a[aria-current="true"] {
+  color: var(--ink);
+  font-weight: 700;
+  border-left-color: var(--accent);
+  background: var(--sheet);
+}
+/* 項目数が奇数のとき、最後の1件を1行使って収まりよく見せる */
+.topbar-panel li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+@media (max-width: 1179px), (max-height: 620px) {
+  .topbar { display: block; }
+}
+
 /* ============================================================
    マストヘッド
    ============================================================ */
@@ -777,13 +891,19 @@ footer.site li:empty { display: none; }
 /* ============================================================
    動きの配慮・印刷
    ============================================================ */
+/* 目次帯が出ている幅では、見出しが帯の下に潜らないよう逃げを大きく取る。
+   .section / .foot の定義より後ろに置くこと（同じ詳細度なので順序で決まる） */
+@media (max-width: 1179px), (max-height: 620px) {
+  .section, .foot { scroll-margin-top: 62px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
 
 @media print {
-  .rail, .skip, details.table-view { display: none; }
+  .rail, .topbar, .skip, details.table-view { display: none; }
   body { background: #fff; font-size: 11pt; }
   .sheet, .tile, .fact, footer.site { border-color: #bbb; background: #fff; }
   .section { break-inside: avoid; margin-top: 24pt; }

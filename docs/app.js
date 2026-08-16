@@ -767,7 +767,7 @@
     var H = rows.length * (BAR + GAP) - GAP;
 
     var svg = '<svg viewBox="0 0 ' + W + " " + H +
-      '" role="img" aria-label="アジア各国の採卵鶏に占めるケージフリーの割合">';
+      '" role="img" aria-label="アジア各国のケージフリー率">';
     rows.forEach(function (r, i) {
       var y = i * (BAR + GAP), jp = r.code === "JPN";
       svg += '<text x="' + (labelW - 8) + '" y="' + (y + BAR * 0.5 + 4.5) + '" text-anchor="end" font-size="' +
@@ -1174,11 +1174,98 @@
   }
 
   /* ---------- 柱（縦組みの索引）の現在地表示 ---------- */
+  /* 狭い画面では柱を出せないので、同じ項目を上部の帯として出す。
+     柱と現在地の判定を共有する（initRail の update から呼ばれる）。 */
+  function buildTopbar(railLinks) {
+    var bar = document.createElement("nav");
+    bar.className = "topbar";
+    bar.setAttribute("aria-label", "ページ内の目次");
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "topbar-btn";
+    btn.setAttribute("aria-expanded", "false");
+    btn.setAttribute("aria-controls", "topbar-panel");
+    /* 読み上げでは「殺される数目次」と続いてしまうので、文脈語を補う */
+    var lead = document.createElement("span");
+    lead.className = "vh";
+    lead.textContent = "現在の位置: ";
+    var here = document.createElement("span");
+    here.className = "topbar-here";
+    var word = document.createElement("span");
+    word.className = "topbar-word";
+    word.textContent = "目次";
+    var sep = document.createElement("span");
+    sep.className = "vh";
+    sep.textContent = "。";
+    btn.appendChild(lead);
+    btn.appendChild(here);
+    btn.appendChild(sep);
+    btn.appendChild(word);
+    bar.appendChild(btn);
+
+    var panel = document.createElement("div");
+    panel.className = "topbar-panel";
+    panel.id = "topbar-panel";
+    panel.hidden = true;
+    var list = document.createElement("ul");
+    var items = railLinks.map(function (a) {
+      var li = document.createElement("li");
+      var link = document.createElement("a");
+      link.href = a.getAttribute("href");
+      link.textContent = a.textContent.trim();
+      li.appendChild(link);
+      list.appendChild(li);
+      return link;
+    });
+    panel.appendChild(list);
+    bar.appendChild(panel);
+    document.body.appendChild(bar);
+
+    function close() {
+      panel.hidden = true;
+      btn.setAttribute("aria-expanded", "false");
+      bar.classList.remove("is-open");
+    }
+    function toggle() {
+      if (panel.hidden) {
+        panel.hidden = false;
+        btn.setAttribute("aria-expanded", "true");
+        bar.classList.add("is-open");
+      } else { close(); }
+    }
+    btn.addEventListener("click", toggle);
+    items.forEach(function (a) { a.addEventListener("click", close); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !panel.hidden) { close(); btn.focus(); }
+    });
+    document.addEventListener("click", function (e) {
+      if (!panel.hidden && !bar.contains(e.target)) close();
+    });
+
+    return {
+      /* cur は現在の項目の添字。帯の出し入れと現在地表示をまとめて更新する */
+      update: function (cur) {
+        var show = window.scrollY > 160;
+        bar.classList.toggle("is-on", show);
+        if (!show) close();
+        var name = railLinks[cur] ? railLinks[cur].textContent.trim() : "";
+        if (here.textContent !== name) here.textContent = name;
+        items.forEach(function (a, i) {
+          if (i === cur) a.setAttribute("aria-current", "true");
+          else a.removeAttribute("aria-current");
+        });
+      }
+    };
+  }
+
   function initRail() {
     var rail = document.getElementById("rail");
     if (!rail) return;
     var links = [].slice.call(rail.querySelectorAll("a"));
+    if (!links.length) return;
     var targets = links.map(function (a) { return document.querySelector(a.getAttribute("href")); });
+    var topbar = buildTopbar(links);
     var ticking = false;
     function update() {
       ticking = false;
@@ -1191,6 +1278,7 @@
         if (i === cur) a.setAttribute("aria-current", "true");
         else a.removeAttribute("aria-current");
       });
+      topbar.update(cur);
     }
     window.addEventListener("scroll", function () {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
