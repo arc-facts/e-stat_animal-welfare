@@ -1416,7 +1416,17 @@
     });
   }
 
-  fetch("data/data.json")
+  /* data.json は index.html ではなく JS から読むため、公開時に style.css / app.js へ
+     付与される ?v=<sha> が効かない。放っておくと、コードは新しいのに数値だけ
+     古いキャッシュのまま表示される。app.js 自身に付いたバージョンを引き継いで防ぐ。
+     ローカル（バージョンなし）では毎回取り直す。 */
+  function dataUrl() {
+    var me = document.querySelector('script[src*="app.js"]');
+    var ver = me && me.src.split("?")[1];
+    return "data/data.json?" + (ver || "dev=" + Date.now());
+  }
+
+  fetch(dataUrl())
     .then(function (r) {
       if (!r.ok) throw new Error("data.json の読み込みに失敗（" + r.status + "）");
       return r.json();
