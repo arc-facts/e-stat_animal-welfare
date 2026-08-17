@@ -28,9 +28,9 @@ broiler_growth = "broiler_growth.csv"
 
 # 取り込み時に列名を検査する。シート側で見出しを書き換えたり列を並べ替えたりすると
 # ここで弾かれ、壊れたデータが公開されるのを防ぐ。
-# claims（主張の台帳）は同期しない。checked_by に協力者の氏名が入るため、
-# 公開リポジトリには取り込まない。台帳はシート上だけで運用しており、
-# リポジトリ側に data/claims.csv も置いていない（唯一の正はシート）。
+# claim（主張の台帳）は同期しない。checked_by に協力者の氏名が入るため。
+# 定義列だけを data/claims.csv に持ち、検証列はシート側にだけ置く。
+# 往復は scripts/sync_claims.py で行う（読み取りのみ・認証不要）。
 
 [columns]
 cagefree = ["source", "year", "scope", "cagefree_birds", "total_birds", "share_pct", "note", "source_text", "source_url", "claim_id"]
