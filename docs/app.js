@@ -1071,9 +1071,15 @@
     var breeding = end - mate, confined = nc * (preg + lact);
     var note = document.getElementById("sowlife-note");
     if (note) {
+      /* 繁殖回数は現場によって幅がある。図はモデルのベース条件（nc回）で描き、
+         実際はもっと少ないことが多い旨を必ず添える。 */
+      var shortEnd = mate + 3 * fi + preg + lact;   // 4産で淘汰された場合
       note.innerHTML = "ひと巻きが1回の妊娠・出産です。初回交配の" + mate + "日齢から" + fi +
-        "日ごとに同じことが" + nc + "回繰り返され、" + fmtPlain(end) + "日齢（約" +
-        (end / 365).toFixed(1) + "歳）で屠殺されます。" +
+        "日ごとに繰り返されます。図は出典のモデルが置いた" + nc + "回で描いており、" +
+        "その場合は" + fmtPlain(end) + "日齢（約" + (end / 365).toFixed(1) +
+        "歳）で屠殺されます。ただし<strong>実際には4産前後、あるいはそれ以下で淘汰される例が多く" +
+        "報告されており、その場合はさらに早く殺されます</strong>（4産なら約" +
+        (shortEnd / 365).toFixed(1) + "歳）。" +
         "繁殖に使われる" + fmtPlain(breeding) + "日のうち、妊娠か授乳にあたる期間が<strong>" +
         fmtPlain(confined) + "日（" + Math.round(confined / breeding * 100) + "%）</strong>。" +
         "日本では繁殖用の雌豚にストールを常用している農場が91.6%を占め、授乳期は分娩ストールに入れられるため、" +
