@@ -171,6 +171,12 @@ searchWord = "食鳥 処理場調査 処理量 累年"
 [series.pigs_slaughtered_thousand]
 file = "slaughter.csv"
 description = "豚 と畜頭数"
+# 【要更新】この統計表は2017年（平成29年）までで更新が止まっている。
+# 確報の最新は「畜産物と畜（処理）頭羽数及び生産量（明治10年～令和5年）」
+# （e-Stat stat_infid=000040188155、2025-04-30公表、令和5年＝2023年まで）。
+# data/slaughter.csv の2018〜2023年はそちらから手で入れたシード値なので、
+# この stats_data_id のまま取得を走らせると2017年までに巻き戻る。
+# APIのstatsDataIdは --discover で特定し直すこと。
 # 「畜産物流通調査 長期累年 / と畜頭数及びと畜場数累年統計」
 # （都道府県別出荷頭数・枝肉生産量の類似表と区別して確定）
 stats_data_id = "0003368795"
