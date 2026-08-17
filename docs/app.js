@@ -1083,7 +1083,8 @@
     }
     var sub = document.getElementById("sowlife-sub");
     if (sub) {
-      sub.textContent = "1巻き＝1回の繁殖サイクル（" + fi +
+      sub.textContent = "一生のほとんどの期間、母豚は身動きがとれません（繁殖期間の" +
+        Math.round(confined / breeding * 100) + "%）/ 1巻き＝1回の繁殖サイクル（" + fi +
         "日）/ 出典: 広岡博之（2018）日本畜産学会報 89(4) のベース条件（生産現場への聞き取りによる）";
     }
   }
