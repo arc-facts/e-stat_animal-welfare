@@ -125,6 +125,18 @@ a:hover { text-decoration-thickness: 2px; }
 /* 画面が狭い・低いときは柱を出さない（本文にかぶるため） */
 @media (max-width: 1179px), (max-height: 620px) { .rail { display: none; } }
 
+/* Q&A の中で、数字の読み方に注意を促す段落 */
+.qa-caveat {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  background: var(--sheet-2);
+  border-left: 3px solid var(--rule-2);
+  border-radius: 3px;
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--ink-2);
+}
+
 /* 目で見るには不要だが、読み上げには必要な文言 */
 .vh {
   position: absolute;
