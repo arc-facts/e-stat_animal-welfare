@@ -1,14 +1,9 @@
 source_id,title,url
-s01,e-Stat 畜産物流通統計 累年統計「畜産物と畜（処理）頭羽数及び生産量（明治10年～令和５年）」,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040188155
-s02,e-Stat 令和５年畜産物流通統計「食鳥の処理羽数及び処理重量」,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040188154
 s03,国立国会図書館 調査と情報 No.1344「採卵鶏のアニマルウェルフェア」（2026年2月）,https://dl.ndl.go.jp/pid/14632280
 s04,環境省「犬・猫の引取り及び負傷動物の収容状況」,https://www.env.go.jp/nature/dobutsu/aigo/2_data/statistics/dog-cat.html
 s05,農林水産省「鶏の改良増殖をめぐる情勢」（令和元年7月）,https://www.maff.go.jp/j/chikusan/sinko/lin/l_katiku/attach/pdf/niwatori-6.pdf
 s06,大木茂「2025年 麻布大学『ケージフリー採卵養鶏調査』報告書」（2025年8月）,https://lab-navi.azabu-u.ac.jp/va-10/a89f109186c30903e98264ccb8880bf7.pdf
-s07,e-Stat 令和６年畜産統計 表4 採卵鶏 飼養戸数・羽数,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040226152
 s08,e-Stat 畜産統計 累年統計表 ブロイラー 飼養戸数・羽数（全国、1965〜2015年）,https://www.e-stat.go.jp/stat-search/database?layout=dataset&kikan=00500&toukei=00500222&statdisp_id=0003238299
-s09,e-Stat 令和６年畜産統計 表5 ブロイラー 飼養戸数・羽数,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040226155
-s10,e-Stat 令和６年畜産統計 表3-1 豚 飼養戸数・頭数,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040226135
 s11,e-Stat 令和４年営農類型別経営統計（全農業経営体）,https://www.e-stat.go.jp/dbview?sid=0002111939
 s12,令和3年環境省令第7号（e-Gov 法令検索）,https://laws.e-gov.go.jp/law/503M60001000007
 s13,環境省「動物取扱業における犬猫の飼養管理基準の解釈と運用指針」2. 従業者の員数,https://www.env.go.jp/nature/dobutsu/aigo/2_data/pamph/r0305a/03_2.pdf
@@ -51,8 +46,9 @@ s50,農林水産省「鶏卵の生産衛生管理ハンドブック — 採卵�
 s51,e-Stat 令和５年畜産統計 累年統計表 4 採卵鶏 飼養戸数・羽数（全国）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040121693
 s52,e-Stat 令和５年畜産統計 累年統計表 3 豚 飼養戸数・頭数（全国）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040121689
 s53,e-Stat 令和５年畜産統計 累年統計表 5 ブロイラー 飼養戸数・羽数（全国）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040121697
-s54,e-Stat 平成22年営農類型別経営統計（個別経営）採卵養鶏 労働時間,https://www.e-stat.go.jp/dbview?sid=0003072694
-s55,e-Stat 平成22年営農類型別経営統計（個別経営）採卵養鶏 主要農畜産物の生産概況,https://www.e-stat.go.jp/dbview?sid=0003072753
 s56,京都府農林水産技術センター畜産センター 研究成果情報（平成24年度）,https://www.naro.go.jp/org/warc/research_results/h24/pdf/10_chikusan/54-1002.pdf
 s57,総務省統計局「人口推計（2024年（令和6年）10月1日現在）」,https://www.stat.go.jp/data/jinsui/2024np/index.html
 s58,韓国 政策ブリーフィング「달걀 껍데기에 산란일자·사육환경 표시된다」,https://www.korea.kr/news/issueQAView.do?newsId=148842381
+s59,e-Stat 令和５年畜産物流通統計「調査結果の概要」（PDF）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040187981
+s60,e-Stat 令和６年畜産統計「調査（統計）結果の概要」（PDF）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040226096
+s61,e-Stat 平成22年営農類型別経営統計（個別経営）（付表）累年統計表 10 採卵養鶏経営（全国）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000013670063
