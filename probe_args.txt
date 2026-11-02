@@ -1,0 +1,1 @@
+--docs https://www.stat.go.jp/data/jinsui/2024np/index.html https://ourworldindata.org/grapher/eggs-cage-free https://www.e-stat.go.jp/dbview?sid=0003072694 https://www.e-stat.go.jp/dbview?sid=0003072753
