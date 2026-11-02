@@ -44,9 +44,10 @@
 
   /* ---------- 文末の確認マーク ----------
      <sup class="fc" data-claim="c101 c102"> に、主張の台帳（claims）を見て
-     人が出典と照合済みかどうかのマークを入れる。複数の主張にまたがる文は、
-     すべて照合済みのときだけ「済み」とする。台帳に無い記述は data-claim を空にし、
-     「まだ」として扱う。押すと主張と出典を吹き出しで示す。 */
+     人が出典と照合済みかどうかのマークを入れる。台帳は1行＝1つの主張と1つの出典で、
+     本サイトの計算による主張は derived_from に材料の主張を持つ。複数の主張にまたがる文や
+     計算の主張は、材料まで含めてすべて照合済みのときだけ「済み」とする。
+     台帳に無い記述は data-claim を空にし、「まだ」として扱う。押すと主張と出典を吹き出しで示す。 */
   function fc(ids) { return '<sup class="fc" data-claim="' + esc(ids || "") + '"></sup>'; }
   var FC_ICON = {
     ok: '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="7.3"/>' +
@@ -63,9 +64,22 @@
     var claims = (DATA && DATA.claims) || {};
     return (el.getAttribute("data-claim") || "").split(/\s+/).filter(function (id) { return claims[id]; });
   }
+  // 計算の主張は材料までたどって、確認が要る主張をすべて集める
+  function fcAll(ids) {
+    var claims = DATA.claims, seen = {}, out = [];
+    (function walk(list) {
+      list.forEach(function (id) {
+        if (seen[id] || !claims[id]) return;
+        seen[id] = true;
+        out.push(id);
+        walk(claims[id].derived_from || []);
+      });
+    })(ids);
+    return out;
+  }
   function fcState(ids) {
     var claims = DATA.claims;
-    return ids.length && ids.every(function (id) { return claims[id].checked; }) ? "ok" : "wait";
+    return ids.length && fcAll(ids).every(function (id) { return claims[id].checked; }) ? "ok" : "wait";
   }
   function markClaims() {
     Array.prototype.forEach.call(document.querySelectorAll("sup.fc"), function (sup) {
@@ -105,14 +119,24 @@
     } else {
       html += '<p class="fc-pop-lead">' + (st === "ok"
         ? "ボランティアが一次資料と照らし合わせて確認しました。"
-        : "出典は示していますが、人がまだ一次資料と照らし合わせていません。") + "</p><ul>";
-      ids.forEach(function (id) {
+        : "人がまだ一次資料と照らし合わせていない主張が含まれています。") + "</p><ul>";
+      fcAll(ids).forEach(function (id) {
         var c = claims[id];
         var when = c.checked ? (fmtDate(c.checked_on) ? fmtDate(c.checked_on) + "に照合" : "照合済み") : "未照合";
-        html += '<li><span class="fc-pop-claim">' + esc(c.claim) + '</span><span class="fc-pop-meta">' +
-          id + "・" + when + "・" + (c.source_url
-            ? '<a href="' + esc(c.source_url) + '" target="_blank" rel="noopener">出典を開く</a>'
-            : "出典未特定") + "</span></li>";
+        var src;
+        if (c.kind === "計算") {
+          src = "本サイトの計算（材料: " + esc((c.derived_from || []).join("・")) + "）";
+        } else if (c.kind === "方法") {
+          src = "本サイトの推計方法";
+        } else if (c.source_url) {
+          src = '<a href="' + esc(c.source_url) + '" target="_blank" rel="noopener">' +
+            esc(c.source_title || "出典を開く") + "</a>";
+        } else {
+          src = "出典未特定";
+        }
+        html += '<li class="fc--' + (c.checked ? "ok" : "wait") + '"><span class="fc-pop-claim">' +
+          FC_ICON[c.checked ? "ok" : "wait"] + esc(c.claim) + '</span><span class="fc-pop-meta">' +
+          id + "・" + when + "・" + src + "</span></li>";
       });
       html += "</ul>";
     }
@@ -613,7 +637,7 @@
       }
       if (got.estimated) {
         note += (note ? " " : "") + "雄ひよこの殺処分数は公式統計が存在しないため、" +
-          "雌雛（廃鶏として入れ替わる年間羽数）と概ね同数孵化するという前提での概算値です。" + fc("c104");
+          "雌雛（廃鶏として入れ替わる年間羽数）と概ね同数孵化するという前提での概算値です。" + fc("c104b c104c");
       }
       noteEl.innerHTML = note;
     }
@@ -1400,6 +1424,7 @@
   var DATA = null;
 
   function render() {
+    closeFc(); // マークは描画のたびに作り直されるので、開いている吹き出しは閉じる
     var d = DATA, C = colors();
     var inv = d.inventory, sl = d.slaughter;
 
@@ -1431,7 +1456,7 @@
       "億</span>の鶏と豚が屠殺されています。";
     document.getElementById("hero-caption").innerHTML =
       slYear + "年のブロイラー・廃鶏（採卵鶏）・豚の処理数の合計。日本の人口（<span class=\"nw\">" +
-      fmtCount(pop, "人") + "</span>）の<span class=\"nw\">約" + ratio.toFixed(1) + "倍</span>にあたります。" + fc("c101 c102 c103 c105");
+      fmtCount(pop, "人") + "</span>）の<span class=\"nw\">約" + ratio.toFixed(1) + "倍</span>にあたります。" + fc("c101");
 
     /* 飼養数チャート — 鶏（羽）と豚（頭）は単位・規模が大きく異なるため別グラフに
        分ける。軸・ツールチップは実数（1羽・1頭・1人単位）で表記してスケールを

@@ -1,0 +1,58 @@
+source_id,title,url
+s01,e-Stat 畜産物流通統計 累年統計「畜産物と畜（処理）頭羽数及び生産量（明治10年～令和５年）」,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040188155
+s02,e-Stat 令和５年畜産物流通統計「食鳥の処理羽数及び処理重量」,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040188154
+s03,国立国会図書館 調査と情報 No.1344「採卵鶏のアニマルウェルフェア」（2026年2月）,https://dl.ndl.go.jp/pid/14632280
+s04,環境省「犬・猫の引取り及び負傷動物の収容状況」,https://www.env.go.jp/nature/dobutsu/aigo/2_data/statistics/dog-cat.html
+s05,農林水産省「鶏の改良増殖をめぐる情勢」（令和元年7月）,https://www.maff.go.jp/j/chikusan/sinko/lin/l_katiku/attach/pdf/niwatori-6.pdf
+s06,大木茂「2025年 麻布大学『ケージフリー採卵養鶏調査』報告書」（2025年8月）,https://lab-navi.azabu-u.ac.jp/va-10/a89f109186c30903e98264ccb8880bf7.pdf
+s07,e-Stat 令和６年畜産統計 表4 採卵鶏 飼養戸数・羽数,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040226152
+s08,e-Stat 畜産統計 累年統計表 ブロイラー 飼養戸数・羽数（全国、1965〜2015年）,https://www.e-stat.go.jp/stat-search/database?layout=dataset&kikan=00500&toukei=00500222&statdisp_id=0003238299
+s09,e-Stat 令和６年畜産統計 表5 ブロイラー 飼養戸数・羽数,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040226155
+s10,e-Stat 令和６年畜産統計 表3-1 豚 飼養戸数・頭数,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040226135
+s11,e-Stat 令和４年営農類型別経営統計（全農業経営体）,https://www.e-stat.go.jp/dbview?sid=0002111939
+s12,令和3年環境省令第7号（e-Gov 法令検索）,https://laws.e-gov.go.jp/law/503M60001000007
+s13,環境省「動物取扱業における犬猫の飼養管理基準の解釈と運用指針」2. 従業者の員数,https://www.env.go.jp/nature/dobutsu/aigo/2_data/pamph/r0305a/03_2.pdf
+s14,アニマルライツセンター「ケージフリー羽数調査」（2025年）,https://arcj.org/issues/farm-animals/layer-chicken/cagefreesurvey2025/
+s15,アニマルライツセンター「ケージフリー飼育の割合は1.11％」（2023年調査）,https://www.hopeforanimals.org/eggs/1percent-cage-free/
+s16,欧州委員会「Eggs」（Laying hens by way of keeping）,https://agriculture.ec.europa.eu/farming/animal-products/eggs_en
+s17,Defra「Egg statistics」,https://www.gov.uk/government/statistics/egg-statistics
+s18,USDA AMS「Egg Markets Overview」,https://esmis.nal.usda.gov/concern/publications/73667q50n
+s19,Welfare Footprint Institute「Transition to cage-free systems」,https://welfarefootprint.org/species/laying-hens
+s20,"Kuppan et al. (2024) Growth Dynamics and Export Potential of India's Poultry Sector, AJAEES 42(6)",https://ageconsearch.umn.edu/record/368028/files/Kuppan4262024AJAEES119459.pdf
+s21,"Zeng et al. (2023) State of Animal Farming in Southeast Asia, Welfare Matters",https://www.welfarematters.org/s/State-of-Animal-Farming-in-Southeast-Asia-v12-July-2023.pdf
+s22,ISO 216:2007（A判・B判の寸法）,https://www.iso.org/standard/36631.html
+s23,EU指令 1999/74/EC（採卵鶏の保護）,https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A31999L0074
+s24,"Ritchie (2023) Do better cages or cage-free environments really improve the lives of hens?, Our World in Data",https://ourworldindata.org/do-better-cages-or-cage-free-environments-really-improve-the-lives-of-hens
+s25,アニマルライツセンター「Inside the Cage」,https://arcj.org/inside-the-cage/
+s26,"Schuck-Paim et al. (2021) Laying hen mortality in different indoor housing systems, Scientific Reports 11",https://doi.org/10.1038/s41598-021-81868-3
+s27,ゲン・コーポレーション「ジュリア コマーシャル鶏飼養管理ガイド」,https://www.ghen.co.jp/pdf/01-julia.pdf
+s28,"Zuidhof et al. (2014) Growth, efficiency, and yield of commercial broilers from 1957, 1978, and 2005, Poultry Science 93(12)",https://doi.org/10.3382/ps.2014-04291
+s29,"Knowles et al. (2008) Leg disorders in broiler chickens, PLoS ONE 3(2)",https://doi.org/10.1371/journal.pone.0001545
+s30,"Julian (1998) Rapid growth problems: ascites and skeletal deformities in broilers, Poultry Science 77(12)",https://doi.org/10.1093/ps/77.12.1773
+s31,Chicken Watch（Open Wing Alliance）,https://chickenwatch.org/
+s32,USDA ERS Charts of Note「Growing share of egg-laying hens are cage-free」（2023年10月）,https://ers.usda.gov/data-products/charts-of-note/107564
+s33,GCAW「Cage Free Eggs: A Global Landscape Review」（2023年12月）,https://www.gc-animalwelfare.org/wp-content/uploads/2024/02/GCAW-Knowledge-Share-Cage-Free-Eggs-Global-Landscape-Review-Executive-Summary.pdf
+s34,農林畜産検疫本部「2024년 동물복지 축산농장 인증 현황」,https://www.apqa.go.kr/viewwebQiaCom.do?id=66055&type=7_depart
+s35,農林畜産検疫本部「動物福祉畜産農場認証基準及び認証等に関する細部実施要領」,https://www.apqa.go.kr/bbs/lawAnn/viewLawWebAction.do?id=123294&type=0
+s36,Hong et al. (2019) Korean Journal of Poultry Science 46(2),https://doi.org/10.5536/KJPS.2019.46.2.55
+s37,韓国 食品医薬品安全処 報道資料「달걀 껍데기를 보면 달걀 정보를 알 수 있다!!」（2018年2月23日）,https://impfood.mfds.go.kr/CFBBB02F02/getCntntsDetail?cntntsSn=282646
+s38,"広岡博之 (2018) ブタの繁殖肥育一貫生産に関するシミュレーションモデルの開発, 日本畜産学会報 89(4)",https://doi.org/10.2508/chikusan.89.415
+s39,日本養豚協会「平成30年度 養豚農業実態調査報告書（全国集計結果）」,https://jppa.biz/zius/wp-content/uploads/2019/10/20190520.pdf
+s40,畜産技術協会「アニマルウェルフェアの考え方に対応した豚の飼養管理指針」第3版（平成30年3月）,https://web.archive.org/web/2021id_/http://jlta.lin.gr.jp/report/animalwelfare/H29/awguideline_the4edition/pig_awguideline_the3edition.pdf
+s41,EU指令 2008/120/EC（豚の保護）,https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32008L0120
+s42,日本養豚協会「2024年（令和6年）養豚農業実態調査報告書」,https://jppa.biz/zius/wp-content/uploads/2025/03/2024%E5%B9%B4%E5%BA%A6-%E9%A4%8A%E8%B1%9A%E8%BE%B2%E6%A5%AD%E5%AE%9F%E6%85%8B%E8%AA%BF%E6%9F%BB%E5%A0%B1%E5%91%8A%E6%9B%B8-%EF%BC%88%E8%A9%B3%E7%B4%B0%E7%89%88%EF%BC%89.pdf
+s43,"EFSA AHAW Panel (2022) Welfare of pigs on farm, EFSA Journal 20(8)",https://doi.org/10.2903/j.efsa.2022.7421
+s44,畜産技術協会「アニマルウェルフェアの考え方に対応した豚の飼養管理指針」第5版（令和2年3月）,https://jlta.jp/test/wp-content/uploads/2023/12/R2_pig_awguideline_the5edition_20230725.pdf
+s45,厚生省通知 生衛発第1674号（平成10年11月25日）,https://www.mhlw.go.jp/web/t_doc?dataId=00ta5686&dataType=1&pageNo=1
+s46,アニマルライツセンター「日本のブロイラーの飼養密度」（畜産技術協会の調査の集計）,https://www.hopeforanimals.org/broiler/495/
+s47,Better Chicken Commitment,https://betterchickencommitment.com/
+s48,農林水産省「ブロイラーの飼養管理に関する技術的な指針」（令和5年）,https://www.maff.go.jp/j/chikusan/sinko/attach/pdf/animal_welfare-131.pdf
+s49,EU指令 2007/43/EC（肉用鶏の保護）,https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32007L0043
+s50,農林水産省「鶏卵の生産衛生管理ハンドブック — 採卵鶏農場・生産者編」（平成24年6月）,https://www.maff.go.jp/j/syouan/seisaku/risk_analysis/survei/pdf/egg_seisan.pdf
+s51,e-Stat 令和５年畜産統計 累年統計表 4 採卵鶏 飼養戸数・羽数（全国）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040121693
+s52,e-Stat 令和５年畜産統計 累年統計表 3 豚 飼養戸数・頭数（全国）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040121689
+s53,e-Stat 令和５年畜産統計 累年統計表 5 ブロイラー 飼養戸数・羽数（全国）,https://www.e-stat.go.jp/stat-search/files?stat_infid=000040121697
+s54,e-Stat 平成22年営農類型別経営統計（個別経営）採卵養鶏 労働時間,https://www.e-stat.go.jp/dbview?sid=0003072694
+s55,e-Stat 平成22年営農類型別経営統計（個別経営）採卵養鶏 主要農畜産物の生産概況,https://www.e-stat.go.jp/dbview?sid=0003072753
+s56,京都府農林水産技術センター畜産センター 研究成果情報（平成24年度）,https://www.naro.go.jp/org/warc/research_results/h24/pdf/10_chikusan/54-1002.pdf
+s57,総務省統計局「人口推計（2024年（令和6年）10月1日現在）」,https://www.stat.go.jp/data/jinsui/2024np/index.html

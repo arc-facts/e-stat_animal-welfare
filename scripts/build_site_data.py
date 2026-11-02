@@ -235,6 +235,7 @@ def read_sow_cycle() -> dict[str, float]:
 def read_claims() -> dict[str, dict]:
     """主張の台帳と、人による確認の状態。
 
+    1行は1つの主張と1つの出典。kind が「計算」の主張は derived_from に材料を持つ。
     サイトの文末マーク（人が確認済みか）とその吹き出しに使う。確認状態は
     sync_claims.py export-status がシートから写した data/claim_status.csv による。
     氏名は持たない。
@@ -245,13 +246,23 @@ def read_claims() -> dict[str, dict]:
         with open(status_path, newline="", encoding="utf-8") as f:
             for r in csv.DictReader(f):
                 status[r["claim_id"]] = r
+    titles: dict[str, str] = {}
+    sources_path = DATA_DIR / "sources.csv"
+    if sources_path.exists():
+        with open(sources_path, newline="", encoding="utf-8") as f:
+            titles = {r["source_id"]: r["title"] for r in csv.DictReader(f)}
     out: dict[str, dict] = {}
     with open(DATA_DIR / "claims.csv", newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
             st = status.get(r["claim_id"], {})
-            rec = {"claim": r["claim"], "checked": st.get("checked", "").upper() == "TRUE"}
+            rec = {"claim": r["claim"], "kind": r.get("kind") or "事実",
+                   "checked": st.get("checked", "").upper() == "TRUE"}
             if r.get("source_url"):
                 rec["source_url"] = r["source_url"].strip()
+            if titles.get(r.get("source_id", "")):
+                rec["source_title"] = titles[r["source_id"]]
+            if (r.get("derived_from") or "").split():
+                rec["derived_from"] = r["derived_from"].split()
             if rec["checked"] and st.get("checked_on"):
                 rec["checked_on"] = st["checked_on"]
             out[r["claim_id"]] = rec

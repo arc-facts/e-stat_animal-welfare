@@ -129,30 +129,46 @@ API から取れない年と系列（採卵鶏・豚の2020年以降、ブロイ
 
 ### claims.csv — 主張の台帳（定義のみ）
 
-サイト上の**検証可能な主張をひとつずつ並べた台帳**です。1つの資料が複数の主張の
-根拠になっている場合も、**主張ごとに1行**に分けてあります。
+サイト上の**検証可能な主張をひとつずつ並べた台帳**です。**1行は「1つの主張と1つの出典」**に
+対応させます。1つの資料が複数の主張の根拠になっている場合は主張ごとに1行に分け、
+1つの主張が複数の資料にまたがる場合は、資料ごとの主張に分けます。
+
+本サイトが計算した数字（合計・比率・倍率）は、材料の数字をそれぞれ1行の主張として持ち、
+計算の行は `kind` を「計算」にして出典を持たせず、`derived_from` に材料の主張を並べます。
+確認する人は、材料の行を出典と照らし合わせ、計算の行では計算が合っているかを確かめます。
 
 台帳は2か所に分かれています。**書く人が違うため**です。
 
 | | 列 | 書く人 | 置き場所 |
 |---|---|---|---|
-| 定義 | `claim_id` `section` `claim` `source_text` `source_url` | サイトを直す人 | このCSV |
+| 定義 | `claim_id` `section` `kind` `claim` `source_id` `source_text` `source_url` `derived_from` | サイトを直す人 | このCSV |
 | 検証 | `checked` `checked_by` `checked_on` `memo` | ボランティア | スプレッドシートの `claim` タブ |
 
 `checked_by` には協力者の氏名が入るため、**検証側の列はリポジトリに置きません**。
-このCSVは定義だけを持ちます。
+このCSVは定義だけを持ちます（サイトのマーク用に `checked` と `checked_on` だけは
+`claim_status.csv` に写します。後述）。
 
 | 列 | 内容 |
 |---|---|
-| `claim_id` | `c101` などの通し番号。各データCSVの `claim_id` から参照される |
+| `claim_id` | `c101` などの通し番号。分けた主張は `c121a` のように枝番を付ける。各データCSVの `claim_id` から参照される |
 | `section` | サイト上の掲載箇所 |
+| `kind` | `事実`（出典で確かめる）/ `計算`（本サイトが他の主張から計算）/ `方法`（本サイトの推計方法などの断り書き） |
 | `claim` | 主張を1文で |
-| `source_text` / `source_url` | 根拠の引用と原典URL |
+| `source_id` | 出典の ID。`sources.csv` の `source_id` |
+| `source_text` / `source_url` | 根拠の引用・確認箇所と、該当箇所に直接着くURL |
+| `derived_from` | `計算` の材料にした主張の ID（空白区切り） |
 | `checked` | 確認できたら `TRUE` |
 | `checked_by` / `checked_on` | 誰がいつ確認したか |
 | `memo` | 食い違いや気づいた点 |
 
-`source_url` が空欄の行は、まだ原典を特定できていない主張です。
+### sources.csv — 出典の一覧
+
+`source_id` `title` `url`（該当箇所への飛び先を除いた資料そのもののURL）。
+`sync_claims.py build` は、出典ごとにその資料で確かめる主張を並べた `source` タブ用の
+CSV（`build/source-import.csv`）も作ります。同じ資料に複数の主張がぶら下がっているときに、
+資料を1回開けば全部を確かめられるようにするためです。
+
+`kind` が `事実` で `source_url` が空欄の行は、まだ原典を特定できていない主張です。
 
 `source_url` は、開いたらすぐ該当箇所に着く形で書きます（確認する人が検索し直さずに済むように）。
 
@@ -166,7 +182,7 @@ API から取れない年と系列（採卵鶏・豚の2020年以降、ブロイ
 
 ```
 python scripts/sync_claims.py status   # シートの進捗を見る（氏名は表示しない）
-python scripts/sync_claims.py build    # build/claim-import.csv を作る
+python scripts/sync_claims.py build    # build/claim-import.csv と build/source-import.csv を作る
 ```
 
 `build` はシートの検証列を読み、このCSVの定義と突き合わせて、**ボランティアの
@@ -188,6 +204,7 @@ python scripts/sync_claims.py build    # build/claim-import.csv を作る
 
 - `docs/index.html` の文末に `<sup class="fc" data-claim="c101"></sup>` を置く。
   複数の主張にまたがる文は `data-claim="c214 c215"` のように並べる（すべて照合済みのときだけ緑）
+- `計算` の主張を指せば、材料の主張までたどって判定する（材料まですべて照合済みで緑）
 - `docs/app.js` が組み立てる文は `fc("c101")` を添える。年表やケージフリーの推計表は
   各データCSVの `claim_id` 列から付く
 - 台帳にまだ無い記述は `data-claim=""`（`fc("")`）にする。灰色のマークになり、
