@@ -1,2 +1,2 @@
---lists https://www.e-stat.go.jp/stat-search/files?layout=datalist&toukei=00500201&tstat=000001013460&cycle=7&tclass1=000001032231&tclass2=000001036976&tclass3=000001050984
---docs https://www.e-stat.go.jp/stat-search/file-download?statInfId=000040226096&fileKind=2
+--files 000013670063
+--docs https://www.e-stat.go.jp/stat-search/file-download?statInfId=000040187981&fileKind=2
