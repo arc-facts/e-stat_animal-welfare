@@ -1,0 +1,42 @@
+name: Update claim check status
+
+# スプレッドシート claim タブの checked / checked_on を data/claim_status.csv に写し、
+# サイトの文末マーク（人が出典と照合済みか）に反映する。氏名とメモは写さない。
+# update-sheets.yml とは独立させる（あちらはタブの列検査で止まることがあるため）。
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 6時間ごと。update-sheets.yml と重ならないよう少しずらす
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Export check status from spreadsheet
+        run: python scripts/sync_claims.py export-status
+
+      - name: Build site data
+        run: python scripts/build_site_data.py
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/claim_status.csv docs/data
+          if git diff --cached --quiet; then
+            echo "変更なし"
+          else
+            git commit -m "data: 主張の確認状況を反映"
+            git push
+          fi

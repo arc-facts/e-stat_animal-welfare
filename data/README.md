@@ -176,6 +176,26 @@ python scripts/sync_claims.py build    # build/claim-import.csv を作る
 読み取りは公開CSVエンドポイント経由なので、認証情報は要りません（シートが
 「リンクを知っている全員が閲覧可」であればよい）。書き込みは人が行います。
 
+#### サイトの確認マーク（claim_status.csv）
+
+サイトの文末には、その記述を人が一次資料と照合済みかどうかのマークが付きます
+（緑のチェック＝照合済み、灰色の「i」＝まだ）。照合済みかどうかはシートの
+`checked` / `checked_on` によります。`update-claim-status.yml` が6時間ごとに
+`python scripts/sync_claims.py export-status` を実行し、この2列だけを
+`data/claim_status.csv` に写します（氏名とメモは写しません）。
+
+マークの付け方:
+
+- `docs/index.html` の文末に `<sup class="fc" data-claim="c101"></sup>` を置く。
+  複数の主張にまたがる文は `data-claim="c214 c215"` のように並べる（すべて照合済みのときだけ緑）
+- `docs/app.js` が組み立てる文は `fc("c101")` を添える。年表やケージフリーの推計表は
+  各データCSVの `claim_id` 列から付く
+- 台帳にまだ無い記述は `data-claim=""`（`fc("")`）にする。灰色のマークになり、
+  吹き出しに「台帳に載っていない」と出る
+
+主張の文言を直したら、シートでその行の `checked` を外して確認し直してもらいます
+（文言が変わっても、シートの「確認済み」はそのまま残るため）。
+
 > **注意** `scripts/make_sheet_workbook.py` が生成するブックに `claim` タブは
 > 含まれません。既存のシートに「スプレッドシートを置換する」でインポートすると
 > 台帳ごと消えます。既存シートを更新するときは「新しいシートを挿入する」を

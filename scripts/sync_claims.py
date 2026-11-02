@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """主張の台帳（claim タブ）とリポジトリの間を往復させる。
 
-    python scripts/sync_claims.py status   # シートの進捗を表示（氏名は伏せる）
-    python scripts/sync_claims.py build    # 取り込み用CSVを作る
+    python scripts/sync_claims.py status         # シートの進捗を表示（氏名は伏せる）
+    python scripts/sync_claims.py build          # 取り込み用CSVを作る
+    python scripts/sync_claims.py export-status  # 確認済みかどうかを data/claim_status.csv に書く
 
 なぜ2か所に分かれているか
 --------------------------
@@ -17,6 +18,9 @@
 検証の記入はシート側にだけ置く。build は両者を突き合わせて、
 ボランティアの記入を保ったまま定義を最新にしたCSVを書き出す。
 
+例外として、サイトに「人が確認済み」のマークを出すために、checked と checked_on
+だけは export-status で data/claim_status.csv に写す。氏名（checked_by）とメモは写さない。
+
 シートは「リンクを知っている全員が閲覧可」であればよい（書き込み権限は不要）。
 """
 
@@ -24,6 +28,7 @@ from __future__ import annotations
 
 import csv
 import io
+import re
 import sys
 import urllib.request
 from pathlib import Path
@@ -31,6 +36,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CLAIMS = ROOT / "data" / "claims.csv"
 OUT = ROOT / "build" / "claim-import.csv"
+STATUS = ROOT / "data" / "claim_status.csv"
 
 SHEET_ID = "1apK7BnjQYV4SzgDQ38D3_I10LEsSVJYcshWpsQdL1YQ"
 TAB = "claim"                                   # 単数。シート側のタブ名と一致させる
@@ -110,11 +116,35 @@ def cmd_build() -> None:
     print("「現在のシートを置換する」で取り込む。")
 
 
+def normalize_date(text: str) -> str:
+    """シートの日付（2026/11/02、2026-11-02 0:00:00 など）を YYYY-MM-DD にする。"""
+    m = re.search(r"(\d{4})\D(\d{1,2})\D(\d{1,2})", text or "")
+    return f"{m[1]}-{int(m[2]):02d}-{int(m[3]):02d}" if m else ""
+
+
+def cmd_export_status() -> None:
+    sheet = {r["claim_id"].strip(): r for r in fetch_sheet()}
+    defs = read_definitions()
+    checked = 0
+    with open(STATUS, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow(["claim_id", "checked", "checked_on"])
+        for d in defs:
+            r = sheet.get(d["claim_id"], {})
+            ok = r.get("checked", "").strip().upper() == "TRUE"
+            checked += ok
+            w.writerow([d["claim_id"], "TRUE" if ok else "FALSE",
+                        normalize_date(r.get("checked_on", "")) if ok else ""])
+    print(f"{STATUS} を書き出した（{len(defs)} 件、うち確認済み {checked} 件）。")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "status"
     if cmd == "status":
         cmd_status()
     elif cmd == "build":
         cmd_build()
+    elif cmd == "export-status":
+        cmd_export_status()
     else:
         sys.exit(__doc__)
