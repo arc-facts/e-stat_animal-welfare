@@ -2,7 +2,7 @@
 """主張の台帳（claim タブ）とリポジトリの間を往復させる。
 
     python scripts/sync_claims.py status   # シートの進捗を表示（氏名は伏せる）
-    python scripts/sync_claims.py build    # 取り込み用CSVを作る
+    python scripts/sync_claims.py build    # 取り込み用CSVとxlsxを作る
 
 なぜ2か所に分かれているか
 --------------------------
@@ -31,6 +31,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CLAIMS = ROOT / "data" / "claims.csv"
 OUT = ROOT / "build" / "claim-import.csv"
+OUT_XLSX = ROOT / "build" / "claim-import.xlsx"
 
 SHEET_ID = "1apK7BnjQYV4SzgDQ38D3_I10LEsSVJYcshWpsQdL1YQ"
 TAB = "claim"                                   # 単数。シート側のタブ名と一致させる
@@ -100,8 +101,26 @@ def cmd_build() -> None:
                 kept += 1
             w.writerow(row)
 
+    # Google Sheets はCSVのインポートを「現在、このファイルをインポートできません」と
+    # 弾くことがある（内容に問題がなくても出る）。xlsx は同じ内容でも通るので、常に両方作る。
+    try:
+        from openpyxl import Workbook
+        wb = Workbook(); ws = wb.active; ws.title = "claim"
+        with open(OUT, encoding="utf-8") as f:
+            for i, row in enumerate(csv.reader(f), start=1):
+                for j, v in enumerate(row, start=1):
+                    if i > 1 and v in ("TRUE", "FALSE"):
+                        v = (v == "TRUE")
+                    ws.cell(row=i, column=j, value=v)
+        ws.freeze_panes = "A2"
+        wb.save(OUT_XLSX)
+        xlsx_note = f"{OUT_XLSX} も書き出した（CSVが弾かれたときはこちらを使う）。"
+    except ImportError:
+        xlsx_note = "openpyxl が無いため xlsx は作っていない（pip install openpyxl）。"
+
     dropped = set(sheet) - {d["claim_id"] for d in defs}
     print(f"{OUT} を書き出した（{len(defs)} 件、うち確認済み {kept} 件を保持）。")
+    print(xlsx_note)
     if dropped:
         print(f"※ シートにあってリポジトリに無い {len(dropped)} 件は落ちる: "
               f"{', '.join(sorted(dropped))}")
