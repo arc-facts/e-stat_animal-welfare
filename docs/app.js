@@ -136,7 +136,8 @@
         }
         html += '<li class="fc--' + (c.checked ? "ok" : "wait") + '"><span class="fc-pop-claim">' +
           FC_ICON[c.checked ? "ok" : "wait"] + esc(c.claim) + '</span><span class="fc-pop-meta">' +
-          id + "・" + when + "・" + src + "</span></li>";
+          id + "・" + when + "・" + src + "</span>" +
+          (c.location ? '<span class="fc-pop-meta">確認箇所: ' + esc(c.location) + "</span>" : "") + "</li>";
       });
       html += "</ul>";
     }

@@ -141,7 +141,7 @@ API から取れない年と系列（採卵鶏・豚の2020年以降、ブロイ
 
 | | 列 | 書く人 | 置き場所 |
 |---|---|---|---|
-| 定義 | `claim_id` `section` `kind` `claim` `source_id` `source_text` `source_url` `derived_from` | サイトを直す人 | このCSV |
+| 定義 | `claim_id` `section` `kind` `claim` `source_id` `location` `source_text` `source_url` `derived_from` | サイトを直す人 | このCSV |
 | 検証 | `checked` `checked_by` `checked_on` `memo` | ボランティア | スプレッドシートの `claim` タブ |
 
 `checked_by` には協力者の氏名が入るため、**検証側の列はリポジトリに置きません**。
@@ -155,7 +155,8 @@ API から取れない年と系列（採卵鶏・豚の2020年以降、ブロイ
 | `kind` | `事実`（出典で確かめる）/ `計算`（本サイトが他の主張から計算）/ `方法`（本サイトの推計方法などの断り書き） |
 | `claim` | 主張を1文で |
 | `source_id` | 出典の ID。`sources.csv` の `source_id` |
-| `source_text` / `source_url` | 根拠の引用・確認箇所と、該当箇所に直接着くURL |
+| `location` | 確認箇所。資料の中のどこを見ればよいか（ページ・表・行・注など）。`計算` の行は材料の行で計算を確かめる旨 |
+| `source_text` / `source_url` | 根拠の引用と、該当箇所に直接着くURL |
 | `derived_from` | `計算` の材料にした主張の ID（空白区切り） |
 | `checked` | 確認できたら `TRUE` |
 | `checked_by` / `checked_on` | 誰がいつ確認したか |
@@ -164,9 +165,9 @@ API から取れない年と系列（採卵鶏・豚の2020年以降、ブロイ
 ### sources.csv — 出典の一覧
 
 `source_id` `title` `url`（該当箇所への飛び先を除いた資料そのもののURL）。
-`sync_claims.py build` は、出典ごとにその資料で確かめる主張を並べた `source` タブ用の
-CSV（`build/source-import.csv`）も作ります。同じ資料に複数の主張がぶら下がっているときに、
-資料を1回開けば全部を確かめられるようにするためです。
+`sync_claims.py build` は、確認の作業用に `source` タブ用のCSV（`build/source-import.csv`）も作ります。
+**主張1件につき1行**で、「主張 → 資料名 → 確認箇所 → リンク」の順に並べます。同じ資料でも
+主張ごとに見る箇所が違うので、資料単位にはまとめません。
 
 `kind` が `事実` で `source_url` が空欄の行は、まだ原典を特定できていない主張です。
 
@@ -176,7 +177,7 @@ CSV（`build/source-import.csv`）も作ります。同じ資料に複数の主�
   一覧ページ（`files?tclass=…`）は数十件が並ぶので使わない。DB の表は `https://www.e-stat.go.jp/dbview?sid=<10桁>`
 - PDF: 末尾に `#page=<PDFのページ番号>`
 - HTML: 末尾に `#:~:text=<該当文をURLエンコードしたもの>`（対応ブラウザでその文までスクロールしハイライトされる）
-- ファイルの中のどこを見るか（行・列・表番号）は `source_text` の「確認箇所：」に書く
+- ファイルの中のどこを見るか（ページ・表・行・注など）は `location` 列に書く
 
 #### 往復のしかた
 

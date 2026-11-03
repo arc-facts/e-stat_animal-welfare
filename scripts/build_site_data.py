@@ -261,6 +261,8 @@ def read_claims() -> dict[str, dict]:
                 rec["source_url"] = r["source_url"].strip()
             if titles.get(r.get("source_id", "")):
                 rec["source_title"] = titles[r["source_id"]]
+            if r.get("location") and rec["kind"] == "事実":
+                rec["location"] = r["location"]
             if (r.get("derived_from") or "").split():
                 rec["derived_from"] = r["derived_from"].split()
             if rec["checked"] and st.get("checked_on"):

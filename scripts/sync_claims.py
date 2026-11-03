@@ -49,7 +49,9 @@ GVIZ = ("https://docs.google.com/spreadsheets/d/{id}"
         "/gviz/tq?tqx=out:csv&sheet={tab}")
 
 DEFINITION = ["claim_id", "section", "kind", "claim", "source_id", "source_title",
-              "source_text", "source_url", "derived_from"]
+              "location", "source_text", "source_url", "derived_from"]
+# source タブ: 主張1件につき1行。確認の流れ（主張を見る→リンクを開く→確認箇所を見る）の順に並べる
+SOURCE_TAB = ["claim_id", "claim", "source_title", "location", "source_url", "kind", "derived_from"]
 VERIFICATION = ["checked", "checked_by", "checked_on", "memo"]
 ALL = DEFINITION + VERIFICATION
 
@@ -91,17 +93,22 @@ def merge(sheet: dict[str, dict], defs: list[dict]) -> list[dict]:
 
 
 def write_source_tab(defs: list[dict]) -> None:
-    """出典ごとに、その資料で確かめる主張を並べた source タブ用のCSV。"""
-    by: dict[str, list[str]] = {}
-    for d in defs:
-        if d.get("source_id"):
-            by.setdefault(d["source_id"], []).append(d["claim_id"])
+    """source タブ用のCSV。主張1件につき1行で、その主張を確かめる資料・確認箇所・リンクを並べる。
+
+    同じ資料でも主張ごとに見る箇所が違うので、資料単位にはまとめない。
+    """
     with open(OUT_SOURCES, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f, lineterminator="\n")
-        w.writerow(["source_id", "title", "url", "claim_count", "claim_ids"])
-        for s in read_sources():
-            ids = by.get(s["source_id"], [])
-            w.writerow([s["source_id"], s["title"], s["url"], len(ids), " ".join(ids)])
+        w = csv.DictWriter(f, fieldnames=SOURCE_TAB, lineterminator="\n", extrasaction="ignore")
+        w.writeheader()
+        for d in defs:
+            row = {k: d.get(k, "") for k in SOURCE_TAB}
+            if d.get("kind") == "計算":
+                row["source_title"] = "本サイトの計算"
+            elif d.get("kind") == "方法":
+                row["source_title"] = "本サイトの推計方法"
+            elif not d.get("source_url"):
+                row["source_title"] = "出典未特定"
+            w.writerow(row)
 
 
 def cmd_status() -> None:
@@ -167,7 +174,7 @@ def cmd_build() -> None:
 
     dropped = set(sheet) - {d["claim_id"] for d in defs}
     print(f"{OUT} を書き出した（{len(defs)} 件、うち確認済み {kept} 件を保持）。")
-    print(f"{OUT_SOURCES} を書き出した（出典 {len(read_sources())} 件）。")
+    print(f"{OUT_SOURCES} を書き出した（{len(defs)} 件）。")
     print(xlsx_note)
     if dropped:
         print(f"※ シートにあってリポジトリに無い {len(dropped)} 件は落ちる: "
