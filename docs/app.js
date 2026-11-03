@@ -42,6 +42,132 @@
     });
   }
 
+  /* ---------- 文末の確認マーク ----------
+     <sup class="fc" data-claim="c101 c102"> に、主張の台帳（claims）を見て
+     人が出典と照合済みかどうかのマークを入れる。台帳は1行＝1つの主張と1つの出典で、
+     本サイトの計算による主張は derived_from に材料の主張を持つ。複数の主張にまたがる文や
+     計算の主張は、材料まで含めてすべて照合済みのときだけ「済み」とする。
+     台帳に無い記述は data-claim を空にし、「まだ」として扱う。押すと主張と出典を吹き出しで示す。 */
+  function fc(ids) { return '<sup class="fc" data-claim="' + esc(ids || "") + '"></sup>'; }
+  var FC_ICON = {
+    ok: '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="7.3"/>' +
+      '<path d="M4.7 8.2l2.2 2.2 4.4-4.6"/></svg>',
+    wait: '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.7"/>' +
+      '<circle class="dot" cx="8" cy="4.8" r="1.05"/><path d="M8 7.1v4.6"/></svg>'
+  };
+  var FC_LABEL = { ok: "人が出典と照合済み", wait: "人による出典の照合はまだです" };
+  function fmtDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
+    return m ? (+m[1]) + "年" + (+m[2]) + "月" + (+m[3]) + "日" : "";
+  }
+  function fcIds(el) {
+    var claims = (DATA && DATA.claims) || {};
+    return (el.getAttribute("data-claim") || "").split(/\s+/).filter(function (id) { return claims[id]; });
+  }
+  // 計算の主張は材料までたどって、確認が要る主張をすべて集める
+  function fcAll(ids) {
+    var claims = DATA.claims, seen = {}, out = [];
+    (function walk(list) {
+      list.forEach(function (id) {
+        if (seen[id] || !claims[id]) return;
+        seen[id] = true;
+        out.push(id);
+        walk(claims[id].derived_from || []);
+      });
+    })(ids);
+    return out;
+  }
+  function fcState(ids) {
+    var claims = DATA.claims;
+    return ids.length && fcAll(ids).every(function (id) { return claims[id].checked; }) ? "ok" : "wait";
+  }
+  function markClaims() {
+    Array.prototype.forEach.call(document.querySelectorAll("sup.fc"), function (sup) {
+      if (sup.firstChild) return;
+      var st = fcState(fcIds(sup));
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "fc-btn fc--" + st;
+      b.setAttribute("aria-label", FC_LABEL[st] + "（詳しく見る）");
+      b.setAttribute("aria-expanded", "false");
+      b.innerHTML = FC_ICON[st];
+      sup.appendChild(b);
+    });
+  }
+
+  var fcPop = null, fcFrom = null;
+  function closeFc(refocus) {
+    if (fcPop) fcPop.hidden = true;
+    if (fcFrom) {
+      fcFrom.setAttribute("aria-expanded", "false");
+      if (refocus) fcFrom.focus();
+      fcFrom = null;
+    }
+  }
+  function openFc(btn) {
+    var claims = DATA.claims, ids = fcIds(btn.parentNode), st = fcState(ids);
+    if (!fcPop) {
+      fcPop = document.createElement("div");
+      fcPop.className = "fc-pop";
+      fcPop.setAttribute("role", "dialog");
+      fcPop.setAttribute("aria-label", "この記述の確認状況");
+      document.body.appendChild(fcPop);
+    }
+    var html = '<p class="fc-pop-head fc--' + st + '">' + FC_ICON[st] + FC_LABEL[st] + "</p>";
+    if (!ids.length) {
+      html += '<p class="fc-pop-lead">この記述は、まだ確認用の台帳に載っていません。</p>';
+    } else {
+      html += '<p class="fc-pop-lead">' + (st === "ok"
+        ? "ボランティアが一次資料と照らし合わせて確認しました。"
+        : "人がまだ一次資料と照らし合わせていない主張が含まれています。") + "</p><ul>";
+      fcAll(ids).forEach(function (id) {
+        var c = claims[id];
+        var when = c.checked ? (fmtDate(c.checked_on) ? fmtDate(c.checked_on) + "に照合" : "照合済み") : "未照合";
+        var src;
+        if (c.kind === "計算") {
+          src = "本サイトの計算（材料: " + esc((c.derived_from || []).join("・")) + "）";
+        } else if (c.kind === "方法") {
+          src = "本サイトの推計方法";
+        } else if (c.source_url) {
+          src = '<a href="' + esc(c.source_url) + '" target="_blank" rel="noopener">' +
+            esc(c.source_title || "出典を開く") + "</a>";
+        } else {
+          src = "出典未特定";
+        }
+        html += '<li class="fc--' + (c.checked ? "ok" : "wait") + '"><span class="fc-pop-claim">' +
+          FC_ICON[c.checked ? "ok" : "wait"] + esc(c.claim) + '</span><span class="fc-pop-meta">' +
+          id + "・" + when + "・" + src + "</span></li>";
+      });
+      html += "</ul>";
+    }
+    fcPop.innerHTML = html;
+    fcPop.hidden = false;
+    var r = btn.getBoundingClientRect();
+    var pw = Math.min(360, document.documentElement.clientWidth - 32);
+    fcPop.style.width = pw + "px";
+    var left = Math.min(Math.max(16, r.left + r.width / 2 - pw / 2), document.documentElement.clientWidth - pw - 16);
+    var h = fcPop.offsetHeight, top = r.bottom + 8;
+    if (top + h > window.innerHeight - 8 && r.top - 8 - h > 8) top = r.top - 8 - h;
+    fcPop.style.left = (left + window.scrollX) + "px";
+    fcPop.style.top = (top + window.scrollY) + "px";
+    btn.setAttribute("aria-expanded", "true");
+    fcFrom = btn;
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".fc-btn");
+    if (b) {
+      e.preventDefault();
+      if (fcFrom === b) { closeFc(); return; }
+      closeFc();
+      openFc(b);
+      return;
+    }
+    if (fcPop && !fcPop.hidden && !fcPop.contains(e.target)) closeFc();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && fcPop && !fcPop.hidden) closeFc(true);
+  });
+
   /* ---------- 数値フォーマット（値は「千」単位で持っている） ---------- */
   function fmtCount(thousand, unit) { // unit: "羽","頭","人"
     var n = thousand * 1000;
@@ -335,7 +461,7 @@
       '<div class="label">' + (opts.color ? '<span class="key" style="background:' + opts.color + '"></span>' : "") +
       opts.label + "</div>" +
       '<div class="value">' + opts.value + "</div>" +
-      '<div class="sub">' + (opts.sub || "") + "</div>";
+      '<div class="sub">' + (opts.sub || "") + (opts.claim ? fc(opts.claim) : "") + "</div>";
     parent.appendChild(d);
   }
 
@@ -504,15 +630,16 @@
           : "約" + fmtPlain(Math.round(ratio)) + "倍";
         note = "社会的な関心が集まる犬猫の殺処分（" + fmtCount(dc[1] / 1000, "頭") + "・" + dc[0] +
           "年度）に対し、ブロイラー1種だけでその" + ratioTxt +
-          "が1年間に殺されています。面積比では図に描ける幅がないため、引き出し線で位置だけを示しました。";
+          "が1年間に殺されています。" + fc("c102 c106") +
+          "面積比では図に描ける幅がないため、引き出し線で位置だけを示しました。";
       } else if (!got.pig) {
         note = "豚のと畜頭数は確報値を取得中のため、集計に含めていません。";
       }
       if (got.estimated) {
         note += (note ? " " : "") + "雄ひよこの殺処分数は公式統計が存在しないため、" +
-          "雌雛（廃鶏として入れ替わる年間羽数）と概ね同数孵化するという前提での概算値です。";
+          "雌雛（廃鶏として入れ替わる年間羽数）と概ね同数孵化するという前提での概算値です。" + fc("c104b c104c");
       }
-      noteEl.textContent = note;
+      noteEl.innerHTML = note;
     }
   }
 
@@ -548,7 +675,8 @@
       card.innerHTML =
         '<div class="label"><span class="key" style="background:' + s.color + '"></span>' + s.name + "</div>" +
         '<div class="fte-bars">' + bar(2010, y0) + bar(2022, y1) + "</div>" +
-        '<div class="sub">1FTE（年間2,080時間）当たり・' + ratio.toFixed(1) + "倍に増加</div>";
+        '<div class="sub">1FTE（年間2,080時間）当たり・' + ratio.toFixed(1) + "倍に増加" +
+        fc(s.key === "layer" ? "c131" : "") + "</div>";
       host.appendChild(card);
     });
   }
@@ -644,7 +772,7 @@
         return "<strong>" + esc(CF_TYPE[t.type] || t.type) + "</strong> " +
           fmtPlain(t.birds) + "羽（" + (t.birds / tTotal * 100).toFixed(1) + "%・" +
           t.farms + "農場）";
-      }).join("、") + "。";
+      }).join("、") + "。" + fc("c204");
     }
 
     /* --- 推計の一覧（数え方が違うことが要点なので表で示す） --- */
@@ -656,7 +784,7 @@
           (a.scope === b.scope ? b.share - a.share : (a.scope === "national" ? -1 : 1));
       }).map(function (e) {
         return "<tr><td>" + esc(CF_SOURCE[e.source] || e.source) + "</td><td>" + e.year + "年</td><td><strong>" +
-          pct(e.share) + "</strong></td><td>" +
+          pct(e.share) + "</strong>" + fc(e.claim_id) + "</td><td>" +
           (e.scope === "sample" ? "調査回答内" : "全国") + "</td><td>" + esc(e.note || "") + "</td></tr>";
       }).join("");
       estHost.innerHTML = '<div class="table-wrap"><table class="datatable">' +
@@ -935,7 +1063,7 @@
     if (jaAvg && bcc) {
       lead = '<p class="breakdown">日本の<strong>平均</strong>は、ベターチキンコミットメントが求める上限の<strong>' +
         (jaAvg.kg_per_m2 / bcc.kg_per_m2).toFixed(2) + "倍</strong>、EUの上限の<strong>" +
-        (jaAvg.kg_per_m2 / 33).toFixed(2) + "倍</strong>です。</p>";
+        (jaAvg.kg_per_m2 / 33).toFixed(2) + "倍</strong>です。" + fc("c404 c405 c407") + "</p>";
     }
     host.innerHTML = svg + '<p class="sub" style="margin-top:8px">単位はkg/m²（1m²あたりの体重の合計）</p>' + lead;
   }
@@ -1076,13 +1204,14 @@
       note.innerHTML = "ひと巻きが1回の妊娠・出産です。初回交配の" + mate + "日齢から" + fi +
         "日ごとに繰り返されます。図は出典のモデルが置いた" + nc + "回で描いており、" +
         "その場合は" + fmtPlain(end) + "日齢（約" + (end / 365).toFixed(1) +
-        "歳）で屠殺されます。最近は4産前後、あるいはそれ以下で淘汰される例も報告されています。" +
+        "歳）で屠殺されます。" + fc("c301 c302") + "最近は4産前後、あるいはそれ以下で淘汰される例も報告されています。" +
+        fc("c307") +
         "繁殖に使われる" + fmtPlain(breeding) + "日のうち、妊娠か授乳にあたる期間が<strong>" +
-        fmtPlain(confined) + "日（" + Math.round(confined / breeding * 100) + "%）</strong>。" +
+        fmtPlain(confined) + "日（" + Math.round(confined / breeding * 100) + "%）</strong>。" + fc("c302") +
         "日本では繁殖用の雌豚にストールを常用している農場が91.6%を占め、授乳期は分娩ストールに入れられるため、" +
-        "この期間の大半で母豚は向きを変えることができません。" +
-        "淘汰された母豚は廃用母豚として食肉になります。" +
-        "豚の寿命は10〜15年とされますが、その3分の1にも満たない年齢です。";
+        "この期間の大半で母豚は向きを変えることができません。" + fc("c303 c304") +
+        "淘汰された母豚は廃用母豚として食肉になります。" + fc("") +
+        "豚の寿命は10〜15年とされますが、その3分の1にも満たない年齢です。" + fc("");
     }
     var sub = document.getElementById("sowlife-sub");
     if (sub) {
@@ -1171,7 +1300,7 @@
         : ' <span class="tl-src tl-src--none">出典未特定</span>';
       list += '<li><span class="tl-day">' + esc(it.day_label) + "</span>" +
         '<div class="tl-body"><b class="tl-event">' + esc(it.event) + "</b>" +
-        '<p class="tl-detail">' + esc(it.detail) + src + "</p></div></li>";
+        '<p class="tl-detail">' + esc(it.detail) + fc(it.claim_id) + src + "</p></div></li>";
     });
     list += "</ol>";
 
@@ -1295,6 +1424,7 @@
   var DATA = null;
 
   function render() {
+    closeFc(); // マークは描画のたびに作り直されるので、開いている吹き出しは閉じる
     var d = DATA, C = colors();
     var inv = d.inventory, sl = d.slaughter;
 
@@ -1326,7 +1456,7 @@
       "億</span>の鶏と豚が屠殺されています。";
     document.getElementById("hero-caption").innerHTML =
       slYear + "年のブロイラー・廃鶏（採卵鶏）・豚の処理数の合計。日本の人口（<span class=\"nw\">" +
-      fmtCount(pop, "人") + "</span>）の<span class=\"nw\">約" + ratio.toFixed(1) + "倍</span>にあたります。";
+      fmtCount(pop, "人") + "</span>）の<span class=\"nw\">約" + ratio.toFixed(1) + "倍</span>にあたります。" + fc("c101");
 
     /* 飼養数チャート — 鶏（羽）と豚（頭）は単位・規模が大きく異なるため別グラフに
        分ける。軸・ツールチップは実数（1羽・1頭・1人単位）で表記してスケールを
@@ -1405,18 +1535,21 @@
     var pt = document.getElementById("perfarm-tiles");
     pt.innerHTML = "";
     [
-      { name: "採卵鶏", color: C.layers, series: pf.layers, unit: "羽" },
-      { name: "ブロイラー", color: C.broilers, series: pf.broilers, unit: "羽" },
-      { name: "豚", color: C.pigs, series: pf.pigs, unit: "頭" }
+      { name: "採卵鶏", color: C.layers, series: pf.layers, unit: "羽", claim: "c121" },
+      { name: "ブロイラー", color: C.broilers, series: pf.broilers, unit: "羽", claim: "c122" },
+      { name: "豚", color: C.pigs, series: pf.pigs, unit: "頭", claim: "c123" }
     ].forEach(function (s) {
       if (!s.series.length) return;
       var lp = last(s.series), base = s.series[0];
       tile(pt, {
         label: s.name + " 1戸当たり", color: s.color,
         value: fmtPlain(lp[1]) + s.unit,
-        sub: lp[0] + "年・" + base[0] + "年の" + (lp[1] / base[1]).toFixed(1) + "倍"
+        sub: lp[0] + "年・" + base[0] + "年の" + (lp[1] / base[1]).toFixed(1) + "倍",
+        claim: s.claim
       });
     });
+
+    markClaims();
   }
 
   /* data.json は index.html ではなく JS から読むため、公開時に style.css / app.js へ

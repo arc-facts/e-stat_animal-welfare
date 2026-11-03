@@ -75,8 +75,8 @@ def read_fte() -> dict[str, dict[int, dict[str, float]]]:
 
 
 def with_source(rec: dict, row: dict) -> dict:
-    """出典の引用と URL をレコードに添える（空欄なら付けない）。"""
-    for key in ("source_text", "source_url"):
+    """出典の引用と URL、主張IDをレコードに添える（空欄なら付けない）。"""
+    for key in ("source_text", "source_url", "claim_id"):
         if row.get(key):
             rec[key] = row[key].strip()
     return rec
@@ -232,6 +232,43 @@ def read_sow_cycle() -> dict[str, float]:
     return out
 
 
+def read_claims() -> dict[str, dict]:
+    """主張の台帳と、人による確認の状態。
+
+    1行は1つの主張と1つの出典。kind が「計算」の主張は derived_from に材料を持つ。
+    サイトの文末マーク（人が確認済みか）とその吹き出しに使う。確認状態は
+    sync_claims.py export-status がシートから写した data/claim_status.csv による。
+    氏名は持たない。
+    """
+    status: dict[str, dict] = {}
+    status_path = DATA_DIR / "claim_status.csv"
+    if status_path.exists():
+        with open(status_path, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                status[r["claim_id"]] = r
+    titles: dict[str, str] = {}
+    sources_path = DATA_DIR / "sources.csv"
+    if sources_path.exists():
+        with open(sources_path, newline="", encoding="utf-8") as f:
+            titles = {r["source_id"]: r["title"] for r in csv.DictReader(f)}
+    out: dict[str, dict] = {}
+    with open(DATA_DIR / "claims.csv", newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            st = status.get(r["claim_id"], {})
+            rec = {"claim": r["claim"], "kind": r.get("kind") or "事実",
+                   "checked": st.get("checked", "").upper() == "TRUE"}
+            if r.get("source_url"):
+                rec["source_url"] = r["source_url"].strip()
+            if titles.get(r.get("source_id", "")):
+                rec["source_title"] = titles[r["source_id"]]
+            if (r.get("derived_from") or "").split():
+                rec["derived_from"] = r["derived_from"].split()
+            if rec["checked"] and st.get("checked_on"):
+                rec["checked_on"] = st["checked_on"]
+            out[r["claim_id"]] = rec
+    return out
+
+
 def total_series(table: dict[int, dict[str, float]]) -> list[list[float]]:
     """犬猫殺処分の合計系列。total 列があればそれを、無ければ dogs+cats を使う。"""
     out = []
@@ -308,6 +345,8 @@ def main() -> None:
         "hen_timeline": read_rows("hen_timeline.csv", ints=("day",)),
         "broiler_timeline": read_rows("broiler_timeline.csv", ints=("day",)),
         "broiler_growth": read_rows("broiler_growth.csv", ints=("day", "body_weight_g", "strain")),
+        # 主張の台帳と人による確認の状態（文末のマーク用）
+        "claims": read_claims(),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
