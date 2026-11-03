@@ -979,6 +979,8 @@ sup.fc {
   margin: 0 0 2px; font-weight: 700;
 }
 .fc-pop-lead { margin: 0 0 6px; color: var(--ink-2); }
+.fc-pop-stmt { margin: 0 0 6px; font-size: 0.92em; color: var(--ink-2); }
+.fc-pop-stmt svg { display: inline-block; width: 1em; height: 1em; vertical-align: -0.15em; margin-right: 0.35em; }
 .fc-pop ul { margin: 0; padding: 0; list-style: none; }
 .fc-pop li { padding: 6px 0 4px; border-top: 1px solid var(--rule); }
 .fc-pop-claim { display: block; }

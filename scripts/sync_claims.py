@@ -2,8 +2,20 @@
 """主張の台帳（claim タブ）とリポジトリの間を往復させる。
 
     python scripts/sync_claims.py status         # シートの進捗を表示（氏名は伏せる）
-    python scripts/sync_claims.py build          # 取り込み用CSV（claim・source タブ）とxlsxを作る
-    python scripts/sync_claims.py export-status  # 確認済みかどうかを data/claim_status.csv に書く
+    python scripts/sync_claims.py build          # 取り込み用CSV（claim・statement タブ）とxlsxを作る
+    python scripts/sync_claims.py export-status  # 確認済みかどうかを data/claim_status.csv と
+                                                 # data/statement_status.csv に書く
+
+シートの2つのタブ
+-----------------
+  claim      1行＝1つの主張と1つの出典。「主張 → 資料名 → 確認箇所 → リンク → チェック」の順。
+             ボランティアはリンクを開き、確認箇所で主張が支持されるかを確かめる。
+  statement  1行＝サイト上の1つの記述（文末マーク1つ）。data/statements.csv から作る
+             （scripts/extract_statements.mjs がサイトを描画して書き出す）。
+             並んだ主張だけで、その記述が言えるか（言い過ぎや、主張にない数字がないか）を確かめる。
+
+サイトのマークは、記述のチェックと、そこに並ぶ主張すべて（計算の主張は材料まで）の
+チェックがそろったときだけ緑になる。
 
 なぜ2か所に分かれているか
 --------------------------
@@ -21,7 +33,11 @@
 ボランティアの記入を保ったまま定義を最新にしたCSVを書き出す。
 
 例外として、サイトに「人が確認済み」のマークを出すために、checked と checked_on
-だけは export-status で data/claim_status.csv に写す。氏名（checked_by）とメモは写さない。
+だけは export-status で data/claim_status.csv（主張）と data/statement_status.csv（記述）に
+写す。氏名（checked_by）とメモは写さない。
+
+主張や記述の文面が変わったら、前のチェックは新しい文面には当てはまらないので、
+build はその行の checked / checked_by / checked_on を空に戻す（memo は残す）。
 
 シートは「リンクを知っている全員が閲覧可」であればよい（書き込み権限は不要）。
 """
@@ -39,30 +55,53 @@ ROOT = Path(__file__).resolve().parent.parent
 CLAIMS = ROOT / "data" / "claims.csv"
 SOURCES = ROOT / "data" / "sources.csv"
 OUT = ROOT / "build" / "claim-import.csv"
-OUT_SOURCES = ROOT / "build" / "source-import.csv"
+OUT_STATEMENTS = ROOT / "build" / "statement-import.csv"
 OUT_XLSX = ROOT / "build" / "claim-import.xlsx"
 STATUS = ROOT / "data" / "claim_status.csv"
+STATEMENTS = ROOT / "data" / "statements.csv"
+STATEMENT_STATUS = ROOT / "data" / "statement_status.csv"
 
 SHEET_ID = "1apK7BnjQYV4SzgDQ38D3_I10LEsSVJYcshWpsQdL1YQ"
 TAB = "claim"                                   # 単数。シート側のタブ名と一致させる
+STATEMENT_TAB = "statement"
 GVIZ = ("https://docs.google.com/spreadsheets/d/{id}"
         "/gviz/tq?tqx=out:csv&sheet={tab}")
 
 DEFINITION = ["claim_id", "section", "kind", "claim", "source_id", "source_title",
               "location", "source_text", "source_url", "derived_from"]
-# source タブ: 主張1件につき1行。確認の流れ（主張を見る→リンクを開く→確認箇所を見る）の順に並べる
-SOURCE_TAB = ["claim_id", "claim", "source_title", "location", "source_url", "kind", "derived_from"]
 VERIFICATION = ["checked", "checked_by", "checked_on", "memo"]
-ALL = DEFINITION + VERIFICATION
+# claim タブの列の並び。確認の流れ（主張を見る→資料名→確認箇所→リンクを開く→チェック）の順で、
+# 確認に使わない列は右に寄せる
+CLAIM_TAB = (["claim_id", "claim", "source_title", "location", "source_url"] + VERIFICATION
+             + ["kind", "derived_from", "section", "source_id", "source_text"])
+# statement タブ: 記述1件につき1行。記述の文面の横に、含まれる主張の文面を並べる
+STATEMENT_DEF = ["statement_id", "section", "heading", "text", "claim_ids", "claims"]
+STATEMENT_TAB_COLS = ["statement_id", "text", "claims"] + VERIFICATION + ["claim_ids", "section", "heading"]
+
+
+def fetch_tab(tab: str, key: str) -> list[dict] | None:
+    """シートの1タブを読む。タブが無ければ None。
+
+    gviz は存在しないタブ名を指定すると先頭のタブを返すので、見出しの1列目で見分ける。
+    """
+    url = GVIZ.format(id=SHEET_ID, tab=tab)
+    with urllib.request.urlopen(url, timeout=60) as r:
+        body = r.read().decode("utf-8")
+    if not body.lstrip().startswith(f'"{key}"'):
+        return None
+    return list(csv.DictReader(io.StringIO(body)))
 
 
 def fetch_sheet() -> list[dict]:
-    url = GVIZ.format(id=SHEET_ID, tab=TAB)
-    with urllib.request.urlopen(url, timeout=60) as r:
-        body = r.read().decode("utf-8")
-    if not body.lstrip().startswith('"claim_id"'):
+    rows = fetch_tab(TAB, "claim_id")
+    if rows is None:
         sys.exit(f"claim タブを読めなかった。タブ名（{TAB}）と共有設定を確認する。")
-    return list(csv.DictReader(io.StringIO(body)))
+    return rows
+
+
+def fetch_statements() -> list[dict]:
+    """statement タブ。まだ作っていなければ空として扱う。"""
+    return fetch_tab(STATEMENT_TAB, "statement_id") or []
 
 
 def read_sources() -> list[dict]:
@@ -80,35 +119,66 @@ def read_definitions() -> list[dict]:
     return rows
 
 
-def merge(sheet: dict[str, dict], defs: list[dict]) -> list[dict]:
-    """定義を最新にし、検証列（ボランティアの記入）はシートのものを保つ。"""
-    out = []
+def same(a: str, b: str) -> bool:
+    return " ".join((a or "").split()) == " ".join((b or "").split())
+
+
+def merge(sheet: dict[str, dict], defs: list[dict], key: str, fields: list[str],
+          watch: list[str]) -> tuple[list[dict], list[str]]:
+    """定義を最新にし、検証列（ボランティアの記入）はシートのものを保つ。
+
+    watch の列（主張の文面やリンク）がシートの値から変わった行は、チェックを外す。
+    返り値は（行のリスト, チェックを外した行のID）。
+    """
+    out, reset = [], []
     for d in defs:
-        row = {k: d.get(k, "") for k in DEFINITION}
-        prev = sheet.get(d["claim_id"]) or {}
+        row = {k: d.get(k, "") for k in fields}
+        prev = sheet.get(d[key]) or {}
         for k in VERIFICATION:
             row[k] = prev.get(k, "")
+        # シートにまだ無い列（新しく足した列）は比べない
+        changed = prev and any(k in prev and not same(prev[k], d.get(k, "")) for k in watch)
+        if changed and any(row[k].strip() and row[k].strip().upper() != "FALSE"
+                           for k in ("checked", "checked_by", "checked_on")):
+            row.update(checked="FALSE", checked_by="", checked_on="")
+            reset.append(d[key])
         out.append(row)
-    return out
+    return out, reset
 
 
-def write_source_tab(defs: list[dict]) -> None:
-    """source タブ用のCSV。主張1件につき1行で、その主張を確かめる資料・確認箇所・リンクを並べる。
+def claim_rows(defs: list[dict]) -> list[dict]:
+    """claim タブ用に、出典の無い行の資料名を埋める。"""
+    rows = []
+    for d in defs:
+        d = dict(d)
+        if d.get("kind") == "計算":
+            d["source_title"] = "本サイトの計算"
+        elif d.get("kind") == "方法":
+            d["source_title"] = "本サイトの推計方法"
+        elif not d.get("source_url"):
+            d["source_title"] = "出典未特定"
+        rows.append(d)
+    return rows
 
-    同じ資料でも主張ごとに見る箇所が違うので、資料単位にはまとめない。
-    """
-    with open(OUT_SOURCES, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=SOURCE_TAB, lineterminator="\n", extrasaction="ignore")
+
+def read_statements(defs: list[dict]) -> list[dict]:
+    """data/statements.csv に、含まれる主張の文面（claims 列）を添えて返す。"""
+    if not STATEMENTS.exists():
+        sys.exit(f"{STATEMENTS} が無い。node scripts/extract_statements.mjs で作る。")
+    text = {d["claim_id"]: d["claim"] for d in defs}
+    with open(STATEMENTS, encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    for r in rows:
+        ids = r["claim_ids"].split()
+        r["claims"] = "\n".join(f"{i}: {text.get(i, '（台帳に無い）')}" for i in ids) or "（主張なし）"
+    return rows
+
+
+def write_csv(path: Path, cols: list[str], rows: list[dict]) -> None:
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=cols, lineterminator="\n", extrasaction="ignore")
         w.writeheader()
-        for d in defs:
-            row = {k: d.get(k, "") for k in SOURCE_TAB}
-            if d.get("kind") == "計算":
-                row["source_title"] = "本サイトの計算"
-            elif d.get("kind") == "方法":
-                row["source_title"] = "本サイトの推計方法"
-            elif not d.get("source_url"):
-                row["source_title"] = "出典未特定"
-            w.writerow(row)
+        w.writerows(rows)
 
 
 def cmd_status() -> None:
@@ -134,54 +204,78 @@ def cmd_status() -> None:
         print(f"\nmemo の記入 {len(memos)} 件:")
         for r in memos:
             print(f"  [{r['claim_id']}] {r['memo'][:70]}")
+
+    st = fetch_statements()
+    if st:
+        st_ok = sum(r["checked"].strip().upper() == "TRUE" for r in st)
+        print(f"\n記述 {len(st)} 件、うち確認済み {st_ok} 件")
+        for r in st:
+            if r.get("memo", "").strip():
+                print(f"  [{r['statement_id']}] {r['memo'][:70]}")
+    else:
+        print("\nstatement タブはまだ無い。")
     # checked_by は表示しない（このスクリプトの出力がログに残るため）
 
 
 def cmd_build() -> None:
     sheet = {r["claim_id"]: r for r in fetch_sheet()}
+    st_sheet = {r["statement_id"]: r for r in fetch_statements()}
     defs = read_definitions()
+    stmts = read_statements(defs)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    rows = merge(sheet, defs)
-    kept = sum(r["checked"].strip().upper() == "TRUE" for r in rows)
-    with open(OUT, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=ALL, lineterminator="\n")
-        w.writeheader()
-        w.writerows(rows)
-    write_source_tab(defs)
+    rows, reset = merge(sheet, claim_rows(defs), "claim_id", CLAIM_TAB,
+                        watch=["claim", "location", "source_url", "derived_from"])
+    st_rows, st_reset = merge(st_sheet, stmts, "statement_id", STATEMENT_TAB_COLS,
+                              watch=["text", "claim_ids"])
+    write_csv(OUT, CLAIM_TAB, rows)
+    write_csv(OUT_STATEMENTS, STATEMENT_TAB_COLS, st_rows)
 
     # Google Sheets はCSVのインポートを「現在、このファイルをインポートできません」と
     # 弾くことがある（内容に問題がなくても出る）。xlsx は同じ内容でも通るので、常に両方作る。
     try:
         from openpyxl import Workbook
-        wb = Workbook(); ws = wb.active; ws.title = "claim"
-        with open(OUT, encoding="utf-8") as f:
-            for i, row in enumerate(csv.reader(f), start=1):
-                for j, v in enumerate(row, start=1):
-                    if i > 1 and v in ("TRUE", "FALSE"):
-                        v = (v == "TRUE")
-                    ws.cell(row=i, column=j, value=v)
-        ws.freeze_panes = "A2"
-        ws2 = wb.create_sheet("source")
-        with open(OUT_SOURCES, encoding="utf-8") as f:
-            for row in csv.reader(f):
-                ws2.append(row)
-        ws2.freeze_panes = "A2"
+        from openpyxl.styles import Alignment, Font
+        wb = Workbook()
+        wb.remove(wb.active)
+        widths = {"claim": 46, "text": 46, "claims": 46, "source_title": 28, "location": 28,
+                  "source_url": 24, "memo": 24, "source_text": 40}
+        for title, cols, data in (("claim", CLAIM_TAB, rows), ("statement", STATEMENT_TAB_COLS, st_rows)):
+            ws = wb.create_sheet(title)
+            ws.append(cols)
+            for r in data:
+                ws.append([(r[k].strip().upper() == "TRUE") if k == "checked" else r.get(k, "")
+                           for k in cols])
+            for j, k in enumerate(cols, start=1):
+                ws.cell(row=1, column=j).font = Font(bold=True)
+                ws.column_dimensions[ws.cell(row=1, column=j).column_letter].width = widths.get(k, 12)
+                if k in ("claim", "text", "claims", "location"):
+                    for i in range(2, len(data) + 2):
+                        ws.cell(row=i, column=j).alignment = Alignment(wrap_text=True, vertical="top")
+            ws.freeze_panes = "B2"
         wb.save(OUT_XLSX)
-        xlsx_note = f"{OUT_XLSX} も書き出した（CSVが弾かれたときはこちらを使う）。"
+        xlsx_note = f"{OUT_XLSX} も書き出した（claim・statement の2タブ。CSVが弾かれたときはこちらを使う）。"
     except ImportError:
         xlsx_note = "openpyxl が無いため xlsx は作っていない（pip install openpyxl）。"
 
-    dropped = set(sheet) - {d["claim_id"] for d in defs}
-    print(f"{OUT} を書き出した（{len(defs)} 件、うち確認済み {kept} 件を保持）。")
-    print(f"{OUT_SOURCES} を書き出した（{len(defs)} 件）。")
+    kept = sum(r["checked"].strip().upper() == "TRUE" for r in rows)
+    st_kept = sum(r["checked"].strip().upper() == "TRUE" for r in st_rows)
+    print(f"{OUT} を書き出した（{len(rows)} 件、うち確認済み {kept} 件を保持）。")
+    print(f"{OUT_STATEMENTS} を書き出した（{len(st_rows)} 件、うち確認済み {st_kept} 件を保持）。")
     print(xlsx_note)
-    if dropped:
-        print(f"※ シートにあってリポジトリに無い {len(dropped)} 件は落ちる: "
-              f"{', '.join(sorted(dropped))}")
-    print("\nスプレッドシートで claim タブの全セルを選択して削除し、")
-    print("A1 を選んで「ファイル → インポート → アップロード」からこのCSVを、")
-    print("「現在のシートを置換する」で取り込む。")
+    if reset:
+        print(f"※ 文面やリンクが変わったためチェックを外した主張: {', '.join(reset)}")
+    if st_reset:
+        print(f"※ 文面や主張が変わったためチェックを外した記述: {', '.join(st_reset)}")
+    for name, old, new in (("主張", sheet, rows), ("記述", st_sheet, st_rows)):
+        key = "claim_id" if name == "主張" else "statement_id"
+        dropped = set(old) - {r[key] for r in new}
+        if dropped:
+            print(f"※ シートにあってリポジトリに無い{name} {len(dropped)} 件は落ちる: "
+                  f"{', '.join(sorted(dropped))}")
+    print("\nスプレッドシートで claim・statement の各タブの全セルを選択して削除し、")
+    print("A1 を選んで「ファイル → インポート → アップロード」から対応するCSVを、")
+    print("「現在のシートを置換する」で取り込む（statement タブが無ければ「新しいシートを挿入」）。")
 
 
 def normalize_date(text: str) -> str:
@@ -190,20 +284,32 @@ def normalize_date(text: str) -> str:
     return f"{m[1]}-{int(m[2]):02d}-{int(m[3]):02d}" if m else ""
 
 
+def write_status(path: Path, key: str, ids: list[str], sheet: dict[str, dict]) -> int:
+    checked = 0
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f, lineterminator="\n")
+        w.writerow([key, "checked", "checked_on"])
+        for i in ids:
+            r = sheet.get(i, {})
+            ok = r.get("checked", "").strip().upper() == "TRUE"
+            checked += ok
+            w.writerow([i, "TRUE" if ok else "FALSE",
+                        normalize_date(r.get("checked_on", "")) if ok else ""])
+    return checked
+
+
 def cmd_export_status() -> None:
     sheet = {r["claim_id"].strip(): r for r in fetch_sheet()}
     defs = read_definitions()
-    checked = 0
-    with open(STATUS, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f, lineterminator="\n")
-        w.writerow(["claim_id", "checked", "checked_on"])
-        for d in defs:
-            r = sheet.get(d["claim_id"], {})
-            ok = r.get("checked", "").strip().upper() == "TRUE"
-            checked += ok
-            w.writerow([d["claim_id"], "TRUE" if ok else "FALSE",
-                        normalize_date(r.get("checked_on", "")) if ok else ""])
-    print(f"{STATUS} を書き出した（{len(defs)} 件、うち確認済み {checked} 件）。")
+    n = write_status(STATUS, "claim_id", [d["claim_id"] for d in defs], sheet)
+    print(f"{STATUS} を書き出した（{len(defs)} 件、うち確認済み {n} 件）。")
+
+    st_sheet = {r["statement_id"].strip(): r for r in fetch_statements()}
+    with open(STATEMENTS, encoding="utf-8") as f:
+        ids = [r["statement_id"] for r in csv.DictReader(f)]
+    n = write_status(STATEMENT_STATUS, "statement_id", ids, st_sheet)
+    note = "" if st_sheet else "（statement タブはまだ無いので、すべて未確認）"
+    print(f"{STATEMENT_STATUS} を書き出した（{len(ids)} 件、うち確認済み {n} 件）{note}。")
 
 
 if __name__ == "__main__":

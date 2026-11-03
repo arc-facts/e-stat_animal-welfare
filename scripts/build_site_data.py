@@ -271,6 +271,32 @@ def read_claims() -> dict[str, dict]:
     return out
 
 
+def read_statements() -> dict[str, dict]:
+    """サイトの記述（文末マーク1つ）ごとの、人による確認の状態。
+
+    記述の一覧は data/statements.csv（scripts/extract_statements.mjs がサイトから作る）、
+    確認状態は sync_claims.py export-status がシートの statement タブから写した
+    data/statement_status.csv による。マークは、記述と含まれる主張すべてが確認済みのときだけ緑。
+    """
+    status: dict[str, dict] = {}
+    status_path = DATA_DIR / "statement_status.csv"
+    if status_path.exists():
+        with open(status_path, newline="", encoding="utf-8") as f:
+            status = {r["statement_id"]: r for r in csv.DictReader(f)}
+    out: dict[str, dict] = {}
+    path = DATA_DIR / "statements.csv"
+    if not path.exists():
+        return out
+    with open(path, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            st = status.get(r["statement_id"], {})
+            rec = {"checked": st.get("checked", "").upper() == "TRUE"}
+            if rec["checked"] and st.get("checked_on"):
+                rec["checked_on"] = st["checked_on"]
+            out[r["statement_id"]] = rec
+    return out
+
+
 def total_series(table: dict[int, dict[str, float]]) -> list[list[float]]:
     """犬猫殺処分の合計系列。total 列があればそれを、無ければ dogs+cats を使う。"""
     out = []
@@ -349,6 +375,7 @@ def main() -> None:
         "broiler_growth": read_rows("broiler_growth.csv", ints=("day", "body_weight_g", "strain")),
         # 主張の台帳と人による確認の状態（文末のマーク用）
         "claims": read_claims(),
+        "statements": read_statements(),
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
