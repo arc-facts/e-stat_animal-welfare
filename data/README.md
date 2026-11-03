@@ -141,7 +141,7 @@ API から取れない年と系列（採卵鶏・豚の2020年以降、ブロイ
 
 | | 列 | 書く人 | 置き場所 |
 |---|---|---|---|
-| 定義 | `claim_id` `section` `kind` `claim` `source_id` `source_text` `source_url` `derived_from` | サイトを直す人 | このCSV |
+| 定義 | `claim_id` `section` `kind` `claim` `source_id` `location` `source_text` `source_url` `derived_from` | サイトを直す人 | このCSV |
 | 検証 | `checked` `checked_by` `checked_on` `memo` | ボランティア | スプレッドシートの `claim` タブ |
 
 `checked_by` には協力者の氏名が入るため、**検証側の列はリポジトリに置きません**。
@@ -155,7 +155,8 @@ API から取れない年と系列（採卵鶏・豚の2020年以降、ブロイ
 | `kind` | `事実`（出典で確かめる）/ `計算`（本サイトが他の主張から計算）/ `方法`（本サイトの推計方法などの断り書き） |
 | `claim` | 主張を1文で |
 | `source_id` | 出典の ID。`sources.csv` の `source_id` |
-| `source_text` / `source_url` | 根拠の引用・確認箇所と、該当箇所に直接着くURL |
+| `location` | 確認箇所。資料の中のどこを見ればよいか（ページ・表・行・注など）。`計算` の行は材料の行で計算を確かめる旨 |
+| `source_text` / `source_url` | 根拠の引用と、該当箇所に直接着くURL |
 | `derived_from` | `計算` の材料にした主張の ID（空白区切り） |
 | `checked` | 確認できたら `TRUE` |
 | `checked_by` / `checked_on` | 誰がいつ確認したか |
@@ -164,9 +165,7 @@ API から取れない年と系列（採卵鶏・豚の2020年以降、ブロイ
 ### sources.csv — 出典の一覧
 
 `source_id` `title` `url`（該当箇所への飛び先を除いた資料そのもののURL）。
-`sync_claims.py build` は、出典ごとにその資料で確かめる主張を並べた `source` タブ用の
-CSV（`build/source-import.csv`）も作ります。同じ資料に複数の主張がぶら下がっているときに、
-資料を1回開けば全部を確かめられるようにするためです。
+シートの `claim` タブでは、`source_id` の代わりにこの `title` を「資料名」（`source_title`）として並べます。
 
 `kind` が `事実` で `source_url` が空欄の行は、まだ原典を特定できていない主張です。
 
@@ -176,44 +175,69 @@ CSV（`build/source-import.csv`）も作ります。同じ資料に複数の主�
   一覧ページ（`files?tclass=…`）は数十件が並ぶので使わない。DB の表は `https://www.e-stat.go.jp/dbview?sid=<10桁>`
 - PDF: 末尾に `#page=<PDFのページ番号>`
 - HTML: 末尾に `#:~:text=<該当文をURLエンコードしたもの>`（対応ブラウザでその文までスクロールしハイライトされる）
-- ファイルの中のどこを見るか（行・列・表番号）は `source_text` の「確認箇所：」に書く
+- ファイルの中のどこを見るか（ページ・表・行・注など）は `location` 列に書く
 
-#### 往復のしかた
+### statements.csv — サイトの記述の一覧（自動生成）
+
+サイト上の文末マーク1つにつき1行。`statement_id` `section` `heading` `text` `claim_ids`。
+`node scripts/extract_statements.mjs` がサイトを描画して書き出します（手で編集しない）。
+`text` はマークの直前の1文（表の行・タイル・年表の項目は、その全体）、`claim_ids` は
+そのマークが根拠にしている主張です。
+
+主張の確認（claim タブ）は「その主張が出典で支持されるか」を見ますが、それだけでは、
+サイトの文が主張より多くを言っていても気づけません（例: 「日本の人口の約6倍にあたる鶏が、
+生後およそ50日で出荷されています」に付いた主張は「生後およそ50日」だけで、「人口の約6倍」を
+支える主張は並んでいない）。statement タブでは、**記述が、並んだ主張だけで言えることを書いているか**
+を確かめます。
+
+### シートとの往復
+
+シートには2つのタブを置きます。
+
+| タブ | 1行 | 列の並び | 確かめること |
+|---|---|---|---|
+| `claim` | 1つの主張と1つの出典 | 主張 → 資料名 → 確認箇所 → リンク → チェック（→ 確認に使わない列） | 主張が出典で支持されるか |
+| `statement` | サイト上の1つの記述 | 記述 → 含まれる主張の文面 → チェック（→ 主張ID・掲載箇所） | 記述が主張どおりか（言い過ぎや、主張にない数字がないか） |
 
 ```
+node scripts/extract_statements.mjs    # サイトの文面やマークを変えたら data/statements.csv を作り直す
 python scripts/sync_claims.py status   # シートの進捗を見る（氏名は表示しない）
-python scripts/sync_claims.py build    # build/claim-import.csv と build/source-import.csv を作る
+python scripts/sync_claims.py build    # build/claim-import.csv・build/statement-import.csv・build/claim-import.xlsx を作る
 ```
 
-`build` はシートの検証列を読み、このCSVの定義と突き合わせて、**ボランティアの
-記入を保ったまま**定義を最新にした取り込み用CSVを書き出します。主張を追加・修正
-したら `build` を実行し、`claim` タブに「現在のシートを置換する」で取り込みます。
+`build` はシートの検証列を読み、リポジトリの定義と突き合わせて、**ボランティアの
+記入を保ったまま**定義を最新にした取り込み用ファイルを書き出します。主張の文面・確認箇所・リンク・
+材料、または記述の文面・含まれる主張が変わった行は、前のチェックが当てはまらないので
+`checked` / `checked_by` / `checked_on` を空に戻します（`memo` は残す）。
+各タブに「現在のシートを置換する」で取り込みます（CSVが弾かれたら xlsx から該当タブをコピーする）。
 
 読み取りは公開CSVエンドポイント経由なので、認証情報は要りません（シートが
 「リンクを知っている全員が閲覧可」であればよい）。書き込みは人が行います。
 
-#### サイトの確認マーク（claim_status.csv）
+#### サイトの確認マーク（claim_status.csv・statement_status.csv）
 
-サイトの文末には、その記述を人が一次資料と照合済みかどうかのマークが付きます
-（緑のチェック＝照合済み、灰色の「i」＝まだ）。照合済みかどうかはシートの
-`checked` / `checked_on` によります。`update-claim-status.yml` が6時間ごとに
-`python scripts/sync_claims.py export-status` を実行し、この2列だけを
-`data/claim_status.csv` に写します（氏名とメモは写しません）。
+サイトの文末には、その記述を人が確認済みかどうかのマークが付きます
+（緑のチェック＝確認済み、灰色の「i」＝まだ）。**緑になるのは、記述のチェックと、
+そこに並ぶ主張すべて（計算の主張は材料まで）のチェックがそろったときだけ**です。
+`update-claim-status.yml` が6時間ごとに `python scripts/sync_claims.py export-status` を実行し、
+`checked` / `checked_on` の2列だけを `data/claim_status.csv`（主張）と
+`data/statement_status.csv`（記述）に写します（氏名とメモは写しません）。
 
 マークの付け方:
 
-- `docs/index.html` の文末に `<sup class="fc" data-claim="c101"></sup>` を置く。
-  複数の主張にまたがる文は `data-claim="c214 c215"` のように並べる（すべて照合済みのときだけ緑）
-- `計算` の主張を指せば、材料の主張までたどって判定する（材料まですべて照合済みで緑）
-- `docs/app.js` が組み立てる文は `fc("c101")` を添える。年表やケージフリーの推計表は
-  各データCSVの `claim_id` 列から付く
-- 台帳にまだ無い記述は `data-claim=""`（`fc("")`）にする。灰色のマークになり、
+- `docs/index.html` の文末に `<sup class="fc" data-claim="c101" data-st="d001"></sup>` を置く。
+  `data-st` は記述ID。新しく置くマークは、使われていない番号（`d078` など）を付ける。
+  文面を直しても ID は変えない（シートの行と対応させるため）
+- 複数の主張にまたがる文は `data-claim="c214 c215"` のように並べる
+- `計算` の主張を指せば、材料の主張までたどって判定する
+- `docs/app.js` が組み立てる文は `fc("c101", "d-hero")` のように記述IDも添える。描画し直しても
+  変わらない固定の文字列にする（年表は `d-<図のID>-<項目のkey>`、推計表は `d-cf-est-<出典>-<年>`）
+- 台帳にまだ無い記述は `data-claim=""`（`fc("", "d-…")`）にする。灰色のマークになり、
   吹き出しに「台帳に載っていない」と出る
+- マークを足したり文面を変えたりしたら、`extract_statements.mjs` → `sync_claims.py build` →
+  シートへの取り込み、の順に進める
 
-主張の文言を直したら、シートでその行の `checked` を外して確認し直してもらいます
-（文言が変わっても、シートの「確認済み」はそのまま残るため）。
-
-> **注意** `scripts/make_sheet_workbook.py` が生成するブックに `claim` タブは
+> **注意** `scripts/make_sheet_workbook.py` が生成するブックに `claim`・`statement` タブは
 > 含まれません。既存のシートに「スプレッドシートを置換する」でインポートすると
 > 台帳ごと消えます。既存シートを更新するときは「新しいシートを挿入する」を
 > 選んでください。

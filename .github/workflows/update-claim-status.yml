@@ -1,6 +1,7 @@
 name: Update claim check status
 
-# スプレッドシート claim タブの checked / checked_on を data/claim_status.csv に写し、
+# スプレッドシート claim・statement タブの checked / checked_on を
+# data/claim_status.csv・data/statement_status.csv に写し、
 # サイトの文末マーク（人が出典と照合済みか）に反映する。氏名とメモは写さない。
 # update-sheets.yml とは独立させる（あちらはタブの列検査で止まることがあるため）。
 
@@ -33,7 +34,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/claim_status.csv docs/data
+          git add data/claim_status.csv data/statement_status.csv docs/data
           if git diff --cached --quiet; then
             echo "変更なし"
           else
