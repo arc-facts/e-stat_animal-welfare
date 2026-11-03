@@ -75,8 +75,12 @@ VERIFICATION = ["checked", "checked_by", "checked_on", "memo"]
 CLAIM_TAB = (["claim_id", "claim", "source_title", "location", "source_url"] + VERIFICATION
              + ["kind", "derived_from", "section", "source_id", "source_text"])
 # statement タブ: 記述1件につき1行。記述の文面の横に、含まれる主張の文面を並べる
-STATEMENT_DEF = ["statement_id", "section", "heading", "text", "claim_ids", "claims"]
-STATEMENT_TAB_COLS = ["statement_id", "text", "claims"] + VERIFICATION + ["claim_ids", "section", "heading"]
+STATEMENT_DEF = ["statement_id", "section", "heading", "text", "claim_ids", "claims", "check_ids"]
+# claims_checked / claims_unchecked は数式の列。claim タブのチェックを読みに行くので、
+# claim タブにチェックを入れると、その場で statement タブの表示も変わる
+STATEMENT_TAB_COLS = (["statement_id", "text", "claims", "claims_checked", "claims_unchecked"]
+                      + VERIFICATION + ["claim_ids", "check_ids", "section", "heading"])
+CLAIM_ROWS = 1000                               # 数式が見る claim タブの行の範囲（2〜この行）
 
 
 def fetch_tab(tab: str, key: str) -> list[dict] | None:
@@ -161,16 +165,60 @@ def claim_rows(defs: list[dict]) -> list[dict]:
     return rows
 
 
+def expand_ids(ids: list[str], derived: dict[str, list[str]]) -> list[str]:
+    """計算の主張を、材料の主張までたどって並べる（サイトの判定と同じ範囲）。"""
+    out: list[str] = []
+    def walk(lst: list[str]) -> None:
+        for i in lst:
+            if i in out:
+                continue
+            out.append(i)
+            walk(derived.get(i, []))
+    walk(ids)
+    return out
+
+
+def col_letter(cols: list[str], name: str) -> str:
+    n, s = cols.index(name) + 1, ""
+    while n:
+        n, r = divmod(n - 1, 26)
+        s = chr(65 + r) + s
+    return s
+
+
+def statement_formulas(row: int, xlsx: bool) -> dict[str, str]:
+    """statement タブの1行分の数式。claim タブの checked を見て、主張の確認状況を出す。
+
+    Google スプレッドシートは xlsx から取り込むと BYROW や SPLIT を解釈できない（#NAME?）ので、
+    どちらの形式でも通る関数だけで書く。check_ids は空白区切りなので、前後に空白を足して探す。
+    xlsx では配列数式として書き、CSV では ARRAYFORMULA で包む。
+    """
+    ids = f"${col_letter(STATEMENT_TAB_COLS, 'check_ids')}{row}"
+    cid = f"claim!${col_letter(CLAIM_TAB, 'claim_id')}$2:${col_letter(CLAIM_TAB, 'claim_id')}${CLAIM_ROWS}"
+    chk = f"claim!${col_letter(CLAIM_TAB, 'checked')}$2:${col_letter(CLAIM_TAB, 'checked')}${CLAIM_ROWS}"
+    hit = f'ISNUMBER(SEARCH(" "&{cid}&" "," "&{ids}&" "))'
+    ok = f"SUMPRODUCT(({chk}=TRUE)*{hit})"
+    n = f'(LEN(TRIM({ids}))-LEN(SUBSTITUTE(TRIM({ids})," ",""))+1)'
+    checked = (f'=IF({ids}="","主張なし",IF({ok}={n},"すべて確認済み（"&{n}&"件）",'
+               f'{ok}&"/"&{n}&" 確認済み"))')
+    join = "_xlfn.TEXTJOIN" if xlsx else "TEXTJOIN"
+    inner = f'{join}(" ",TRUE,IF(({chk}<>TRUE)*{hit},{cid},""))'
+    unchecked = f'=IF({ids}="","",{inner})' if xlsx else f'=IF({ids}="","",ARRAYFORMULA({inner}))'
+    return {"claims_checked": checked, "claims_unchecked": unchecked}
+
+
 def read_statements(defs: list[dict]) -> list[dict]:
-    """data/statements.csv に、含まれる主張の文面（claims 列）を添えて返す。"""
+    """data/statements.csv に、含まれる主張の文面（claims 列）と、材料まで広げた ID（check_ids）を添えて返す。"""
     if not STATEMENTS.exists():
         sys.exit(f"{STATEMENTS} が無い。node scripts/extract_statements.mjs で作る。")
     text = {d["claim_id"]: d["claim"] for d in defs}
+    derived = {d["claim_id"]: (d.get("derived_from") or "").split() for d in defs}
     with open(STATEMENTS, encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     for r in rows:
         ids = r["claim_ids"].split()
         r["claims"] = "\n".join(f"{i}: {text.get(i, '（台帳に無い）')}" for i in ids) or "（主張なし）"
+        r["check_ids"] = " ".join(expand_ids(ids, derived))
     return rows
 
 
@@ -229,23 +277,31 @@ def cmd_build() -> None:
     st_rows, st_reset = merge(st_sheet, stmts, "statement_id", STATEMENT_TAB_COLS,
                               watch=["text", "claim_ids"])
     write_csv(OUT, CLAIM_TAB, rows)
-    write_csv(OUT_STATEMENTS, STATEMENT_TAB_COLS, st_rows)
+    write_csv(OUT_STATEMENTS, STATEMENT_TAB_COLS,
+              [{**r, **statement_formulas(i, xlsx=False)} for i, r in enumerate(st_rows, start=2)])
 
     # Google Sheets はCSVのインポートを「現在、このファイルをインポートできません」と
     # 弾くことがある（内容に問題がなくても出る）。xlsx は同じ内容でも通るので、常に両方作る。
     try:
         from openpyxl import Workbook
         from openpyxl.styles import Alignment, Font
+        from openpyxl.worksheet.formula import ArrayFormula
         wb = Workbook()
         wb.remove(wb.active)
         widths = {"claim": 46, "text": 46, "claims": 46, "source_title": 28, "location": 28,
-                  "source_url": 24, "memo": 24, "source_text": 40}
+                  "source_url": 24, "memo": 24, "source_text": 40,
+                  "claims_checked": 18, "claims_unchecked": 18}
         for title, cols, data in (("claim", CLAIM_TAB, rows), ("statement", STATEMENT_TAB_COLS, st_rows)):
             ws = wb.create_sheet(title)
             ws.append(cols)
-            for r in data:
+            for i, r in enumerate(data, start=2):
                 ws.append([(r[k].strip().upper() == "TRUE") if k == "checked" else r.get(k, "")
                            for k in cols])
+                if title == "statement":
+                    f = statement_formulas(i, xlsx=True)
+                    ws[f"{col_letter(cols, 'claims_checked')}{i}"] = f["claims_checked"]
+                    ref = f"{col_letter(cols, 'claims_unchecked')}{i}"
+                    ws[ref] = ArrayFormula(ref, f["claims_unchecked"])
             for j, k in enumerate(cols, start=1):
                 ws.cell(row=1, column=j).font = Font(bold=True)
                 ws.column_dimensions[ws.cell(row=1, column=j).column_letter].width = widths.get(k, 12)
